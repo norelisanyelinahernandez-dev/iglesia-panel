@@ -1,17 +1,14 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import './Login.css'
-
 export default function Login() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-
   const handle = (e) => setForm({ ...form, [e.target.name]: e.target.value })
-
   const submit = async (e) => {
     e.preventDefault()
     setError('')
@@ -25,23 +22,20 @@ export default function Login() {
       setLoading(false)
     }
   }
-
   return (
     <div className="login-bg">
-      {/* Decorative crosses */}
       <div className="deco-cross cross-1">✛</div>
       <div className="deco-cross cross-2">✛</div>
       <div className="deco-cross cross-3">✛</div>
-
       <div className="login-card fade-in">
         <div className="login-header">
-          <div className="login-logo">🕊️</div>
-          <h1 className="login-title">Sistema Iglesia</h1>
-          <p className="login-sub">Ingresa tus credenciales para continuar</p>
+          <div className="login-logo">
+            <img src="/logo.jpg" alt="Logo" style={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover' }} />
+          </div>
+          <h1 className="login-title">Ministerio San Juan 7:38</h1>
+          <p className="login-sub">Del Semillero 1/11</p>
         </div>
-
         {error && <div className="alert alert-error">{error}</div>}
-
         <form onSubmit={submit} className="login-form">
           <div className="form-group">
             <label className="form-label">Correo electrónico</label>
@@ -71,7 +65,6 @@ export default function Login() {
             {loading ? <><span className="spinner" style={{width:16,height:16}} /> Entrando...</> : 'Iniciar sesión'}
           </button>
         </form>
-
         <div className="login-divider">
           <span>Sistema de Gestión Integral</span>
         </div>

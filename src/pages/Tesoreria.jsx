@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { getIngresos, createIngreso, getGastos, createGasto, getCategoriasIngreso, getCategoriasGasto, getResumenDiezmos } from '../api/client'
+﻿import { useEffect, useState } from 'react'
+import { getIngresos, createIngreso, deleteIngreso, getGastos, createGasto, deleteGasto, getCategoriasIngreso, getCategoriasGasto, getResumenDiezmos } from '../api/client'
 
 const fmt = (n) => new Intl.NumberFormat('es-DO', { style:'currency', currency:'DOP', maximumFractionDigits:0 }).format(n)
 
@@ -26,31 +26,35 @@ export default function Tesoreria() {
   const [diezmos, setDiezmos] = useState([])
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(null)
-  const [formIng, setFormIng] = useState({ categoria_id:'', monto:'', fecha: new Date().toISOString().split('T')[0], descripcion:'' })
+  const [formIng, setFormIng] = useState({ categoria_id:'', monto:'', fecha: new Date().toISOString().split('T')[0], descripcion:'', miembro_id:'' })
   const [formGas, setFormGas] = useState({ categoria_id:'', monto:'', fecha: new Date().toISOString().split('T')[0], descripcion:'', beneficiario:'' })
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
   const anio = new Date().getFullYear()
 
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true)
-      try {
-        const [i, g, ci, cg, d] = await Promise.allSettled([
-          getIngresos({ limit:200 }), getGastos({ limit:200 }),
-          getCategoriasIngreso(), getCategoriasGasto(),
-          getResumenDiezmos(anio)
-        ])
-        if (i.status==='fulfilled') setIngresos(i.value.data)
-        if (g.status==='fulfilled') setGastos(g.value.data)
-        if (ci.status==='fulfilled') setCatIng(ci.value.data)
-        if (cg.status==='fulfilled') setCatGas(cg.value.data)
-        if (d.status==='fulfilled') setDiezmos(d.value.data)
-      } catch(_) {}
-      setLoading(false)
-    }
-    load()
-  }, [])
+  const diezmoDeDiezmo = formIng.monto && catIng.find(c=>c.id===parseInt(formIng.categoria_id))?.nombre === 'Diezmo'
+    ? parseFloat(formIng.monto) * 0.1 : null
+  const diezmoDeOfrenda = formIng.monto && catIng.find(c=>c.id===parseInt(formIng.categoria_id))?.nombre === 'Ofrenda'
+    ? parseFloat(formIng.monto) * 0.1 : null
+
+  const loadData = async () => {
+    setLoading(true)
+    try {
+      const [i, g, ci, cg, d] = await Promise.allSettled([
+        getIngresos({ limit:200 }), getGastos({ limit:200 }),
+        getCategoriasIngreso(), getCategoriasGasto(),
+        getResumenDiezmos(anio)
+      ])
+      if (i.status==='fulfilled') setIngresos(i.value.data)
+      if (g.status==='fulfilled') setGastos(g.value.data)
+      if (ci.status==='fulfilled') setCatIng(ci.value.data)
+      if (cg.status==='fulfilled') setCatGas(cg.value.data)
+      if (d.status==='fulfilled') setDiezmos(d.value.data)
+    } catch(_) {}
+    setLoading(false)
+  }
+
+  useEffect(() => { loadData() }, [])
 
   const totalIng = ingresos.reduce((a,b) => a + parseFloat(b.monto), 0)
   const totalGas = gastos.reduce((a,b) => a + parseFloat(b.monto), 0)
@@ -58,10 +62,12 @@ export default function Tesoreria() {
   const submitIngreso = async (e) => {
     e.preventDefault(); setSaving(true); setError('')
     try {
-      await createIngreso({ ...formIng, categoria_id: parseInt(formIng.categoria_id), monto: parseFloat(formIng.monto) })
-      const { data } = await getIngresos({ limit:200 })
-      setIngresos(data); setModal(null)
-      setFormIng({ categoria_id:'', monto:'', fecha: new Date().toISOString().split('T')[0], descripcion:'' })
+      const payload = { ...formIng, categoria_id: parseInt(formIng.categoria_id), monto: parseFloat(formIng.monto) }
+      if (!payload.miembro_id) delete payload.miembro_id
+      await createIngreso(payload)
+      await loadData()
+      setModal(null)
+      setFormIng({ categoria_id:'', monto:'', fecha: new Date().toISOString().split('T')[0], descripcion:'', miembro_id:'' })
     } catch(err) { setError(err.response?.data?.detail || 'Error') }
     setSaving(false)
   }
@@ -70,11 +76,23 @@ export default function Tesoreria() {
     e.preventDefault(); setSaving(true); setError('')
     try {
       await createGasto({ ...formGas, categoria_id: parseInt(formGas.categoria_id), monto: parseFloat(formGas.monto) })
-      const { data } = await getGastos({ limit:200 })
-      setGastos(data); setModal(null)
+      await loadData()
+      setModal(null)
       setFormGas({ categoria_id:'', monto:'', fecha: new Date().toISOString().split('T')[0], descripcion:'', beneficiario:'' })
     } catch(err) { setError(err.response?.data?.detail || 'Error') }
     setSaving(false)
+  }
+
+  const eliminarIngreso = async (id) => {
+    if (!confirm('¿Seguro que deseas eliminar este ingreso?')) return
+    try { await deleteIngreso(id); await loadData() }
+    catch(err) { alert(err.response?.data?.detail || 'Error al eliminar') }
+  }
+
+  const eliminarGasto = async (id) => {
+    if (!confirm('¿Seguro que deseas eliminar este gasto?')) return
+    try { await deleteGasto(id); await loadData() }
+    catch(err) { alert(err.response?.data?.detail || 'Error al eliminar') }
   }
 
   const tabs = [
@@ -96,20 +114,19 @@ export default function Tesoreria() {
         </div>
       </div>
 
-      {/* Summary */}
       <div className="grid-3" style={{ marginBottom:24 }}>
         <div className="stat-card">
-          <div className="stat-icon">⬆</div>
+          <div className="stat-icon">↑</div>
           <div className="stat-value text-green" style={{ fontSize:24 }}>{fmt(totalIng)}</div>
           <div className="stat-label">Total ingresos</div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon">⬇</div>
+          <div className="stat-icon">↓</div>
           <div className="stat-value text-red" style={{ fontSize:24 }}>{fmt(totalGas)}</div>
           <div className="stat-label">Total gastos</div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon">◉</div>
+          <div className="stat-icon">◎</div>
           <div className="stat-value" style={{ fontSize:24, color: (totalIng-totalGas)>=0?'var(--green)':'var(--red)' }}>
             {fmt(totalIng - totalGas)}
           </div>
@@ -117,7 +134,6 @@ export default function Tesoreria() {
         </div>
       </div>
 
-      {/* Tabs */}
       <div style={{ display:'flex', gap:4, marginBottom:20, borderBottom:'1px solid var(--border)', paddingBottom:0 }}>
         {tabs.map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
@@ -130,12 +146,11 @@ export default function Tesoreria() {
         ))}
       </div>
 
-      {/* Ingresos tab */}
       {tab === 'ingresos' && (
         <div className="card">
           <div className="table-wrap">
             <table>
-              <thead><tr><th>Fecha</th><th>Categoría</th><th>Monto</th><th>Descripción</th><th>Comprobante</th></tr></thead>
+              <thead><tr><th>Fecha</th><th>Categoría</th><th>Monto</th><th>Descripción</th><th>Acciones</th></tr></thead>
               <tbody>
                 {loading ? <tr><td colSpan={5} style={{ textAlign:'center', padding:40 }}><span className="spinner" /></td></tr>
                 : ingresos.map(i => (
@@ -144,7 +159,12 @@ export default function Tesoreria() {
                     <td><span className="badge badge-green">{catIng.find(c=>c.id===i.categoria_id)?.nombre || i.categoria_id}</span></td>
                     <td style={{ fontWeight:600, color:'var(--green)' }}>{fmt(i.monto)}</td>
                     <td style={{ color:'var(--text-muted)' }}>{i.descripcion || '—'}</td>
-                    <td style={{ color:'var(--text-muted)' }}>{i.comprobante || '—'}</td>
+                    <td>
+                      <button onClick={() => eliminarIngreso(i.id)}
+                        style={{ background:'none', border:'none', cursor:'pointer', color:'var(--red)', fontSize:13, padding:'2px 8px' }}>
+                        🗑 Eliminar
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -153,14 +173,13 @@ export default function Tesoreria() {
         </div>
       )}
 
-      {/* Gastos tab */}
       {tab === 'gastos' && (
         <div className="card">
           <div className="table-wrap">
             <table>
-              <thead><tr><th>Fecha</th><th>Categoría</th><th>Monto</th><th>Descripción</th><th>Beneficiario</th></tr></thead>
+              <thead><tr><th>Fecha</th><th>Categoría</th><th>Monto</th><th>Descripción</th><th>Beneficiario</th><th>Acciones</th></tr></thead>
               <tbody>
-                {loading ? <tr><td colSpan={5} style={{ textAlign:'center', padding:40 }}><span className="spinner" /></td></tr>
+                {loading ? <tr><td colSpan={6} style={{ textAlign:'center', padding:40 }}><span className="spinner" /></td></tr>
                 : gastos.map(g => (
                   <tr key={g.id}>
                     <td style={{ color:'var(--text-muted)' }}>{new Date(g.fecha).toLocaleDateString('es-DO')}</td>
@@ -168,6 +187,12 @@ export default function Tesoreria() {
                     <td style={{ fontWeight:600, color:'var(--red)' }}>{fmt(g.monto)}</td>
                     <td>{g.descripcion}</td>
                     <td style={{ color:'var(--text-muted)' }}>{g.beneficiario || '—'}</td>
+                    <td>
+                      <button onClick={() => eliminarGasto(g.id)}
+                        style={{ background:'none', border:'none', cursor:'pointer', color:'var(--red)', fontSize:13, padding:'2px 8px' }}>
+                        🗑 Eliminar
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -176,7 +201,6 @@ export default function Tesoreria() {
         </div>
       )}
 
-      {/* Diezmos tab */}
       {tab === 'diezmos' && (
         <div className="card">
           <div style={{ marginBottom:16 }}>
@@ -184,16 +208,17 @@ export default function Tesoreria() {
           </div>
           <div className="table-wrap">
             <table>
-              <thead><tr><th>#</th><th>Miembro</th><th>Total diezmado</th><th>Cantidad de pagos</th></tr></thead>
+              <thead><tr><th>#</th><th>Miembro</th><th>Total diezmado</th><th>Diezmo de diezmo (10%)</th><th>Cantidad de pagos</th></tr></thead>
               <tbody>
-                {loading ? <tr><td colSpan={4} style={{ textAlign:'center', padding:40 }}><span className="spinner" /></td></tr>
+                {loading ? <tr><td colSpan={5} style={{ textAlign:'center', padding:40 }}><span className="spinner" /></td></tr>
                 : diezmos.length === 0
-                  ? <tr><td colSpan={4} style={{ textAlign:'center', padding:30, color:'var(--text-muted)' }}>Sin registros de diezmos</td></tr>
+                  ? <tr><td colSpan={5} style={{ textAlign:'center', padding:30, color:'var(--text-muted)' }}>Sin registros de diezmos</td></tr>
                   : diezmos.map((d, i) => (
                     <tr key={i}>
                       <td style={{ color:'var(--text-muted)' }}>{i+1}</td>
                       <td style={{ fontWeight:500 }}>{d.miembro}</td>
                       <td style={{ fontWeight:600, color:'var(--gold)' }}>{fmt(d.total)}</td>
+                      <td style={{ fontWeight:600, color:'var(--green)' }}>{fmt(d.total * 0.1)}</td>
                       <td><span className="badge badge-blue">{d.pagos} pagos</span></td>
                     </tr>
                   ))}
@@ -203,7 +228,6 @@ export default function Tesoreria() {
         </div>
       )}
 
-      {/* New Ingreso Modal */}
       {modal === 'ingreso' && (
         <Modal title="Registrar Ingreso" onClose={() => setModal(null)}>
           {error && <div className="alert alert-error">{error}</div>}
@@ -225,6 +249,16 @@ export default function Tesoreria() {
                 <input type="date" value={formIng.fecha} onChange={e=>setFormIng({...formIng,fecha:e.target.value})} className="form-input" required />
               </div>
             </div>
+            {diezmoDeDiezmo !== null && (
+              <div style={{ background:'var(--bg-card)', border:'1px solid var(--gold)', borderRadius:8, padding:'10px 14px', fontSize:13 }}>
+                💰 <strong>Diezmo de diezmo (10%):</strong> <span style={{ color:'var(--gold)', fontWeight:700 }}>{fmt(diezmoDeDiezmo)}</span>
+              </div>
+            )}
+            {diezmoDeOfrenda !== null && (
+              <div style={{ background:'var(--bg-card)', border:'1px solid var(--green)', borderRadius:8, padding:'10px 14px', fontSize:13 }}>
+                💰 <strong>Diezmo de ofrenda (10%):</strong> <span style={{ color:'var(--green)', fontWeight:700 }}>{fmt(diezmoDeOfrenda)}</span>
+              </div>
+            )}
             <div className="form-group">
               <label className="form-label">Descripción</label>
               <input value={formIng.descripcion} onChange={e=>setFormIng({...formIng,descripcion:e.target.value})} className="form-input" />
@@ -237,7 +271,6 @@ export default function Tesoreria() {
         </Modal>
       )}
 
-      {/* New Gasto Modal */}
       {modal === 'gasto' && (
         <Modal title="Registrar Gasto" onClose={() => setModal(null)}>
           {error && <div className="alert alert-error">{error}</div>}

@@ -65,3 +65,6 @@ export const registrarAsistencia = (eventoId, data) => api.post(`/eventos/${even
 
 export const getMinisterios = () => api.get('/ministerios/')
 export const getCelulas = () => api.get('/celulas/')
+
+export const deleteIngreso = (id) => api.delete(/tesoreria/ingresos/)
+export const deleteGasto = (id) => api.delete(/tesoreria/gastos/)
