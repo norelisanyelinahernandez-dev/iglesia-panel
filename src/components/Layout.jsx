@@ -7,6 +7,7 @@ const NAV = [
   { to: '/tesoreria',  icon: '◉',  label: 'Tesorería' },
   { to: '/inventario', icon: '▣',  label: 'Inventario' },
   { to: '/eventos',    icon: '◆',  label: 'Eventos' },
+  { to: '/pastora',    icon: '✝',  label: 'Pastora' },
 ]
 export default function Layout({ children }) {
   const { user, logout } = useAuth()
