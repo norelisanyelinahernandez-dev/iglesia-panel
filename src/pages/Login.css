@@ -1,0 +1,104 @@
+.login-bg {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-bg::before {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 70%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.deco-cross {
+  position: absolute;
+  font-size: 120px;
+  color: rgba(201,168,76,0.04);
+  pointer-events: none;
+  font-family: serif;
+  transition: opacity 0.3s;
+}
+.cross-1 { top: -30px; left: 10%; transform: rotate(-15deg); }
+.cross-2 { bottom: -20px; right: 8%; transform: rotate(20deg); font-size: 180px; }
+.cross-3 { top: 40%; left: -40px; transform: rotate(5deg); font-size: 90px; }
+
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 44px 40px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: var(--shadow-lg), 0 0 60px rgba(201,168,76,0.05);
+  position: relative;
+  z-index: 1;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-logo {
+  font-size: 44px;
+  margin-bottom: 14px;
+  display: block;
+}
+
+.login-title {
+  font-family: var(--font-heading);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.login-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.login-btn {
+  width: 100%;
+  justify-content: center;
+  padding: 11px;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.login-divider {
+  margin-top: 28px;
+  text-align: center;
+  position: relative;
+}
+.login-divider::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  height: 1px;
+  background: var(--border);
+}
+.login-divider span {
+  background: var(--surface);
+  padding: 0 14px;
+  font-size: 11px;
+  color: var(--text-dim);
+  position: relative;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
