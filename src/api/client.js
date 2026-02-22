@@ -1,7 +1,7 @@
-import axios from 'axios'
+﻿import axios from 'axios'
 
-// En desarrollo usa el proxy de Vite (/api → localhost:8000)
-// En producción usa VITE_API_URL (tu backend en Render)
+// En desarrollo usa el proxy de Vite (/api â†’ localhost:8000)
+// En producciÃ³n usa VITE_API_URL (tu backend en Render)
 const baseURL = import.meta.env.VITE_API_URL
   ? import.meta.env.VITE_API_URL
   : '/api'
@@ -66,5 +66,6 @@ export const registrarAsistencia = (eventoId, data) => api.post(`/eventos/${even
 export const getMinisterios = () => api.get('/ministerios/')
 export const getCelulas = () => api.get('/celulas/')
 
-export const deleteIngreso = (id) => api.delete(/tesoreria/ingresos/)
-export const deleteGasto = (id) => api.delete(/tesoreria/gastos/)
+export const deleteIngreso = (id) => api.delete(`/tesoreria/ingresos/${id}`)
+export const deleteGasto = (id) => api.delete(`/tesoreria/gastos/${id}`)
+
