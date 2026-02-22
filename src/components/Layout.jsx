@@ -2,13 +2,14 @@
 import { useAuth } from '../context/AuthContext'
 import './Layout.css'
 const NAV = [
-  { to: '/',           icon: 'Panel',     label: 'Panel' },
-  { to: '/miembros',   icon: 'Miembros',  label: 'Miembros' },
-  { to: '/tesoreria',  icon: 'Tesorer',   label: 'Tesoreria' },
-  { to: '/inventario', icon: 'Inventario',label: 'Inventario' },
-  { to: '/eventos',    icon: 'Eventos',   label: 'Eventos' },
-  { to: '/pastora',    icon: 'Pastora',   label: 'Pastora' },
-  { to: '/programa',   icon: 'Programa',  label: 'Programa' },
+  { to: '/',           label: 'Panel' },
+  { to: '/miembros',   label: 'Miembros' },
+  { to: '/tesoreria',  label: 'Tesoreria' },
+  { to: '/inventario', label: 'Inventario' },
+  { to: '/eventos',    label: 'Eventos' },
+  { to: '/pastora',    label: 'Pastora' },
+  { to: '/programa',   label: 'Programa' },
+  { to: '/anuncios',   label: 'Anuncios' },
 ]
 export default function Layout({ children }) {
   const { user, logout } = useAuth()

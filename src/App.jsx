@@ -9,6 +9,7 @@ import Inventario from './pages/Inventario'
 import Eventos from './pages/Eventos'
 import Pastora from './pages/Pastora'
 import Programa from './pages/Programa'
+import Anuncios from './pages/Anuncios'
 function PrivateRoute({ children }) {
   const { user } = useAuth()
   return user ? children : <Navigate to="/login" replace />
@@ -29,6 +30,7 @@ function AppRoutes() {
               <Route path="/eventos"    element={<Eventos />} />
               <Route path="/pastora"    element={<Pastora />} />
               <Route path="/programa"   element={<Programa />} />
+              <Route path="/anuncios"   element={<Anuncios />} />
               <Route path="*"           element={<Navigate to="/" replace />} />
             </Routes>
           </Layout>
