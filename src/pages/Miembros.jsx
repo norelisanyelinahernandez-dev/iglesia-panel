@@ -361,6 +361,21 @@ function PerfilModal({ miembro, onClose, onEdit }) {
             <InfoRow icon="🎁" label="Dones o talentos" value={miembro.dones_talentos} />
             <InfoRow icon="🗓️" label="Disponibilidad" value={miembro.disponibilidad} />
           </SeccionPerfil>
+          <SeccionPerfil titulo="Ocupación y Educación" icono="💼">
+            <InfoRow icon="👔" label="Ocupación / Profesión" value={miembro.ocupacion} />
+            <InfoRow icon="🏢" label="Lugar de trabajo" value={miembro.lugar_trabajo} />
+            <InfoRow icon="🎓" label="Nivel educativo" value={miembro.nivel_educativo} />
+          </SeccionPerfil>
+          <SeccionPerfil titulo="Redes Sociales" icono="📲">
+            <InfoRow icon="💬" label="WhatsApp" value={miembro.whatsapp} />
+            <InfoRow icon="👤" label="Facebook" value={miembro.facebook} />
+            <InfoRow icon="📸" label="Instagram" value={miembro.instagram} />
+          </SeccionPerfil>
+          <SeccionPerfil titulo="Historial Médico" icono="🏥">
+            <InfoRow icon="🩸" label="Tipo de sangre" value={miembro.tipo_sangre} />
+            <InfoRow icon="💊" label="Condición médica" value={miembro.condicion_medica} />
+            <InfoRow icon="⚠️" label="Alergias" value={miembro.alergias} />
+          </SeccionPerfil>
           <SeccionPerfil titulo="Cuidado Pastoral" icono="🤲">
             <InfoRow icon="🏠" label="Visitas pastorales" value={miembro.visitas_pastorales} />
             <InfoRow icon="💬" label="Consejería pastoral" value={miembro.consejeria_pastoral} />
@@ -518,6 +533,7 @@ export default function Miembros() {
     </div>
   )
 }
+
 
 
 
