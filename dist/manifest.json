@@ -1,0 +1,22 @@
+﻿{
+  "name": "Ministerio San Juan 7:38",
+  "short_name": "SanJuan 7:38",
+  "description": "Panel de gestion - Del Semillero 1/11",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f1117",
+  "theme_color": "#b8860b",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "/logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}

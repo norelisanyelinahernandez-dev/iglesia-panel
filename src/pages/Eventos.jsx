@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { getEventos, createEvento, deleteEvento, getAsistencia, registrarAsistencia } from '../api/client'
 
 const TIPO_BADGE = { culto:'badge-gold', retiro:'badge-blue', conferencia:'badge-blue', boda:'badge-green', bautismo:'badge-gold', celula:'badge-amber', otro:'badge-green' }
@@ -103,7 +103,7 @@ export default function Eventos() {
             <div key={ev.id} className="card" style={{ position:'relative', cursor:'default' }}>
               <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:12 }}>
                 <span style={{ fontSize:26 }}>{TIPO_EMOJI[ev.tipo] || '\ud83d\udcc5'}</span>
-                <span className={\adge \\}>{TIPO_LABEL[ev.tipo] || ev.tipo}</span>
+                <span className={`badge ${TIPO_BADGE[ev.tipo] || "badge-green"}`}>{TIPO_LABEL[ev.tipo] || ev.tipo}</span>
               </div>
               <h3 style={{ fontFamily:'var(--font-heading)', fontSize:16, fontWeight:600, marginBottom:6 }}>{ev.nombre}</h3>
               <div style={{ color:'var(--text-muted)', fontSize:12, marginBottom:4 }}>
@@ -193,7 +193,7 @@ export default function Eventos() {
                 {asistenciaData.registros.map((r, i) => (
                   <div key={i} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'8px 0', borderBottom:'1px solid var(--border)' }}>
                     <span style={{ fontWeight:500, fontSize:13 }}>{r.nombre_visita || 'Miembro registrado'}</span>
-                    <span className={\adge \\}>{r.presente ? 'Presente' : 'Ausente'}</span>
+                    <span className={`badge ${r.presente ? "badge-green" : "badge-red"}`}>{r.presente ? "Presente" : "Ausente"}</span>
                   </div>
                 ))}
               </div>
@@ -204,3 +204,4 @@ export default function Eventos() {
     </div>
   )
 }
+
