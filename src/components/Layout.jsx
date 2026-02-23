@@ -1,4 +1,5 @@
-﻿import { NavLink, useNavigate } from 'react-router-dom'
+﻿import { useState } from 'react'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { usePermisos } from '../context/PermisosContext'
 import './Layout.css'
@@ -23,15 +24,20 @@ export default function Layout({ children }) {
   const { user, logout } = useAuth()
   const { puede } = usePermisos()
   const navigate = useNavigate()
+  const [menuAbierto, setMenuAbierto] = useState(false)
 
   const handleLogout = () => {
     logout()
     navigate('/login')
   }
 
+  const cerrarMenu = () => setMenuAbierto(false)
+
   return (
     <div className="layout">
-      <aside className="sidebar">
+      <div className={`sidebar-overlay ${menuAbierto ? 'open' : ''}`} onClick={cerrarMenu} />
+
+      <aside className={`sidebar ${menuAbierto ? 'open' : ''}`}>
         <div className="sidebar-logo">
           <img src="/logo.jpg" alt="Logo" style={{ width:42, height:42, borderRadius:'50%', objectFit:'cover', flexShrink:0 }} />
           <div>
@@ -47,6 +53,7 @@ export default function Layout({ children }) {
               to={to}
               end={to === '/'}
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+              onClick={cerrarMenu}
             >
               <span>{label}</span>
             </NavLink>
@@ -63,11 +70,16 @@ export default function Layout({ children }) {
           <button className="logout-btn" onClick={handleLogout} title="Cerrar sesion">X</button>
         </div>
       </aside>
-      <main className="main-content">
+
+      <div className="main-content">
+        <div className="mobile-topbar">
+          <div className="mobile-topbar-title">Ministerio San Juan 7:38</div>
+          <button className="menu-toggle" onClick={() => setMenuAbierto(!menuAbierto)}>☰</button>
+        </div>
         <div className="content-inner">
           {children}
         </div>
-      </main>
+      </div>
     </div>
   )
 }
