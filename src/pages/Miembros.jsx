@@ -12,7 +12,7 @@ const EMPTY = {
   telefono_emergencia:'',
   iglesia_bautismo:'', tiempo_en_iglesia:'', miembro_activo:'Si',
   ministerio_actual:'', ministerios_anteriores:'', dones_talentos:'', disponibilidad:'',
-  visitas_pastorales:'No', consejeria_pastoral:'No', motivo_oracion:'', foto:''
+  visitas_pastorales:'No', consejeria_pastoral:'No', motivo_oracion:'', foto:'', ocupacion:'', lugar_trabajo:'', nivel_educativo:'', whatsapp:'', facebook:'', instagram:'', tipo_sangre:'', condicion_medica:'', alergias:''
 }
 
 const capFirst = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : str
@@ -518,6 +518,7 @@ export default function Miembros() {
     </div>
   )
 }
+
 
 
 
