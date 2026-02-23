@@ -12,6 +12,7 @@ const NAV = [
   { to: '/pastora',     label: 'Pastora' },
   { to: '/programa',    label: 'Programa' },
   { to: '/anuncios',    label: 'Anuncios' },
+  { to: '/respaldo',    label: 'Respaldo' },
 ]
 export default function Layout({ children }) {
   const { user, logout } = useAuth()
