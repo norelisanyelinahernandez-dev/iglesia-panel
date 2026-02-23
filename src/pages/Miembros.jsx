@@ -393,6 +393,8 @@ export default function Miembros() {
   const [loading, setLoading] = useState(true)
   const [buscar, setBuscar] = useState('')
   const [filtroEstado, setFiltroEstado] = useState('')
+  const [filtroRol, setFiltroRol] = useState('')
+  const [filtroMinisterio, setFiltroMinisterio] = useState('')
   const [modal, setModal] = useState(null)
   const [perfil, setPerfil] = useState(null)
   const [confirmDel, setConfirmDel] = useState(null)
@@ -402,6 +404,7 @@ export default function Miembros() {
     try {
       const params = { limit: 200 }
       if (filtroEstado) params.estado = filtroEstado
+      if (filtroRol) params.rol = filtroRol
       if (buscar) params.buscar = buscar
       const { data } = await getMiembros(params)
       setMiembros(data)
@@ -430,6 +433,18 @@ export default function Miembros() {
           <span className="search-icon">⌕</span>
           <input placeholder="Buscar por nombre o cédula..." value={buscar} onChange={e => setBuscar(e.target.value)} />
         </div>
+        <select value={filtroRol} onChange={e => setFiltroRol(e.target.value)} className="form-input" style={{ width:'auto' }}>
+          <option value="">Todos los roles</option>
+          <option value="miembro">Miembro</option>
+          <option value="lider">Líder</option>
+          <option value="diacono">Diácono</option>
+          <option value="secretario">Secretario/a</option>
+          <option value="tesorero">Tesorero/a</option>
+          <option value="maestro">Maestro/a de niños</option>
+          <option value="co-pastor">Co-Pastor</option>
+          <option value="pastor">Pastor</option>
+          <option value="visitante">Visitante</option>
+        </select>
         <select value={filtroEstado} onChange={e => setFiltroEstado(e.target.value)} className="form-input" style={{ width:'auto' }}>
           <option value="">Todos los estados</option>
           <option value="activo">Activos</option>
@@ -515,3 +530,5 @@ export default function Miembros() {
     </div>
   )
 }
+
+
