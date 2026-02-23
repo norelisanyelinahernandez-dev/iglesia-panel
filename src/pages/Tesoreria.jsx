@@ -1,4 +1,55 @@
-﻿import { useEffect, useState } from 'react'
+﻿import { useEffect, useState, useRef } from 'react'
+
+const MESES_CORTOS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
+const MESES_LARGOS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
+
+function MonthPicker({ value, onChange }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+  const [year, setYear] = useState(() => value ? parseInt(value.split('-')[0]) : new Date().getFullYear())
+  const month = value ? parseInt(value.split('-')[1]) - 1 : new Date().getMonth()
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const select = (m) => {
+    const val = year + '-' + String(m+1).padStart(2,'0')
+    onChange({ target: { value: val } })
+    setOpen(false)
+  }
+
+  return (
+    <div ref={ref} style={{ position:'relative' }}>
+      <button type='button' onClick={() => setOpen(o=>!o)} className='form-input'
+        style={{ cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'space-between', gap:10, minWidth:180 }}>
+        <span>{MESES_LARGOS[month]} {year}</span>
+        <span style={{ fontSize:13, opacity:0.5 }}>&#128197;</span>
+      </button>
+      {open && (
+        <div style={{ position:'absolute', top:'calc(100% + 6px)', left:0, zIndex:1000, background:'var(--surface)', border:'1px solid var(--border)', borderRadius:'var(--radius-lg)', boxShadow:'var(--shadow-lg)', padding:16, minWidth:220 }}>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:12 }}>
+            <button type='button' onClick={() => setYear(y=>y-1)} style={{ background:'none', border:'none', color:'var(--text-muted)', cursor:'pointer', fontSize:20, padding:'2px 10px' }}>&#8249;</button>
+            <div style={{ fontFamily:'var(--font-heading)', fontWeight:600, color:'var(--gold)', fontSize:15 }}>{year}</div>
+            <button type='button' onClick={() => setYear(y=>y+1)} style={{ background:'none', border:'none', color:'var(--text-muted)', cursor:'pointer', fontSize:20, padding:'2px 10px' }}>&#8250;</button>
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:4 }}>
+            {MESES_CORTOS.map((m,i) => (
+              <button key={i} type='button' onClick={() => select(i)} style={{
+                padding:'8px 4px', border:'none', borderRadius:8, cursor:'pointer', fontSize:13,
+                background: i===month && year===parseInt(value?.split('-')[0]) ? 'var(--gold)' : 'transparent',
+                color: i===month && year===parseInt(value?.split('-')[0]) ? '#000' : 'var(--text)',
+                fontWeight: i===month ? 600 : 400
+              }}>{m}</button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
 import DatePicker from '../components/DatePicker'
 import { getIngresos, createIngreso, deleteIngreso, getGastos, createGasto, deleteGasto, getCategoriasIngreso, getCategoriasGasto, getResumenDiezmos, getMiembros } from '../api/client'
 
@@ -433,7 +484,7 @@ export default function Tesoreria() {
         <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
           <div style={{ display:'flex', alignItems:'center', gap:12 }}>
             <label className="form-label" style={{ margin:0 }}>Mes:</label>
-            <input type="month" value={mesCentral} onChange={e => setMesCentral(e.target.value)} className="form-input" style={{ width:'auto' }} />
+            <MonthPicker value={mesCentral} onChange={e=>setMesCentral(e.target.value)} />
           </div>
 
           <div className="grid-2">
@@ -556,6 +607,8 @@ export default function Tesoreria() {
     </div>
   )
 }
+
+
 
 
 
