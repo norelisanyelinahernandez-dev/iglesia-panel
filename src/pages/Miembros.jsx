@@ -110,6 +110,7 @@ function MiembroForm({ initial, onSave, onClose }) {
     setLoading(true); setError('')
     try {
       const payload = { ...form }
+      console.log("PAYLOAD NOTAS:", payload.notas)
       if (!payload.fecha_nacimiento) delete payload.fecha_nacimiento
       if (!payload.fecha_conversion) delete payload.fecha_conversion
       if (!payload.fecha_bautismo) delete payload.fecha_bautismo
@@ -543,6 +544,7 @@ export default function Miembros() {
     </div>
   )
 }
+
 
 
 
