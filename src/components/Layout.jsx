@@ -73,8 +73,14 @@ export default function Layout({ children }) {
 
       <div className="main-content">
         <div className="mobile-topbar">
-          <div className="mobile-topbar-title">Ministerio San Juan 7:38</div>
           <button className="menu-toggle" onClick={() => setMenuAbierto(!menuAbierto)}>☰</button>
+          <div className="mobile-topbar-logo">
+            <img src="/logo.jpg" alt="Logo" style={{ width:32, height:32, borderRadius:'50%', objectFit:'cover' }} />
+            <div>
+              <div className="mobile-topbar-title">Ministerio San Juan 7:38</div>
+              <div className="mobile-topbar-sub">Del Semillero 1/11</div>
+            </div>
+          </div>
         </div>
         <div className="content-inner">
           {children}
