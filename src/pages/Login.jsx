@@ -17,7 +17,7 @@ export default function Login() {
       await login(form.email, form.password)
       navigate('/')
     } catch (err) {
-      setError(err.response?.data?.detail || 'Error al iniciar sesión')
+      setError(err.response?.data?.detail || 'Error al iniciar sesion')
     } finally {
       setLoading(false)
     }
@@ -38,7 +38,7 @@ export default function Login() {
         {error && <div className="alert alert-error">{error}</div>}
         <form onSubmit={submit} className="login-form">
           <div className="form-group">
-            <label className="form-label">Correo electrónico</label>
+            <label className="form-label">Correo electronico</label>
             <input
               name="email"
               type="email"
@@ -50,7 +50,7 @@ export default function Login() {
             />
           </div>
           <div className="form-group">
-            <label className="form-label">Contraseña</label>
+            <label className="form-label">Contrasena</label>
             <input
               name="password"
               type="password"
@@ -62,11 +62,17 @@ export default function Login() {
             />
           </div>
           <button type="submit" className="btn btn-gold login-btn" disabled={loading}>
-            {loading ? <><span className="spinner" style={{width:16,height:16}} /> Entrando...</> : 'Iniciar sesión'}
+            {loading ? <><span className="spinner" style={{width:16,height:16}} /> Entrando...</> : 'Iniciar sesion'}
           </button>
         </form>
         <div className="login-divider">
-          <span>Sistema de Gestión Integral</span>
+          <span>Sistema de Gestion Integral</span>
+        </div>
+        <div style={{ textAlign:'center', marginTop:16, padding:'0 8px' }}>
+          <p style={{ fontStyle:'italic', fontSize:13, color:'var(--text-muted)', lineHeight:1.7 }}>
+            "El que cree en mi, como dice la Escritura, de su interior correran rios de agua viva."
+          </p>
+          <span style={{ color:'var(--gold)', fontSize:12, fontWeight:600 }}>— Juan 7:38</span>
         </div>
       </div>
     </div>
