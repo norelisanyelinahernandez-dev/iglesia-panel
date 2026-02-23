@@ -183,7 +183,7 @@ export default function Documentos() {
                 </div>
                 <div className="form-group">
                   <label className="form-label">Fecha del documento</label>
-                  <input name="fecha" type="date" value={form.fecha} onChange={h} className="form-input" />
+                  <DatePicker name="fecha" value={form.fecha} onChange={h} />
                 </div>
               </div>
               <div className="form-group">
@@ -208,4 +208,5 @@ export default function Documentos() {
     </div>
   )
 }
+
 

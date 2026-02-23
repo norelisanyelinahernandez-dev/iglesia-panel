@@ -141,7 +141,7 @@ export default function Anuncios() {
                 </div>
                 <div className="form-group">
                   <label className="form-label">Fecha de expiracion</label>
-                  <input name="fecha_expira" type="date" value={form.fecha_expira} onChange={h} className="form-input" />
+                  <DatePicker name="fecha_expira" value={form.fecha_expira} onChange={h} />
                 </div>
               </div>
               <div style={{ display:'flex', gap:10, justifyContent:'flex-end', marginTop:4 }}>
@@ -157,4 +157,5 @@ export default function Anuncios() {
     </div>
   )
 }
+
 

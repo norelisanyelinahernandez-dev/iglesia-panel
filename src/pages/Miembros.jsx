@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState } from 'react'
+import DatePicker from '../components/DatePicker'
 import { getMiembros, createMiembro, updateMiembro, deleteMiembro } from '../api/client'
 
 const ROL_BADGE = { pastor:'badge-gold', 'co-pastor':'badge-gold', diacono:'badge-blue', lider:'badge-blue', miembro:'badge-green', visitante:'badge-amber', secretario:'badge-blue', tesorero:'badge-blue', maestro:'badge-blue' }
@@ -542,6 +543,8 @@ export default function Miembros() {
     </div>
   )
 }
+
+
 
 
 

@@ -115,7 +115,7 @@ export default function Asistencia() {
             <div className="grid-2" style={{ gap:12 }}>
               <div className="form-group">
                 <label className="form-label">Fecha</label>
-                <input type="date" value={fecha} onChange={e=>setFecha(e.target.value)} className="form-input" />
+                <DatePicker name="fecha" value={fecha} onChange={e=>setFecha(e.target.value)} />
               </div>
               <div className="form-group">
                 <label className="form-label">Tipo de actividad</label>
@@ -276,4 +276,5 @@ export default function Asistencia() {
     </div>
   )
 }
+
 

@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState } from 'react'
+import DatePicker from '../components/DatePicker'
 import { getEventos, createEvento, deleteEvento, getAsistencia, registrarAsistencia } from '../api/client'
 
 const TIPO_BADGE = { culto:'badge-gold', retiro:'badge-blue', conferencia:'badge-blue', boda:'badge-green', bautismo:'badge-gold', celula:'badge-amber', otro:'badge-green' }
@@ -204,6 +205,7 @@ export default function Eventos() {
     </div>
   )
 }
+
 
 
 

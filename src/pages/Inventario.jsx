@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState } from 'react'
+import DatePicker from '../components/DatePicker'
 import { getInventario, createItem, updateItem, deleteItem, getPrestamos, createPrestamo, updatePrestamo, getCategoriasInventario } from '../api/client'
 
 const ESTADO_BADGE = { excelente:'badge-green', bueno:'badge-green', regular:'badge-amber', dañado:'badge-red', dado_de_baja:'badge-red' }
@@ -256,7 +257,7 @@ export default function Inventario() {
             </div>
             <div className="form-group">
               <label className="form-label">Fecha de retorno esperada</label>
-              <input type="date" value={prestamoForm.fecha_retorno_esperada} onChange={e=>setPrestamoForm({...prestamoForm,fecha_retorno_esperada:e.target.value})} className="form-input" />
+              <DatePicker name="fecha_retorno_esperada" value={prestamoForm.fecha_retorno_esperada} onChange={e=>setPrestamoForm({...prestamoForm,fecha_retorno_esperada:e.target.value})} />
             </div>
             <div style={{ display:'flex', gap:10, justifyContent:'flex-end' }}>
               <button type="button" className="btn btn-ghost" onClick={()=>setModal(null)}>Cancelar</button>
@@ -268,4 +269,5 @@ export default function Inventario() {
     </div>
   )
 }
+
 

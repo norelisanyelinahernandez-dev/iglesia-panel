@@ -254,11 +254,11 @@ export default function Finanzas() {
                 </div>
                 <div className="form-group">
                   <label className="form-label">Fecha inicio</label>
-                  <input type="date" value={formDeuda.fecha_inicio} onChange={e=>setFormDeuda({...formDeuda,fecha_inicio:e.target.value})} className="form-input" />
+                  <DatePicker name="fecha_inicio" value={formDeuda.fecha_inicio} onChange={e=>setFormDeuda({...formDeuda,fecha_inicio:e.target.value})} />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Fecha vencimiento</label>
-                  <input type="date" value={formDeuda.fecha_vencimiento} onChange={e=>setFormDeuda({...formDeuda,fecha_vencimiento:e.target.value})} className="form-input" />
+                  <DatePicker name="fecha_vencimiento" value={formDeuda.fecha_vencimiento} onChange={e=>setFormDeuda({...formDeuda,fecha_vencimiento:e.target.value})} />
                 </div>
               </div>
               <div className="form-group">
@@ -286,4 +286,5 @@ export default function Finanzas() {
     </div>
   )
 }
+
 

@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState } from 'react'
+import DatePicker from '../components/DatePicker'
 import { getIngresos, createIngreso, deleteIngreso, getGastos, createGasto, deleteGasto, getCategoriasIngreso, getCategoriasGasto, getResumenDiezmos, getMiembros } from '../api/client'
 
 const fmt = (n) => new Intl.NumberFormat('es-DO', { style:'currency', currency:'DOP', maximumFractionDigits:0 }).format(n)
@@ -284,7 +285,7 @@ export default function Tesoreria() {
               </div>
               <div className="form-group" style={{ flex:1, minWidth:140 }}>
                 <label className="form-label">Fecha</label>
-                <input type="date" value={formDiezmo.fecha} onChange={e=>setFormDiezmo({...formDiezmo,fecha:e.target.value})} className="form-input" required />
+                <DatePicker name="fecha" value={formDiezmo.fecha} onChange={e=>setFormDiezmo({...formDiezmo,fecha:e.target.value})} />
               </div>
               <button type="submit" className="btn btn-gold" style={{ marginBottom:4 }}>+ Agregar</button>
             </form>
@@ -358,7 +359,7 @@ export default function Tesoreria() {
               </div>
               <div className="form-group" style={{ flex:1, minWidth:140 }}>
                 <label className="form-label">Fecha</label>
-                <input type="date" value={formOfrenda.fecha} onChange={e=>setFormOfrenda({...formOfrenda,fecha:e.target.value})} className="form-input" required />
+                <DatePicker name="fecha" value={formOfrenda.fecha} onChange={e=>setFormOfrenda({...formOfrenda,fecha:e.target.value})} />
               </div>
               <div className="form-group" style={{ flex:2, minWidth:180 }}>
                 <label className="form-label">Descripcion</label>
@@ -501,7 +502,7 @@ export default function Tesoreria() {
               </div>
               <div className="form-group">
                 <label className="form-label">Fecha *</label>
-                <input type="date" value={formIng.fecha} onChange={e=>setFormIng({...formIng,fecha:e.target.value})} className="form-input" required />
+                <DatePicker name="fecha" value={formIng.fecha} onChange={e=>setFormIng({...formIng,fecha:e.target.value})} />
               </div>
             </div>
             <div className="form-group">
@@ -534,7 +535,7 @@ export default function Tesoreria() {
               </div>
               <div className="form-group">
                 <label className="form-label">Fecha *</label>
-                <input type="date" value={formGas.fecha} onChange={e=>setFormGas({...formGas,fecha:e.target.value})} className="form-input" required />
+                <DatePicker name="fecha" value={formGas.fecha} onChange={e=>setFormGas({...formGas,fecha:e.target.value})} />
               </div>
             </div>
             <div className="form-group">
@@ -555,3 +556,5 @@ export default function Tesoreria() {
     </div>
   )
 }
+
+
