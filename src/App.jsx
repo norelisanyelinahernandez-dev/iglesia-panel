@@ -1,9 +1,7 @@
-﻿import { useState } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+﻿import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { PermisosProvider, usePermisos } from './context/PermisosContext'
 import Layout from './components/Layout'
-import SplashScreen from './components/SplashScreen'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Miembros from './pages/Miembros'
@@ -63,14 +61,13 @@ function AppRoutes() {
 }
 
 export default function App() {
-  const [splash, setSplash] = useState(true)
 
   return (
     <AuthProvider>
       <BrowserRouter>
-        {splash && <SplashScreen onDone={() => setSplash(false)} />}
-        <AppRoutes />
+          <AppRoutes />
       </BrowserRouter>
     </AuthProvider>
   )
 }
+
