@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { getEventos, createEvento, deleteEvento, getAsistencia, registrarAsistencia } from '../api/client'
 
 const TIPO_BADGE = { culto:'badge-gold', retiro:'badge-blue', conferencia:'badge-blue', boda:'badge-green', bautismo:'badge-gold', celula:'badge-amber', otro:'badge-green' }
-const TIPO_EMOJI = { culto:'⛪', retiro:'🏕️', conferencia:'🎤', boda:'💒', bautismo:'💧', celula:'👥', otro:'📅' }
+const TIPO_EMOJI = { culto:'\u26ea', retiro:'\ud83c\udfd5\ufe0f', conferencia:'\ud83c\udfa4', boda:'\ud83d\udc8d', bautismo:'\ud83d\udca7', celula:'\ud83d\udc65', otro:'\ud83d\udcc5' }
+const TIPO_LABEL = { culto:'Culto', retiro:'Retiro', conferencia:'Conferencia', boda:'Boda', bautismo:'Bautismo', celula:'C\u00e9lula', otro:'Otro' }
 
 function Modal({ title, onClose, children }) {
   return (
@@ -10,7 +11,7 @@ function Modal({ title, onClose, children }) {
       <div className="modal">
         <div className="modal-header">
           <h3 className="modal-title">{title}</h3>
-          <button className="modal-close" onClick={onClose}>×</button>
+          <button className="modal-close" onClick={onClose}>\u00d7</button>
         </div>
         {children}
       </div>
@@ -64,7 +65,7 @@ export default function Eventos() {
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('¿Eliminar este evento?')) return
+    if (!confirm('\u00bfEliminar este evento?')) return
     try { await deleteEvento(id); load() } catch(_) {}
   }
 
@@ -78,7 +79,6 @@ export default function Eventos() {
         <button className="btn btn-gold" onClick={() => { setError(''); setModal('nuevo') }}>+ Nuevo evento</button>
       </div>
 
-      {/* Summary by type */}
       <div style={{ display:'flex', gap:10, marginBottom:24, flexWrap:'wrap' }}>
         {['culto','retiro','boda','bautismo','conferencia','celula'].map(tipo => {
           const count = eventos.filter(e=>e.tipo===tipo).length
@@ -88,14 +88,13 @@ export default function Eventos() {
               <span style={{ fontSize:18 }}>{TIPO_EMOJI[tipo]}</span>
               <div>
                 <div style={{ fontWeight:600, fontSize:16 }}>{count}</div>
-                <div style={{ fontSize:11, color:'var(--text-muted)', textTransform:'capitalize' }}>{tipo}s</div>
+                <div style={{ fontSize:11, color:'var(--text-muted)' }}>{TIPO_LABEL[tipo]}s</div>
               </div>
             </div>
           )
         })}
       </div>
 
-      {/* Events grid */}
       {loading ? (
         <div style={{ textAlign:'center', padding:60 }}><span className="spinner" style={{width:28,height:28}}/></div>
       ) : (
@@ -103,26 +102,25 @@ export default function Eventos() {
           {eventos.map(ev => (
             <div key={ev.id} className="card" style={{ position:'relative', cursor:'default' }}>
               <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:12 }}>
-                <span style={{ fontSize:26 }}>{TIPO_EMOJI[ev.tipo] || '📅'}</span>
-                <span className={`badge ${TIPO_BADGE[ev.tipo] || 'badge-green'}`}>{ev.tipo}</span>
+                <span style={{ fontSize:26 }}>{TIPO_EMOJI[ev.tipo] || '\ud83d\udcc5'}</span>
+                <span className={\adge \\}>{TIPO_LABEL[ev.tipo] || ev.tipo}</span>
               </div>
               <h3 style={{ fontFamily:'var(--font-heading)', fontSize:16, fontWeight:600, marginBottom:6 }}>{ev.nombre}</h3>
               <div style={{ color:'var(--text-muted)', fontSize:12, marginBottom:4 }}>
-                📅 {new Date(ev.fecha_inicio).toLocaleDateString('es-DO', { weekday:'short', year:'numeric', month:'short', day:'numeric' })}
+                \ud83d\udcc5 {new Date(ev.fecha_inicio).toLocaleDateString('es-DO', { weekday:'short', year:'numeric', month:'short', day:'numeric' })}
               </div>
-              {ev.lugar && <div style={{ color:'var(--text-muted)', fontSize:12, marginBottom:12 }}>📍 {ev.lugar}</div>}
+              {ev.lugar && <div style={{ color:'var(--text-muted)', fontSize:12, marginBottom:12 }}>\ud83d\udccd {ev.lugar}</div>}
               <div style={{ display:'flex', gap:8, marginTop:14, borderTop:'1px solid var(--border)', paddingTop:12 }}>
                 <button className="btn btn-ghost" style={{ flex:1, justifyContent:'center', fontSize:12, padding:'6px' }} onClick={()=>loadAsistencia(ev)}>
                   Ver asistencia
                 </button>
-                <button className="btn btn-danger" style={{ padding:'6px 10px', fontSize:12 }} onClick={()=>handleDelete(ev.id)}>✕</button>
+                <button className="btn btn-danger" style={{ padding:'6px 10px', fontSize:12 }} onClick={()=>handleDelete(ev.id)}>\u2715</button>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* New event modal */}
       {modal === 'nuevo' && (
         <Modal title="Nuevo evento" onClose={()=>setModal(null)}>
           {error && <div className="alert alert-error">{error}</div>}
@@ -135,7 +133,7 @@ export default function Eventos() {
               <div className="form-group">
                 <label className="form-label">Tipo</label>
                 <select value={form.tipo} onChange={e=>setForm({...form,tipo:e.target.value})} className="form-input">
-                  {['culto','retiro','conferencia','boda','bautismo','celula','otro'].map(t=><option key={t} value={t}>{t}</option>)}
+                  {['culto','retiro','conferencia','boda','bautismo','celula','otro'].map(t=><option key={t} value={t}>{TIPO_LABEL[t]}</option>)}
                 </select>
               </div>
               <div className="form-group">
@@ -148,7 +146,7 @@ export default function Eventos() {
               <input value={form.lugar} onChange={e=>setForm({...form,lugar:e.target.value})} className="form-input" />
             </div>
             <div className="form-group">
-              <label className="form-label">Descripción</label>
+              <label className="form-label">Descripci\u00f3n</label>
               <textarea value={form.descripcion} onChange={e=>setForm({...form,descripcion:e.target.value})} className="form-input" rows={2} style={{ resize:'vertical' }} />
             </div>
             <div style={{ display:'flex', gap:10, justifyContent:'flex-end' }}>
@@ -159,13 +157,12 @@ export default function Eventos() {
         </Modal>
       )}
 
-      {/* Attendance modal */}
       {asistenciaEvento && (
         <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&setAsistenciaEvento(null)}>
           <div className="modal" style={{ maxWidth:550 }}>
             <div className="modal-header">
-              <h3 className="modal-title">Asistencia — {asistenciaEvento.nombre}</h3>
-              <button className="modal-close" onClick={()=>setAsistenciaEvento(null)}>×</button>
+              <h3 className="modal-title">Asistencia \u2013 {asistenciaEvento.nombre}</h3>
+              <button className="modal-close" onClick={()=>setAsistenciaEvento(null)}>\u00d7</button>
             </div>
 
             {asistenciaData && (
@@ -181,24 +178,22 @@ export default function Eventos() {
               </div>
             )}
 
-            {/* Register attendance */}
             <form onSubmit={submitAsistencia} style={{ display:'flex', gap:10, marginBottom:18 }}>
               <input placeholder="Nombre de visita" value={asForm.nombre_visita} onChange={e=>setAsForm({...asForm,nombre_visita:e.target.value})} className="form-input" style={{ flex:2 }} required />
-              <input placeholder="Teléfono" value={asForm.telefono_visita} onChange={e=>setAsForm({...asForm,telefono_visita:e.target.value})} className="form-input" style={{ flex:1 }} />
+              <input placeholder="Tel\u00e9fono" value={asForm.telefono_visita} onChange={e=>setAsForm({...asForm,telefono_visita:e.target.value})} className="form-input" style={{ flex:1 }} />
               <button type="submit" className="btn btn-gold" disabled={saving} style={{ whiteSpace:'nowrap' }}>+ Agregar</button>
             </form>
 
-            {/* List */}
             {!asistenciaData ? (
               <div style={{ textAlign:'center', padding:20 }}><span className="spinner" /></div>
             ) : asistenciaData.registros?.length === 0 ? (
-              <div style={{ textAlign:'center', padding:20, color:'var(--text-muted)', fontSize:13 }}>Sin registros aún</div>
+              <div style={{ textAlign:'center', padding:20, color:'var(--text-muted)', fontSize:13 }}>Sin registros a\u00fan</div>
             ) : (
               <div style={{ maxHeight:250, overflowY:'auto' }}>
                 {asistenciaData.registros.map((r, i) => (
                   <div key={i} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'8px 0', borderBottom:'1px solid var(--border)' }}>
                     <span style={{ fontWeight:500, fontSize:13 }}>{r.nombre_visita || 'Miembro registrado'}</span>
-                    <span className={`badge ${r.presente ? 'badge-green' : 'badge-red'}`}>{r.presente ? 'Presente' : 'Ausente'}</span>
+                    <span className={\adge \\}>{r.presente ? 'Presente' : 'Ausente'}</span>
                   </div>
                 ))}
               </div>
