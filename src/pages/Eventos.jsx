@@ -139,7 +139,7 @@ export default function Eventos() {
               </div>
               <div className="form-group">
                 <label className="form-label">Fecha y hora *</label>
-                <input type="datetime-local" value={form.fecha_inicio} onChange={e=>setForm({...form,fecha_inicio:e.target.value})} className="form-input" required />
+                <DatePicker name="fecha_inicio" value={form.fecha_inicio} onChange={e=>setForm({...form,fecha_inicio:e.target.value})} required />
               </div>
             </div>
             <div className="form-group">
@@ -205,6 +205,7 @@ export default function Eventos() {
     </div>
   )
 }
+
 
 
 

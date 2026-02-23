@@ -157,7 +157,7 @@ function MiembroForm({ initial, onSave, onClose }) {
         <Field label="Nombres *"><input name="nombres" value={form.nombres} onChange={hCapWords} className="form-input" required /></Field>
         <Field label="Apellidos *"><input name="apellidos" value={form.apellidos} onChange={hCapWords} className="form-input" required /></Field>
         <Field label="Cédula"><input name="cedula" value={form.cedula||''} onChange={h} className="form-input" /></Field>
-        <Field label="Fecha de nacimiento"><input name="fecha_nacimiento" type="date" value={form.fecha_nacimiento||''} onChange={h} className="form-input" /></Field>
+        <Field label="Fecha de nacimiento"><DatePicker name="fecha_nacimiento" value={form.fecha_nacimiento} onChange={h} /></Field>
         <Field label="Teléfono">
           <input name="telefono" type="tel" value={form.telefono||''} onChange={hTel('telefono')} className="form-input" placeholder="809-000-0000" />
         </Field>
@@ -210,8 +210,8 @@ function MiembroForm({ initial, onSave, onClose }) {
       </Section>
 
       <Section title="III. Información Espiritual">
-        <Field label="Fecha de conversión"><input name="fecha_conversion" type="date" value={form.fecha_conversion||''} onChange={h} className="form-input" /></Field>
-        <Field label="Fecha de bautismo"><input name="fecha_bautismo" type="date" value={form.fecha_bautismo||''} onChange={h} className="form-input" /></Field>
+        <Field label="Fecha de conversión"><DatePicker name="fecha_conversion" value={form.fecha_conversion} onChange={h} /></Field>
+        <Field label="Fecha de bautismo"><DatePicker name="fecha_bautismo" value={form.fecha_bautismo} onChange={h} /></Field>
         <Field label="Iglesia donde fue bautizado"><input name="iglesia_bautismo" value={form.iglesia_bautismo||''} onChange={hCapFirst} className="form-input" /></Field>
         <Field label="Tiempo en esta iglesia"><input name="tiempo_en_iglesia" type="text" value={form.tiempo_en_iglesia||''} onChange={h} className="form-input" placeholder="Ej: 2 años" /></Field>
         <Field label="Miembro activo">{sel('miembro_activo',[['Si','Sí'],['No','No']])}</Field>
@@ -543,6 +543,7 @@ export default function Miembros() {
     </div>
   )
 }
+
 
 
 
