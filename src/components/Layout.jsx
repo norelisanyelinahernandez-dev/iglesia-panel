@@ -6,7 +6,6 @@ import './Layout.css'
 
 const NAV = [
   { to: '/',            label: 'Panel',      seccion: 'panel' },
-  { to: '/asistente',   label: '✦ Asistente IA', seccion: 'panel' },
   { to: '/miembros',    label: 'Miembros',   seccion: 'miembros' },
   { to: '/tesoreria',   label: 'Tesoreria',  seccion: 'tesoreria' },
   { to: '/finanzas',    label: 'Finanzas',   seccion: 'finanzas' },
@@ -90,3 +89,4 @@ export default function Layout({ children }) {
     </div>
   )
 }
+
