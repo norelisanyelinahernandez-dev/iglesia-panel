@@ -439,7 +439,7 @@ export default function Tesoreria() {
           <div className="grid-2">
             <div className="stat-card" style={{ border:'1px solid var(--gold)', textAlign:'center' }}>
               <div style={{ fontSize:28, marginBottom:8 }}>🏦</div>
-              <div style={{ fontSize:13, color:'var(--text-muted)', marginBottom:4 }}>Envios de Diezmos del mes</div>
+              <div style={{ fontSize:13, color:'var(--text-muted)', marginBottom:4 }}>Envío del diezmo de diezmo</div>
               <div style={{ fontSize:12, color:'var(--text-muted)', marginBottom:8 }}>{enviosDiezmos.length} registro(s)</div>
               {enviosDiezmos.map((e,i) => (
                 <div key={i} style={{ fontSize:12, color:'var(--text-muted)', marginBottom:2 }}>
@@ -454,7 +454,7 @@ export default function Tesoreria() {
 
             <div className="stat-card" style={{ border:'1px solid var(--green)', textAlign:'center' }}>
               <div style={{ fontSize:28, marginBottom:8 }}>💝</div>
-              <div style={{ fontSize:13, color:'var(--text-muted)', marginBottom:4 }}>Envios de Ofrendas del mes</div>
+              <div style={{ fontSize:13, color:'var(--text-muted)', marginBottom:4 }}>Envío del diezmo de ofrenda</div>
               <div style={{ fontSize:12, color:'var(--text-muted)', marginBottom:8 }}>{enviosOfrendas.length} registro(s)</div>
               {enviosOfrendas.map((e,i) => (
                 <div key={i} style={{ fontSize:12, color:'var(--text-muted)', marginBottom:2 }}>
@@ -556,6 +556,7 @@ export default function Tesoreria() {
     </div>
   )
 }
+
 
 
 
