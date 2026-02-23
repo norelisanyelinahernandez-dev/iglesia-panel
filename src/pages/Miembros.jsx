@@ -7,7 +7,8 @@ const ESTADO_BADGE = { activo:'badge-green', inactivo:'badge-red', visita:'badge
 const EMPTY = {
   nombres:'', apellidos:'', cedula:'', telefono:'', email:'', genero:'', estado_civil:'', direccion:'', fecha_nacimiento:'',
   fecha_conversion:'', fecha_bautismo:'', tipo_bautismo:'', rol:'miembro', estado:'activo', notas:'',
-  nombre_conyuge:'', numero_hijos:'', telefono_emergencia:'', nombres_hijos:'',
+  tiene_conyuge:'no', nombre_conyuge:'', telefono_conyuge:'', tiene_hijos:'no', numero_hijos:0, hijos:[],
+  telefono_emergencia:'',
   iglesia_bautismo:'', tiempo_en_iglesia:'', miembro_activo:'Si',
   ministerio_actual:'', ministerios_anteriores:'', dones_talentos:'', disponibilidad:'',
   visitas_pastorales:'No', consejeria_pastoral:'No', motivo_oracion:'', foto:''
@@ -67,6 +68,18 @@ function MiembroForm({ initial, onSave, onClose }) {
     reader.readAsDataURL(file)
   }
 
+  const handleNumHijos = (e) => {
+    const n = parseInt(e.target.value) || 0
+    const hijos = Array.from({ length: n }, (_, i) => form.hijos?.[i] || { nombre:'', edad:'', observacion:'' })
+    setForm({ ...form, numero_hijos: n, hijos })
+  }
+
+  const handleHijo = (i, campo, valor) => {
+    const hijos = [...(form.hijos || [])]
+    hijos[i] = { ...hijos[i], [campo]: valor }
+    setForm({ ...form, hijos })
+  }
+
   const submit = async (e) => {
     e.preventDefault()
     setLoading(true); setError('')
@@ -75,6 +88,9 @@ function MiembroForm({ initial, onSave, onClose }) {
       if (!payload.fecha_nacimiento) delete payload.fecha_nacimiento
       if (!payload.fecha_conversion) delete payload.fecha_conversion
       if (!payload.fecha_bautismo) delete payload.fecha_bautismo
+      if (payload.tiene_conyuge === 'no') { payload.nombre_conyuge = ''; payload.telefono_conyuge = '' }
+      if (payload.tiene_hijos === 'no') { payload.numero_hijos = 0; payload.hijos = [] }
+      payload.nombres_hijos = (payload.hijos || []).map((h,i) => `${i+1}. ${h.nombre} (${h.edad} años)${h.observacion ? ' - '+h.observacion : ''}`).join('\n')
       if (initial?.id) await updateMiembro(initial.id, payload)
       else await createMiembro(payload)
       onSave()
@@ -115,7 +131,7 @@ function MiembroForm({ initial, onSave, onClose }) {
         </FullWidth>
       </Section>
 
-      <Section title="I. Informacion Personal">
+      <Section title="I. Información Personal">
         <Field label="Nombres *"><input name="nombres" value={form.nombres} onChange={h} className="form-input" required /></Field>
         <Field label="Apellidos *"><input name="apellidos" value={form.apellidos} onChange={h} className="form-input" required /></Field>
         <Field label="Cédula">{inp('cedula')}</Field>
@@ -127,20 +143,66 @@ function MiembroForm({ initial, onSave, onClose }) {
         <FullWidth><Field label="Dirección">{inp('direccion')}</Field></FullWidth>
       </Section>
 
-      <Section title="II. Informacion Familiar">
-        <Field label="Nombre del conyuge">{inp('nombre_conyuge')}</Field>
-        <Field label="Número de hijos">{inp('numero_hijos','number')}</Field>
+      <Section title="II. Información Familiar">
+        <FullWidth>
+          <Field label="¿Tiene cónyuge?">
+            {sel('tiene_conyuge',[['no','No'],['si','Sí']])}
+          </Field>
+        </FullWidth>
+
+        {form.tiene_conyuge === 'si' && (
+          <>
+            <Field label="Nombre del cónyuge">{inp('nombre_conyuge')}</Field>
+            <Field label="Teléfono del cónyuge">{inp('telefono_conyuge','tel')}</Field>
+          </>
+        )}
+
+        <FullWidth>
+          <Field label="¿Tiene hijos?">
+            {sel('tiene_hijos',[['no','No'],['si','Sí']])}
+          </Field>
+        </FullWidth>
+
+        {form.tiene_hijos === 'si' && (
+          <FullWidth>
+            <Field label="¿Cuántos hijos?">
+              <input type="number" min="1" max="20" value={form.numero_hijos||0} onChange={handleNumHijos} className="form-input" style={{ width:100 }} />
+            </Field>
+          </FullWidth>
+        )}
+
+        {form.tiene_hijos === 'si' && form.numero_hijos > 0 && (form.hijos||[]).map((hijo, i) => (
+          <FullWidth key={i}>
+            <div style={{ background:'var(--bg-card)', border:'1px solid var(--border)', borderRadius:8, padding:14, marginTop:6 }}>
+              <div style={{ fontWeight:700, fontSize:13, color:'var(--gold)', marginBottom:10 }}>Hijo/a #{i+1}</div>
+              <div className="grid-2" style={{ gap:10 }}>
+                <div className="form-group">
+                  <label className="form-label">Nombre completo</label>
+                  <input value={hijo.nombre||''} onChange={e => handleHijo(i,'nombre',e.target.value)} className="form-input" placeholder="Nombre del hijo/a" />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Edad</label>
+                  <input type="number" min="0" value={hijo.edad||''} onChange={e => handleHijo(i,'edad',e.target.value)} className="form-input" placeholder="Años" />
+                </div>
+                <div className="form-group" style={{ gridColumn:'1 / -1' }}>
+                  <label className="form-label">Observación (opcional)</label>
+                  <input value={hijo.observacion||''} onChange={e => handleHijo(i,'observacion',e.target.value)} className="form-input" placeholder="Ej: estudia, trabaja, etc." />
+                </div>
+              </div>
+            </div>
+          </FullWidth>
+        ))}
+
         <Field label="Teléfono de emergencia">{inp('telefono_emergencia','tel')}</Field>
-        <FullWidth><Field label="Nombres y edades de los hijos">{ta('nombres_hijos',2)}</Field></FullWidth>
       </Section>
 
-      <Section title="III. Informacion Espiritual">
+      <Section title="III. Información Espiritual">
         <Field label="Fecha de conversión">{inp('fecha_conversion','date')}</Field>
         <Field label="Fecha de bautismo">{inp('fecha_bautismo','date')}</Field>
         <Field label="Iglesia donde fue bautizado">{inp('iglesia_bautismo')}</Field>
         <Field label="Tiempo en esta iglesia">{inp('tiempo_en_iglesia','','Ej: 2 años')}</Field>
-        <Field label="Miembro activo">{sel('miembro_activo',[['Si','Si'],['No','No']])}</Field>
-        <Field label="Rol">{sel('rol',[['miembro','Miembro'],['lider','Lider'],['diacono','Diacono'],['co-pastor','Co-Pastor'],['pastor','Pastor'],['secretario','Secretario/a'],['tesorero','Tesorero/a'],['maestro','Maestro/a de niños'],['visitante','Visitante']])}</Field>
+        <Field label="Miembro activo">{sel('miembro_activo',[['Si','Sí'],['No','No']])}</Field>
+        <Field label="Rol">{sel('rol',[['miembro','Miembro'],['lider','Líder'],['diacono','Diácono'],['secretario','Secretario/a'],['tesorero','Tesorero/a'],['maestro','Maestro/a de niños'],['co-pastor','Co-Pastor'],['pastor','Pastor'],['visitante','Visitante']])}</Field>
         <Field label="Estado">{sel('estado',[['activo','Activo'],['inactivo','Inactivo'],['visita','Visita'],['trasladado','Trasladado']])}</Field>
       </Section>
 
@@ -152,8 +214,8 @@ function MiembroForm({ initial, onSave, onClose }) {
       </Section>
 
       <Section title="V. Cuidado Pastoral">
-        <Field label="¿Visitas pastorales?">{sel('visitas_pastorales',[['Si','Si'],['No','No']])}</Field>
-        <Field label="¿Consejería pastoral?">{sel('consejeria_pastoral',[['Si','Si'],['No','No']])}</Field>
+        <Field label="¿Visitas pastorales?">{sel('visitas_pastorales',[['No','No'],['Si','Sí']])}</Field>
+        <Field label="¿Consejería pastoral?">{sel('consejeria_pastoral',[['No','No'],['Si','Sí']])}</Field>
         <FullWidth><Field label="Motivo de oración">{ta('motivo_oracion',2)}</Field></FullWidth>
         <FullWidth><Field label="Notas adicionales">{ta('notas',2)}</Field></FullWidth>
       </Section>
@@ -214,50 +276,45 @@ function PerfilModal({ miembro, onClose, onEdit }) {
             <p style="margin:0; font-size:13px; color:#666;">${miembro.rol || ''} | ${miembro.estado || ''}</p>
           </div>
         </div>
-
-        <h2>I. Informacion Personal</h2>
+        <h2>I. Información Personal</h2>
         <div class="grid">
-          ${miembro.cedula ? `<div class="campo"><span class="label">Cedula: </span>${miembro.cedula}</div>` : ''}
+          ${miembro.cedula ? `<div class="campo"><span class="label">Cédula: </span>${miembro.cedula}</div>` : ''}
           ${miembro.fecha_nacimiento ? `<div class="campo"><span class="label">Nacimiento: </span>${new Date(miembro.fecha_nacimiento).toLocaleDateString('es-DO')}</div>` : ''}
-          ${miembro.telefono ? `<div class="campo"><span class="label">Telefono: </span>${miembro.telefono}</div>` : ''}
+          ${miembro.telefono ? `<div class="campo"><span class="label">Teléfono: </span>${miembro.telefono}</div>` : ''}
           ${miembro.email ? `<div class="campo"><span class="label">Email: </span>${miembro.email}</div>` : ''}
-          ${miembro.genero ? `<div class="campo"><span class="label">Genero: </span>${miembro.genero === 'M' ? 'Masculino' : miembro.genero === 'F' ? 'Femenino' : miembro.genero}</div>` : ''}
+          ${miembro.genero ? `<div class="campo"><span class="label">Género: </span>${miembro.genero === 'M' ? 'Masculino' : miembro.genero === 'F' ? 'Femenino' : miembro.genero}</div>` : ''}
           ${miembro.estado_civil ? `<div class="campo"><span class="label">Estado civil: </span>${miembro.estado_civil}</div>` : ''}
         </div>
-        ${miembro.direccion ? `<div class="campo"><span class="label">Direccion: </span>${miembro.direccion}</div>` : ''}
-
-        <h2>II. Informacion Familiar</h2>
+        ${miembro.direccion ? `<div class="campo"><span class="label">Dirección: </span>${miembro.direccion}</div>` : ''}
+        <h2>II. Información Familiar</h2>
         <div class="grid">
-          ${miembro.nombre_conyuge ? `<div class="campo"><span class="label">Conyuge: </span>${miembro.nombre_conyuge}</div>` : ''}
-          ${miembro.numero_hijos ? `<div class="campo"><span class="label">Hijos: </span>${miembro.numero_hijos}</div>` : ''}
+          ${miembro.nombre_conyuge ? `<div class="campo"><span class="label">Cónyuge: </span>${miembro.nombre_conyuge}</div>` : ''}
+          ${miembro.telefono_conyuge ? `<div class="campo"><span class="label">Tel. cónyuge: </span>${miembro.telefono_conyuge}</div>` : ''}
+          ${miembro.numero_hijos ? `<div class="campo"><span class="label">Número de hijos: </span>${miembro.numero_hijos}</div>` : ''}
           ${miembro.telefono_emergencia ? `<div class="campo"><span class="label">Tel. emergencia: </span>${miembro.telefono_emergencia}</div>` : ''}
         </div>
-        ${miembro.nombres_hijos ? `<div class="campo"><span class="label">Nombres de hijos: </span>${miembro.nombres_hijos}</div>` : ''}
-
-        <h2>III. Informacion Espiritual</h2>
+        ${miembro.nombres_hijos ? `<div class="campo"><span class="label">Hijos: </span><pre style="font-family:Arial;font-size:13px;margin:4px 0">${miembro.nombres_hijos}</pre></div>` : ''}
+        <h2>III. Información Espiritual</h2>
         <div class="grid">
-          ${miembro.fecha_conversion ? `<div class="campo"><span class="label">Conversion: </span>${new Date(miembro.fecha_conversion).toLocaleDateString('es-DO')}</div>` : ''}
+          ${miembro.fecha_conversion ? `<div class="campo"><span class="label">Conversión: </span>${new Date(miembro.fecha_conversion).toLocaleDateString('es-DO')}</div>` : ''}
           ${miembro.fecha_bautismo ? `<div class="campo"><span class="label">Bautismo: </span>${new Date(miembro.fecha_bautismo).toLocaleDateString('es-DO')}</div>` : ''}
           ${miembro.iglesia_bautismo ? `<div class="campo"><span class="label">Iglesia bautismo: </span>${miembro.iglesia_bautismo}</div>` : ''}
           ${miembro.tiempo_en_iglesia ? `<div class="campo"><span class="label">Tiempo en iglesia: </span>${miembro.tiempo_en_iglesia}</div>` : ''}
           ${miembro.miembro_activo ? `<div class="campo"><span class="label">Miembro activo: </span>${miembro.miembro_activo}</div>` : ''}
         </div>
-
         <h2>IV. Servicio y Ministerio</h2>
         ${miembro.ministerio_actual ? `<div class="campo"><span class="label">Ministerio actual: </span>${miembro.ministerio_actual}</div>` : ''}
         ${miembro.ministerios_anteriores ? `<div class="campo"><span class="label">Ministerios anteriores: </span>${miembro.ministerios_anteriores}</div>` : ''}
         ${miembro.dones_talentos ? `<div class="campo"><span class="label">Dones y talentos: </span>${miembro.dones_talentos}</div>` : ''}
         ${miembro.disponibilidad ? `<div class="campo"><span class="label">Disponibilidad: </span>${miembro.disponibilidad}</div>` : ''}
-
         <h2>V. Cuidado Pastoral</h2>
         <div class="grid">
           ${miembro.visitas_pastorales ? `<div class="campo"><span class="label">Visitas pastorales: </span>${miembro.visitas_pastorales}</div>` : ''}
-          ${miembro.consejeria_pastoral ? `<div class="campo"><span class="label">Consejeria: </span>${miembro.consejeria_pastoral}</div>` : ''}
+          ${miembro.consejeria_pastoral ? `<div class="campo"><span class="label">Consejería: </span>${miembro.consejeria_pastoral}</div>` : ''}
         </div>
-        ${miembro.motivo_oracion ? `<div class="campo"><span class="label">Motivo de oracion: </span>${miembro.motivo_oracion}</div>` : ''}
+        ${miembro.motivo_oracion ? `<div class="campo"><span class="label">Motivo de oración: </span>${miembro.motivo_oracion}</div>` : ''}
         ${miembro.notas ? `<div class="campo"><span class="label">Notas: </span>${miembro.notas}</div>` : ''}
-
-        <div class="versiculo">"El que cree en mi, como dice la Escritura, de su interior correran rios de agua viva." — Juan 7:38</div>
+        <div class="versiculo">"El que cree en mí, como dice la Escritura, de su interior correrán ríos de agua viva." — Juan 7:38</div>
       </body>
       </html>
     `)
@@ -285,23 +342,29 @@ function PerfilModal({ miembro, onClose, onEdit }) {
         </div>
       </div>
 
-      {seccion('I. Informacion Personal', <>
-        {campo('Cedula', miembro.cedula)}
+      {seccion('I. Información Personal', <>
+        {campo('Cédula', miembro.cedula)}
         {campo('Fecha de nacimiento', miembro.fecha_nacimiento ? new Date(miembro.fecha_nacimiento).toLocaleDateString('es-DO') : null)}
-        {campo('Telefono', miembro.telefono)}
+        {campo('Teléfono', miembro.telefono)}
         {campo('Correo', miembro.email)}
-        {campo('Genero', miembro.genero === 'M' ? 'Masculino' : miembro.genero === 'F' ? 'Femenino' : miembro.genero)}
+        {campo('Género', miembro.genero === 'M' ? 'Masculino' : miembro.genero === 'F' ? 'Femenino' : miembro.genero)}
         {campo('Estado civil', miembro.estado_civil)}
-        {campo('Direccion', miembro.direccion)}
+        {campo('Dirección', miembro.direccion)}
       </>)}
-      {seccion('II. Informacion Familiar', <>
-        {campo('Conyuge', miembro.nombre_conyuge)}
-        {campo('Numero de hijos', miembro.numero_hijos)}
-        {campo('Telefono de emergencia', miembro.telefono_emergencia)}
-        {campo('Hijos', miembro.nombres_hijos)}
+      {seccion('II. Información Familiar', <>
+        {campo('Cónyuge', miembro.nombre_conyuge)}
+        {campo('Teléfono cónyuge', miembro.telefono_conyuge)}
+        {campo('Número de hijos', miembro.numero_hijos)}
+        {campo('Teléfono de emergencia', miembro.telefono_emergencia)}
+        {miembro.nombres_hijos && (
+          <div style={{ marginBottom:8 }}>
+            <span style={{ color:'var(--text-muted)', fontSize:12 }}>Hijos: </span>
+            <pre style={{ fontFamily:'inherit', fontSize:13, margin:'4px 0', whiteSpace:'pre-wrap' }}>{miembro.nombres_hijos}</pre>
+          </div>
+        )}
       </>)}
-      {seccion('III. Informacion Espiritual', <>
-        {campo('Fecha de conversion', miembro.fecha_conversion ? new Date(miembro.fecha_conversion).toLocaleDateString('es-DO') : null)}
+      {seccion('III. Información Espiritual', <>
+        {campo('Fecha de conversión', miembro.fecha_conversion ? new Date(miembro.fecha_conversion).toLocaleDateString('es-DO') : null)}
         {campo('Fecha de bautismo', miembro.fecha_bautismo ? new Date(miembro.fecha_bautismo).toLocaleDateString('es-DO') : null)}
         {campo('Iglesia de bautismo', miembro.iglesia_bautismo)}
         {campo('Tiempo en la iglesia', miembro.tiempo_en_iglesia)}
@@ -317,8 +380,8 @@ function PerfilModal({ miembro, onClose, onEdit }) {
       </>)}
       {seccion('V. Cuidado Pastoral', <>
         {campo('Visitas pastorales', miembro.visitas_pastorales)}
-        {campo('Consejeria pastoral', miembro.consejeria_pastoral)}
-        {campo('Motivo de oracion', miembro.motivo_oracion)}
+        {campo('Consejería pastoral', miembro.consejeria_pastoral)}
+        {campo('Motivo de oración', miembro.motivo_oracion)}
         {campo('Notas', miembro.notas)}
       </>)}
     </Modal>
@@ -365,7 +428,7 @@ export default function Miembros() {
       <div style={{ display:'flex', gap:12, marginBottom:20, flexWrap:'wrap' }}>
         <div className="search-bar">
           <span className="search-icon">⌕</span>
-          <input placeholder="Buscar por nombre o cedula..." value={buscar} onChange={e => setBuscar(e.target.value)} />
+          <input placeholder="Buscar por nombre o cédula..." value={buscar} onChange={e => setBuscar(e.target.value)} />
         </div>
         <select value={filtroEstado} onChange={e => setFiltroEstado(e.target.value)} className="form-input" style={{ width:'auto' }}>
           <option value="">Todos los estados</option>
@@ -383,8 +446,8 @@ export default function Miembros() {
               <tr>
                 <th>Foto</th>
                 <th>Nombre</th>
-                <th>Cedula</th>
-                <th>Telefono</th>
+                <th>Cédula</th>
+                <th>Teléfono</th>
                 <th>Rol</th>
                 <th>Estado</th>
                 <th>Bautismo</th>
@@ -439,12 +502,12 @@ export default function Miembros() {
           <div className="modal" style={{ maxWidth:380 }}>
             <div style={{ textAlign:'center', padding:'8px 0 20px' }}>
               <div style={{ fontSize:36, marginBottom:12 }}>⚠️</div>
-              <h3 style={{ fontFamily:'var(--font-heading)', fontSize:18, marginBottom:8 }}>Eliminar miembro?</h3>
-              <p style={{ color:'var(--text-muted)', fontSize:13 }}>Esta accion no se puede deshacer.</p>
+              <h3 style={{ fontFamily:'var(--font-heading)', fontSize:18, marginBottom:8 }}>¿Eliminar miembro?</h3>
+              <p style={{ color:'var(--text-muted)', fontSize:13 }}>Esta acción no se puede deshacer.</p>
             </div>
             <div style={{ display:'flex', gap:10 }}>
               <button className="btn btn-ghost" style={{ flex:1 }} onClick={() => setConfirmDel(null)}>Cancelar</button>
-              <button className="btn btn-danger" style={{ flex:1, justifyContent:'center' }} onClick={handleDelete}>Si, eliminar</button>
+              <button className="btn btn-danger" style={{ flex:1, justifyContent:'center' }} onClick={handleDelete}>Sí, eliminar</button>
             </div>
           </div>
         </div>
@@ -452,7 +515,3 @@ export default function Miembros() {
     </div>
   )
 }
-
-
-
-
