@@ -14,6 +14,7 @@ import Anuncios from './pages/Anuncios'
 import Asistencia from './pages/Asistencia'
 import Reportes from './pages/Reportes'
 import Respaldo from './pages/Respaldo'
+import Finanzas from './pages/Finanzas'
 
 function PrivateRoute({ children }) {
   const { user } = useAuth()
@@ -46,6 +47,7 @@ function AppRoutes() {
                 <Route path="/asistencia" element={<RutaProtegida seccion="asistencia"><Asistencia /></RutaProtegida>} />
                 <Route path="/reportes"   element={<RutaProtegida seccion="reportes"><Reportes /></RutaProtegida>} />
                 <Route path="/respaldo"   element={<RutaProtegida seccion="respaldo"><Respaldo /></RutaProtegida>} />
+                <Route path="/finanzas"   element={<RutaProtegida seccion="finanzas"><Finanzas /></RutaProtegida>} />
                 <Route path="*"           element={<Navigate to="/" replace />} />
               </Routes>
             </Layout>

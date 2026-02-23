@@ -2,14 +2,14 @@
 import { useAuth } from './AuthContext'
 
 const PERMISOS = {
-  admin:      ['panel','miembros','tesoreria','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo','ver_balance'],
-  pastor:     ['panel','miembros','tesoreria','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo','ver_balance'],
-  pastora:    ['panel','miembros','tesoreria','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo','ver_balance'],
-  copastor:   ['panel','miembros','tesoreria','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo','ver_balance'],
-  copastora:  ['panel','miembros','tesoreria','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo','ver_balance'],
-  secretaria: ['panel','miembros','tesoreria','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo','ver_balance'],
-  tesorero:   ['panel','tesoreria','reportes','respaldo','ver_balance'],
-  tesorera:   ['panel','tesoreria','reportes','respaldo','ver_balance'],
+  admin:      ['panel','miembros','tesoreria','finanzas','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo','ver_balance'],
+  pastor:     ['panel','miembros','tesoreria','finanzas','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo','ver_balance'],
+  pastora:    ['panel','miembros','tesoreria','finanzas','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo','ver_balance'],
+  copastor:   ['panel','miembros','tesoreria','finanzas','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo','ver_balance'],
+  copastora:  ['panel','miembros','tesoreria','finanzas','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo','ver_balance'],
+  secretaria: ['panel','miembros','tesoreria','finanzas','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo','ver_balance'],
+  tesorero:   ['panel','tesoreria','finanzas','reportes','respaldo','ver_balance'],
+  tesorera:   ['panel','tesoreria','finanzas','reportes','respaldo','ver_balance'],
   diacono:    ['panel','miembros','eventos','asistencia','programa'],
   maestra:    ['panel','programa','asistencia','anuncios'],
   miembro:    ['panel','programa','eventos'],

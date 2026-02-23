@@ -7,6 +7,7 @@ const NAV = [
   { to: '/',            label: 'Panel',      seccion: 'panel' },
   { to: '/miembros',    label: 'Miembros',   seccion: 'miembros' },
   { to: '/tesoreria',   label: 'Tesoreria',  seccion: 'tesoreria' },
+  { to: '/finanzas',    label: 'Finanzas',   seccion: 'finanzas' },
   { to: '/reportes',    label: 'Reportes',   seccion: 'reportes' },
   { to: '/inventario',  label: 'Inventario', seccion: 'inventario' },
   { to: '/eventos',     label: 'Eventos',    seccion: 'eventos' },
