@@ -14,6 +14,16 @@ const EMPTY = {
   visitas_pastorales:'No', consejeria_pastoral:'No', motivo_oracion:'', foto:''
 }
 
+const capFirst = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : str
+const capWords = (str) => str ? str.replace(/\b\w/g, c => c.toUpperCase()) : str
+
+const formatTel = (val) => {
+  const nums = val.replace(/\D/g, '').slice(0, 10)
+  if (nums.length <= 3) return nums
+  if (nums.length <= 6) return `${nums.slice(0,3)}-${nums.slice(3)}`
+  return `${nums.slice(0,3)}-${nums.slice(3,6)}-${nums.slice(6)}`
+}
+
 function Section({ title, children }) {
   return (
     <div style={{ marginBottom:20 }}>
@@ -55,10 +65,24 @@ function Modal({ title, onClose, children }) {
 }
 
 function MiembroForm({ initial, onSave, onClose }) {
-  const [form, setForm] = useState(initial ? { ...EMPTY, ...initial } : EMPTY)
+  const [form, setForm] = useState(() => {
+    if (!initial) return { ...EMPTY }
+    return {
+      ...EMPTY,
+      ...initial,
+      tiene_conyuge: initial.nombre_conyuge ? 'si' : (initial.tiene_conyuge || 'no'),
+      tiene_hijos: (initial.numero_hijos > 0 || initial.hijos?.length > 0) ? 'si' : (initial.tiene_hijos || 'no'),
+      hijos: initial.hijos || [],
+      tiempo_en_iglesia: initial.tiempo_en_iglesia || '',
+    }
+  })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
   const h = (e) => setForm({ ...form, [e.target.name]: e.target.value })
+  const hCapFirst = (e) => setForm({ ...form, [e.target.name]: capFirst(e.target.value) })
+  const hCapWords = (e) => setForm({ ...form, [e.target.name]: capWords(e.target.value) })
+  const hTel = (name) => (e) => setForm({ ...form, [name]: formatTel(e.target.value) })
 
   const handleFoto = (e) => {
     const file = e.target.files[0]
@@ -99,9 +123,6 @@ function MiembroForm({ initial, onSave, onClose }) {
     } finally { setLoading(false) }
   }
 
-  const inp = (name, type='text', placeholder='') => (
-    <input name={name} type={type} value={form[name]||''} onChange={h} className="form-input" placeholder={placeholder} />
-  )
   const sel = (name, options) => (
     <select name={name} value={form[name]||''} onChange={h} className="form-input">
       {options.map(([v,l]) => <option key={v} value={v}>{l}</option>)}
@@ -132,37 +153,28 @@ function MiembroForm({ initial, onSave, onClose }) {
       </Section>
 
       <Section title="I. Información Personal">
-        <Field label="Nombres *"><input name="nombres" value={form.nombres} onChange={h} className="form-input" required /></Field>
-        <Field label="Apellidos *"><input name="apellidos" value={form.apellidos} onChange={h} className="form-input" required /></Field>
-        <Field label="Cédula">{inp('cedula')}</Field>
-        <Field label="Fecha de nacimiento">{inp('fecha_nacimiento','date')}</Field>
-        <Field label="Teléfono">{inp('telefono','tel')}</Field>
-        <Field label="Correo electrónico">{inp('email','email')}</Field>
+        <Field label="Nombres *"><input name="nombres" value={form.nombres} onChange={hCapWords} className="form-input" required /></Field>
+        <Field label="Apellidos *"><input name="apellidos" value={form.apellidos} onChange={hCapWords} className="form-input" required /></Field>
+        <Field label="Cédula"><input name="cedula" value={form.cedula||''} onChange={h} className="form-input" /></Field>
+        <Field label="Fecha de nacimiento"><input name="fecha_nacimiento" type="date" value={form.fecha_nacimiento||''} onChange={h} className="form-input" /></Field>
+        <Field label="Teléfono">
+          <input name="telefono" type="tel" value={form.telefono||''} onChange={hTel('telefono')} className="form-input" placeholder="809-000-0000" />
+        </Field>
+        <Field label="Correo electrónico"><input name="email" type="email" value={form.email||''} onChange={h} className="form-input" /></Field>
         <Field label="Género">{sel('genero',[['','-- Seleccionar --'],['M','Masculino'],['F','Femenino'],['O','Otro']])}</Field>
         <Field label="Estado civil">{sel('estado_civil',[['','-- Seleccionar --'],['soltero','Soltero/a'],['casado','Casado/a'],['viudo','Viudo/a'],['divorciado','Divorciado/a']])}</Field>
-        <FullWidth><Field label="Dirección">{inp('direccion')}</Field></FullWidth>
+        <FullWidth><Field label="Dirección"><input name="direccion" value={form.direccion||''} onChange={hCapFirst} className="form-input" /></Field></FullWidth>
       </Section>
 
       <Section title="II. Información Familiar">
-        <FullWidth>
-          <Field label="¿Tiene cónyuge?">
-            {sel('tiene_conyuge',[['no','No'],['si','Sí']])}
-          </Field>
-        </FullWidth>
-
+        <FullWidth><Field label="¿Tiene cónyuge?">{sel('tiene_conyuge',[['no','No'],['si','Sí']])}</Field></FullWidth>
         {form.tiene_conyuge === 'si' && (
           <>
-            <Field label="Nombre del cónyuge">{inp('nombre_conyuge')}</Field>
-            <Field label="Teléfono del cónyuge">{inp('telefono_conyuge','tel')}</Field>
+            <Field label="Nombre del cónyuge"><input name="nombre_conyuge" value={form.nombre_conyuge||''} onChange={hCapWords} className="form-input" /></Field>
+            <Field label="Teléfono del cónyuge"><input name="telefono_conyuge" type="tel" value={form.telefono_conyuge||''} onChange={hTel('telefono_conyuge')} className="form-input" placeholder="809-000-0000" /></Field>
           </>
         )}
-
-        <FullWidth>
-          <Field label="¿Tiene hijos?">
-            {sel('tiene_hijos',[['no','No'],['si','Sí']])}
-          </Field>
-        </FullWidth>
-
+        <FullWidth><Field label="¿Tiene hijos?">{sel('tiene_hijos',[['no','No'],['si','Sí']])}</Field></FullWidth>
         {form.tiene_hijos === 'si' && (
           <FullWidth>
             <Field label="¿Cuántos hijos?">
@@ -170,7 +182,6 @@ function MiembroForm({ initial, onSave, onClose }) {
             </Field>
           </FullWidth>
         )}
-
         {form.tiene_hijos === 'si' && form.numero_hijos > 0 && (form.hijos||[]).map((hijo, i) => (
           <FullWidth key={i}>
             <div style={{ background:'var(--bg-card)', border:'1px solid var(--border)', borderRadius:8, padding:14, marginTop:6 }}>
@@ -178,7 +189,7 @@ function MiembroForm({ initial, onSave, onClose }) {
               <div className="grid-2" style={{ gap:10 }}>
                 <div className="form-group">
                   <label className="form-label">Nombre completo</label>
-                  <input value={hijo.nombre||''} onChange={e => handleHijo(i,'nombre',e.target.value)} className="form-input" placeholder="Nombre del hijo/a" />
+                  <input value={hijo.nombre||''} onChange={e => handleHijo(i,'nombre',capWords(e.target.value))} className="form-input" placeholder="Nombre del hijo/a" />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Edad</label>
@@ -186,31 +197,32 @@ function MiembroForm({ initial, onSave, onClose }) {
                 </div>
                 <div className="form-group" style={{ gridColumn:'1 / -1' }}>
                   <label className="form-label">Observación (opcional)</label>
-                  <input value={hijo.observacion||''} onChange={e => handleHijo(i,'observacion',e.target.value)} className="form-input" placeholder="Ej: estudia, trabaja, etc." />
+                  <input value={hijo.observacion||''} onChange={e => handleHijo(i,'observacion',capFirst(e.target.value))} className="form-input" placeholder="Ej: estudia, trabaja, etc." />
                 </div>
               </div>
             </div>
           </FullWidth>
         ))}
-
-        <Field label="Teléfono de emergencia">{inp('telefono_emergencia','tel')}</Field>
+        <Field label="Teléfono de emergencia">
+          <input name="telefono_emergencia" type="tel" value={form.telefono_emergencia||''} onChange={hTel('telefono_emergencia')} className="form-input" placeholder="809-000-0000" />
+        </Field>
       </Section>
 
       <Section title="III. Información Espiritual">
-        <Field label="Fecha de conversión">{inp('fecha_conversion','date')}</Field>
-        <Field label="Fecha de bautismo">{inp('fecha_bautismo','date')}</Field>
-        <Field label="Iglesia donde fue bautizado">{inp('iglesia_bautismo')}</Field>
-        <Field label="Tiempo en esta iglesia">{inp('tiempo_en_iglesia','','Ej: 2 años')}</Field>
+        <Field label="Fecha de conversión"><input name="fecha_conversion" type="date" value={form.fecha_conversion||''} onChange={h} className="form-input" /></Field>
+        <Field label="Fecha de bautismo"><input name="fecha_bautismo" type="date" value={form.fecha_bautismo||''} onChange={h} className="form-input" /></Field>
+        <Field label="Iglesia donde fue bautizado"><input name="iglesia_bautismo" value={form.iglesia_bautismo||''} onChange={hCapFirst} className="form-input" /></Field>
+        <Field label="Tiempo en esta iglesia"><input name="tiempo_en_iglesia" type="text" value={form.tiempo_en_iglesia||''} onChange={h} className="form-input" placeholder="Ej: 2 años" /></Field>
         <Field label="Miembro activo">{sel('miembro_activo',[['Si','Sí'],['No','No']])}</Field>
         <Field label="Rol">{sel('rol',[['miembro','Miembro'],['lider','Líder'],['diacono','Diácono'],['secretario','Secretario/a'],['tesorero','Tesorero/a'],['maestro','Maestro/a de niños'],['co-pastor','Co-Pastor'],['pastor','Pastor'],['visitante','Visitante']])}</Field>
         <Field label="Estado">{sel('estado',[['activo','Activo'],['inactivo','Inactivo'],['visita','Visita'],['trasladado','Trasladado']])}</Field>
       </Section>
 
       <Section title="IV. Servicio y Ministerio">
-        <FullWidth><Field label="Ministerio actual">{inp('ministerio_actual')}</Field></FullWidth>
+        <FullWidth><Field label="Ministerio actual"><input name="ministerio_actual" value={form.ministerio_actual||''} onChange={hCapFirst} className="form-input" /></Field></FullWidth>
         <FullWidth><Field label="Ministerios anteriores">{ta('ministerios_anteriores',2)}</Field></FullWidth>
         <FullWidth><Field label="Dones o talentos">{ta('dones_talentos',2)}</Field></FullWidth>
-        <FullWidth><Field label="Disponibilidad">{inp('disponibilidad','','Ej: Lunes y viernes, tarde')}</Field></FullWidth>
+        <FullWidth><Field label="Disponibilidad"><input name="disponibilidad" value={form.disponibilidad||''} onChange={hCapFirst} className="form-input" placeholder="Ej: Lunes y viernes, tarde" /></Field></FullWidth>
       </Section>
 
       <Section title="V. Cuidado Pastoral">
@@ -394,7 +406,6 @@ export default function Miembros() {
   const [buscar, setBuscar] = useState('')
   const [filtroEstado, setFiltroEstado] = useState('')
   const [filtroRol, setFiltroRol] = useState('')
-  const [filtroMinisterio, setFiltroMinisterio] = useState('')
   const [modal, setModal] = useState(null)
   const [perfil, setPerfil] = useState(null)
   const [confirmDel, setConfirmDel] = useState(null)
@@ -530,5 +541,3 @@ export default function Miembros() {
     </div>
   )
 }
-
-
