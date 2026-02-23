@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import { PermisosProvider, usePermisos } from './context/PermisosContext'
 import Layout from './components/Layout'
 import SplashScreen from './components/SplashScreen'
+import NotificacionCumple from './components/NotificacionCumple'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Miembros from './pages/Miembros'
@@ -69,7 +70,9 @@ export default function App() {
       <BrowserRouter>
         {splash && <SplashScreen onDone={() => setSplash(false)} />}
         <AppRoutes />
+        <NotificacionCumple />
       </BrowserRouter>
     </AuthProvider>
   )
 }
+
