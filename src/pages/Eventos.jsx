@@ -146,7 +146,7 @@ export default function Eventos() {
               <input value={form.lugar} onChange={e=>setForm({...form,lugar:e.target.value})} className="form-input" />
             </div>
             <div className="form-group">
-              <label className="form-label">Descripci\u00f3n</label>
+              <label className="form-label">Descripción</label>
               <textarea value={form.descripcion} onChange={e=>setForm({...form,descripcion:e.target.value})} className="form-input" rows={2} style={{ resize:'vertical' }} />
             </div>
             <div style={{ display:'flex', gap:10, justifyContent:'flex-end' }}>
@@ -187,7 +187,7 @@ export default function Eventos() {
             {!asistenciaData ? (
               <div style={{ textAlign:'center', padding:20 }}><span className="spinner" /></div>
             ) : asistenciaData.registros?.length === 0 ? (
-              <div style={{ textAlign:'center', padding:20, color:'var(--text-muted)', fontSize:13 }}>Sin registros a\u00fan</div>
+              <div style={{ textAlign:'center', padding:20, color:'var(--text-muted)', fontSize:13 }}>Sin registros aún</div>
             ) : (
               <div style={{ maxHeight:250, overflowY:'auto' }}>
                 {asistenciaData.registros.map((r, i) => (
@@ -204,6 +204,7 @@ export default function Eventos() {
     </div>
   )
 }
+
 
 
 
