@@ -1,7 +1,7 @@
 ﻿import { useEffect, useState } from 'react'
 import { getMiembros, createMiembro, updateMiembro, deleteMiembro } from '../api/client'
 
-const ROL_BADGE = { pastor:'badge-gold', 'co-pastor':'badge-gold', diacono:'badge-blue', lider:'badge-blue', miembro:'badge-green', visitante:'badge-amber' }
+const ROL_BADGE = { pastor:'badge-gold', 'co-pastor':'badge-gold', diacono:'badge-blue', lider:'badge-blue', miembro:'badge-green', visitante:'badge-amber', secretario:'badge-blue', tesorero:'badge-blue', maestro:'badge-blue' }
 const ESTADO_BADGE = { activo:'badge-green', inactivo:'badge-red', visita:'badge-amber', trasladado:'badge-blue' }
 
 const EMPTY = {
@@ -118,29 +118,29 @@ function MiembroForm({ initial, onSave, onClose }) {
       <Section title="I. Informacion Personal">
         <Field label="Nombres *"><input name="nombres" value={form.nombres} onChange={h} className="form-input" required /></Field>
         <Field label="Apellidos *"><input name="apellidos" value={form.apellidos} onChange={h} className="form-input" required /></Field>
-        <Field label="Cedula">{inp('cedula')}</Field>
+        <Field label="Cédula">{inp('cedula')}</Field>
         <Field label="Fecha de nacimiento">{inp('fecha_nacimiento','date')}</Field>
-        <Field label="Telefono">{inp('telefono','tel')}</Field>
-        <Field label="Correo electronico">{inp('email','email')}</Field>
-        <Field label="Genero">{sel('genero',[['','-- Seleccionar --'],['M','Masculino'],['F','Femenino'],['O','Otro']])}</Field>
+        <Field label="Teléfono">{inp('telefono','tel')}</Field>
+        <Field label="Correo electrónico">{inp('email','email')}</Field>
+        <Field label="Género">{sel('genero',[['','-- Seleccionar --'],['M','Masculino'],['F','Femenino'],['O','Otro']])}</Field>
         <Field label="Estado civil">{sel('estado_civil',[['','-- Seleccionar --'],['soltero','Soltero/a'],['casado','Casado/a'],['viudo','Viudo/a'],['divorciado','Divorciado/a']])}</Field>
-        <FullWidth><Field label="Direccion">{inp('direccion')}</Field></FullWidth>
+        <FullWidth><Field label="Dirección">{inp('direccion')}</Field></FullWidth>
       </Section>
 
       <Section title="II. Informacion Familiar">
         <Field label="Nombre del conyuge">{inp('nombre_conyuge')}</Field>
-        <Field label="Numero de hijos">{inp('numero_hijos','number')}</Field>
-        <Field label="Telefono de emergencia">{inp('telefono_emergencia','tel')}</Field>
+        <Field label="Número de hijos">{inp('numero_hijos','number')}</Field>
+        <Field label="Teléfono de emergencia">{inp('telefono_emergencia','tel')}</Field>
         <FullWidth><Field label="Nombres y edades de los hijos">{ta('nombres_hijos',2)}</Field></FullWidth>
       </Section>
 
       <Section title="III. Informacion Espiritual">
-        <Field label="Fecha de conversion">{inp('fecha_conversion','date')}</Field>
+        <Field label="Fecha de conversión">{inp('fecha_conversion','date')}</Field>
         <Field label="Fecha de bautismo">{inp('fecha_bautismo','date')}</Field>
         <Field label="Iglesia donde fue bautizado">{inp('iglesia_bautismo')}</Field>
         <Field label="Tiempo en esta iglesia">{inp('tiempo_en_iglesia','','Ej: 2 años')}</Field>
         <Field label="Miembro activo">{sel('miembro_activo',[['Si','Si'],['No','No']])}</Field>
-        <Field label="Rol">{sel('rol',[['miembro','Miembro'],['lider','Lider'],['diacono','Diacono'],['co-pastor','Co-Pastor'],['pastor','Pastor'],['visitante','Visitante']])}</Field>
+        <Field label="Rol">{sel('rol',[['miembro','Miembro'],['lider','Lider'],['diacono','Diacono'],['co-pastor','Co-Pastor'],['pastor','Pastor'],['secretario','Secretario/a'],['tesorero','Tesorero/a'],['maestro','Maestro/a de niños'],['visitante','Visitante']])}</Field>
         <Field label="Estado">{sel('estado',[['activo','Activo'],['inactivo','Inactivo'],['visita','Visita'],['trasladado','Trasladado']])}</Field>
       </Section>
 
@@ -152,9 +152,9 @@ function MiembroForm({ initial, onSave, onClose }) {
       </Section>
 
       <Section title="V. Cuidado Pastoral">
-        <Field label="Visitas pastorales?">{sel('visitas_pastorales',[['Si','Si'],['No','No']])}</Field>
-        <Field label="Consejeria pastoral?">{sel('consejeria_pastoral',[['Si','Si'],['No','No']])}</Field>
-        <FullWidth><Field label="Motivo de oracion">{ta('motivo_oracion',2)}</Field></FullWidth>
+        <Field label="¿Visitas pastorales?">{sel('visitas_pastorales',[['Si','Si'],['No','No']])}</Field>
+        <Field label="¿Consejería pastoral?">{sel('consejeria_pastoral',[['Si','Si'],['No','No']])}</Field>
+        <FullWidth><Field label="Motivo de oración">{ta('motivo_oracion',2)}</Field></FullWidth>
         <FullWidth><Field label="Notas adicionales">{ta('notas',2)}</Field></FullWidth>
       </Section>
 
@@ -452,4 +452,7 @@ export default function Miembros() {
     </div>
   )
 }
+
+
+
 
