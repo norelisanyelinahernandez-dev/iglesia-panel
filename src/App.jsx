@@ -1,7 +1,9 @@
-﻿import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+﻿import { useState } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { PermisosProvider, usePermisos } from './context/PermisosContext'
 import Layout from './components/Layout'
+import SplashScreen from './components/SplashScreen'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Miembros from './pages/Miembros'
@@ -49,7 +51,8 @@ function AppRoutes() {
                 <Route path="/reportes"   element={<RutaProtegida seccion="reportes"><Reportes /></RutaProtegida>} />
                 <Route path="/respaldo"   element={<RutaProtegida seccion="respaldo"><Respaldo /></RutaProtegida>} />
                 <Route path="/finanzas"   element={<RutaProtegida seccion="finanzas"><Finanzas /></RutaProtegida>} />
-                <Route path="/documentos" element={<RutaProtegida seccion="documentos"><Documentos /></RutaProtegida>} />                <Route path="*"           element={<Navigate to="/" replace />} />
+                <Route path="/documentos" element={<RutaProtegida seccion="documentos"><Documentos /></RutaProtegida>} />
+                <Route path="*"           element={<Navigate to="/" replace />} />
               </Routes>
             </Layout>
           </PermisosProvider>
@@ -60,12 +63,14 @@ function AppRoutes() {
 }
 
 export default function App() {
+  const [splash, setSplash] = useState(true)
+
   return (
     <AuthProvider>
       <BrowserRouter>
+        {splash && <SplashScreen onDone={() => setSplash(false)} />}
         <AppRoutes />
       </BrowserRouter>
     </AuthProvider>
   )
 }
-
