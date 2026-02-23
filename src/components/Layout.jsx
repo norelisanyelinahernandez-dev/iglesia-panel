@@ -5,19 +5,19 @@ import { usePermisos } from '../context/PermisosContext'
 import './Layout.css'
 
 const NAV = [
-  { to: '/',            label: 'Panel',      seccion: 'panel' },
-  { to: '/miembros',    label: 'Miembros',   seccion: 'miembros' },
-  { to: '/Tesorería',   label: 'Tesorería',  seccion: 'Tesorería' },
-  { to: '/finanzas',    label: 'Finanzas',   seccion: 'finanzas' },
-  { to: '/reportes',    label: 'Reportes',   seccion: 'reportes' },
-  { to: '/inventario',  label: 'Inventario', seccion: 'inventario' },
-  { to: '/eventos',     label: 'Eventos',    seccion: 'eventos' },
-  { to: '/asistencia',  label: 'Asistencia', seccion: 'asistencia' },
-  { to: '/pastora',     label: 'Pastora',    seccion: 'pastora' },
-  { to: '/programa',    label: 'Programa',   seccion: 'programa' },
-  { to: '/anuncios',    label: 'Anuncios',   seccion: 'anuncios' },
-  { to: '/documentos',  label: 'Documentos', seccion: 'documentos' },
-  { to: '/respaldo',    label: 'Respaldo',   seccion: 'respaldo' },
+  { to: '/',            label: 'Panel',           icono: '🏠', seccion: 'panel' },
+  { to: '/miembros',    label: 'Miembros',         icono: '👥', seccion: 'miembros' },
+  { to: '/tesoreria',   label: 'Tesorería',        icono: '💰', seccion: 'tesoreria' },
+  { to: '/finanzas',    label: 'Finanzas',         icono: '📊', seccion: 'finanzas' },
+  { to: '/reportes',    label: 'Reportes',         icono: '📋', seccion: 'reportes' },
+  { to: '/inventario',  label: 'Inventario',       icono: '📦', seccion: 'inventario' },
+  { to: '/eventos',     label: 'Eventos',          icono: '📅', seccion: 'eventos' },
+  { to: '/asistencia',  label: 'Asistencia',       icono: '✅', seccion: 'asistencia' },
+  { to: '/pastora',     label: 'Pastora',          icono: '✝️', seccion: 'pastora' },
+  { to: '/programa',    label: 'Programa',         icono: '📖', seccion: 'programa' },
+  { to: '/anuncios',    label: 'Anuncios',         icono: '📢', seccion: 'anuncios' },
+  { to: '/documentos',  label: 'Documentos',       icono: '📄', seccion: 'documentos' },
+  { to: '/respaldo',    label: 'Respaldo',         icono: '💾', seccion: 'respaldo' },
 ]
 
 export default function Layout({ children }) {
@@ -47,7 +47,7 @@ export default function Layout({ children }) {
           </div>
         </div>
         <nav className="sidebar-nav">
-          {NAV.filter(({ seccion }) => puede(seccion)).map(({ to, label }) => (
+          {NAV.filter(({ seccion }) => puede(seccion)).map(({ to, label, icono }) => (
             <NavLink
               key={to}
               to={to}
@@ -55,6 +55,7 @@ export default function Layout({ children }) {
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
               onClick={cerrarMenu}
             >
+              <span className="nav-icon">{icono}</span>
               <span>{label}</span>
             </NavLink>
           ))}
@@ -67,7 +68,7 @@ export default function Layout({ children }) {
               <div className="user-role">{user?.rol}</div>
             </div>
           </div>
-          <button className="logout-btn" onClick={handleLogout} title="Cerrar sesión">X</button>
+          <button className="logout-btn" onClick={handleLogout} title="Cerrar sesión">⏻</button>
         </div>
       </aside>
 
@@ -89,5 +90,3 @@ export default function Layout({ children }) {
     </div>
   )
 }
-
-
