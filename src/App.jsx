@@ -1,5 +1,6 @@
 ﻿import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { PermisosProvider, usePermisos } from './context/PermisosContext'
 import Layout from './components/Layout'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
@@ -13,10 +14,17 @@ import Anuncios from './pages/Anuncios'
 import Asistencia from './pages/Asistencia'
 import Reportes from './pages/Reportes'
 import Respaldo from './pages/Respaldo'
+
 function PrivateRoute({ children }) {
   const { user } = useAuth()
   return user ? children : <Navigate to="/login" replace />
 }
+
+function RutaProtegida({ seccion, children }) {
+  const { puede } = usePermisos()
+  return puede(seccion) ? children : <Navigate to="/" replace />
+}
+
 function AppRoutes() {
   const { user } = useAuth()
   return (
@@ -24,27 +32,30 @@ function AppRoutes() {
       <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
       <Route path="/*" element={
         <PrivateRoute>
-          <Layout>
-            <Routes>
-              <Route path="/"            element={<Dashboard />} />
-              <Route path="/miembros"    element={<Miembros />} />
-              <Route path="/tesoreria"   element={<Tesoreria />} />
-              <Route path="/inventario"  element={<Inventario />} />
-              <Route path="/eventos"     element={<Eventos />} />
-              <Route path="/pastora"     element={<Pastora />} />
-              <Route path="/programa"    element={<Programa />} />
-              <Route path="/anuncios"    element={<Anuncios />} />
-              <Route path="/asistencia"  element={<Asistencia />} />
-              <Route path="/reportes"    element={<Reportes />} />
-              <Route path="/respaldo"    element={<Respaldo />} />
-              <Route path="*"            element={<Navigate to="/" replace />} />
-            </Routes>
-          </Layout>
+          <PermisosProvider>
+            <Layout>
+              <Routes>
+                <Route path="/"           element={<Dashboard />} />
+                <Route path="/miembros"   element={<RutaProtegida seccion="miembros"><Miembros /></RutaProtegida>} />
+                <Route path="/tesoreria"  element={<RutaProtegida seccion="tesoreria"><Tesoreria /></RutaProtegida>} />
+                <Route path="/inventario" element={<RutaProtegida seccion="inventario"><Inventario /></RutaProtegida>} />
+                <Route path="/eventos"    element={<RutaProtegida seccion="eventos"><Eventos /></RutaProtegida>} />
+                <Route path="/pastora"    element={<RutaProtegida seccion="pastora"><Pastora /></RutaProtegida>} />
+                <Route path="/programa"   element={<RutaProtegida seccion="programa"><Programa /></RutaProtegida>} />
+                <Route path="/anuncios"   element={<RutaProtegida seccion="anuncios"><Anuncios /></RutaProtegida>} />
+                <Route path="/asistencia" element={<RutaProtegida seccion="asistencia"><Asistencia /></RutaProtegida>} />
+                <Route path="/reportes"   element={<RutaProtegida seccion="reportes"><Reportes /></RutaProtegida>} />
+                <Route path="/respaldo"   element={<RutaProtegida seccion="respaldo"><Respaldo /></RutaProtegida>} />
+                <Route path="*"           element={<Navigate to="/" replace />} />
+              </Routes>
+            </Layout>
+          </PermisosProvider>
         </PrivateRoute>
       } />
     </Routes>
   )
 }
+
 export default function App() {
   return (
     <AuthProvider>

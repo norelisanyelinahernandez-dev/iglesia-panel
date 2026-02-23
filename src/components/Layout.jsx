@@ -1,26 +1,32 @@
 ﻿import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { usePermisos } from '../context/PermisosContext'
 import './Layout.css'
+
 const NAV = [
-  { to: '/',            label: 'Panel' },
-  { to: '/miembros',    label: 'Miembros' },
-  { to: '/tesoreria',   label: 'Tesoreria' },
-  { to: '/reportes',    label: 'Reportes' },
-  { to: '/inventario',  label: 'Inventario' },
-  { to: '/eventos',     label: 'Eventos' },
-  { to: '/asistencia',  label: 'Asistencia' },
-  { to: '/pastora',     label: 'Pastora' },
-  { to: '/programa',    label: 'Programa' },
-  { to: '/anuncios',    label: 'Anuncios' },
-  { to: '/respaldo',    label: 'Respaldo' },
+  { to: '/',            label: 'Panel',      seccion: 'panel' },
+  { to: '/miembros',    label: 'Miembros',   seccion: 'miembros' },
+  { to: '/tesoreria',   label: 'Tesoreria',  seccion: 'tesoreria' },
+  { to: '/reportes',    label: 'Reportes',   seccion: 'reportes' },
+  { to: '/inventario',  label: 'Inventario', seccion: 'inventario' },
+  { to: '/eventos',     label: 'Eventos',    seccion: 'eventos' },
+  { to: '/asistencia',  label: 'Asistencia', seccion: 'asistencia' },
+  { to: '/pastora',     label: 'Pastora',    seccion: 'pastora' },
+  { to: '/programa',    label: 'Programa',   seccion: 'programa' },
+  { to: '/anuncios',    label: 'Anuncios',   seccion: 'anuncios' },
+  { to: '/respaldo',    label: 'Respaldo',   seccion: 'respaldo' },
 ]
+
 export default function Layout({ children }) {
   const { user, logout } = useAuth()
+  const { puede } = usePermisos()
   const navigate = useNavigate()
+
   const handleLogout = () => {
     logout()
     navigate('/login')
   }
+
   return (
     <div className="layout">
       <aside className="sidebar">
@@ -33,7 +39,7 @@ export default function Layout({ children }) {
           </div>
         </div>
         <nav className="sidebar-nav">
-          {NAV.map(({ to, label }) => (
+          {NAV.filter(({ seccion }) => puede(seccion)).map(({ to, label }) => (
             <NavLink
               key={to}
               to={to}
