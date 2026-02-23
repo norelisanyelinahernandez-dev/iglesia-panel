@@ -10,6 +10,7 @@ import Eventos from './pages/Eventos'
 import Pastora from './pages/Pastora'
 import Programa from './pages/Programa'
 import Anuncios from './pages/Anuncios'
+import Asistencia from './pages/Asistencia'
 function PrivateRoute({ children }) {
   const { user } = useAuth()
   return user ? children : <Navigate to="/login" replace />
@@ -23,15 +24,16 @@ function AppRoutes() {
         <PrivateRoute>
           <Layout>
             <Routes>
-              <Route path="/"           element={<Dashboard />} />
-              <Route path="/miembros"   element={<Miembros />} />
-              <Route path="/tesoreria"  element={<Tesoreria />} />
-              <Route path="/inventario" element={<Inventario />} />
-              <Route path="/eventos"    element={<Eventos />} />
-              <Route path="/pastora"    element={<Pastora />} />
-              <Route path="/programa"   element={<Programa />} />
-              <Route path="/anuncios"   element={<Anuncios />} />
-              <Route path="*"           element={<Navigate to="/" replace />} />
+              <Route path="/"            element={<Dashboard />} />
+              <Route path="/miembros"    element={<Miembros />} />
+              <Route path="/tesoreria"   element={<Tesoreria />} />
+              <Route path="/inventario"  element={<Inventario />} />
+              <Route path="/eventos"     element={<Eventos />} />
+              <Route path="/pastora"     element={<Pastora />} />
+              <Route path="/programa"    element={<Programa />} />
+              <Route path="/anuncios"    element={<Anuncios />} />
+              <Route path="/asistencia"  element={<Asistencia />} />
+              <Route path="*"            element={<Navigate to="/" replace />} />
             </Routes>
           </Layout>
         </PrivateRoute>
