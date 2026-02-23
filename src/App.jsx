@@ -61,13 +61,11 @@ function AppRoutes() {
 }
 
 export default function App() {
-
   return (
     <AuthProvider>
       <BrowserRouter>
-          <AppRoutes />
+        <AppRoutes />
       </BrowserRouter>
     </AuthProvider>
   )
 }
-
