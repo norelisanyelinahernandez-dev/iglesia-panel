@@ -111,6 +111,7 @@ function MiembroForm({ initial, onSave, onClose }) {
     try {
       const payload = { ...form }
       console.log("PAYLOAD NOTAS:", payload.notas)
+      console.log("ID A ACTUALIZAR:", initial?.id)
       if (!payload.fecha_nacimiento) delete payload.fecha_nacimiento
       if (!payload.fecha_conversion) delete payload.fecha_conversion
       if (!payload.fecha_bautismo) delete payload.fecha_bautismo
@@ -544,6 +545,7 @@ export default function Miembros() {
     </div>
   )
 }
+
 
 
 
