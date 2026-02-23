@@ -243,6 +243,7 @@ function MiembroForm({ initial, onSave, onClose }) {
 }
 
 function PerfilModal({ miembro, onClose, onEdit }) {
+  const capDisplay = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : str
   const campo = (label, value) => value ? (
     <div style={{ marginBottom:8 }}>
       <span style={{ color:'var(--text-muted)', fontSize:12 }}>{label}: </span>
@@ -360,7 +361,7 @@ function PerfilModal({ miembro, onClose, onEdit }) {
         {campo('Teléfono', miembro.telefono)}
         {campo('Correo', miembro.email)}
         {campo('Género', miembro.genero === 'M' ? 'Masculino' : miembro.genero === 'F' ? 'Femenino' : miembro.genero)}
-        {campo('Estado civil', miembro.estado_civil)}
+        {campo('Estado civil', capDisplay(miembro.estado_civil))}
         {campo('Dirección', miembro.direccion)}
       </>)}
       {seccion('II. Información Familiar', <>
@@ -381,8 +382,8 @@ function PerfilModal({ miembro, onClose, onEdit }) {
         {campo('Iglesia de bautismo', miembro.iglesia_bautismo)}
         {campo('Tiempo en la iglesia', miembro.tiempo_en_iglesia)}
         {campo('Miembro activo', miembro.miembro_activo)}
-        {campo('Rol', miembro.rol)}
-        {campo('Estado', miembro.estado)}
+        {campo('Rol', capDisplay(miembro.rol))}
+        {campo('Estado', capDisplay(miembro.estado))}
       </>)}
       {seccion('IV. Servicio y Ministerio', <>
         {campo('Ministerio actual', miembro.ministerio_actual)}
@@ -541,3 +542,7 @@ export default function Miembros() {
     </div>
   )
 }
+
+
+
+
