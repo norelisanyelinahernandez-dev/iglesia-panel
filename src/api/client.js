@@ -1,7 +1,5 @@
-﻿import axios from 'axios'
+import axios from 'axios'
 
-// En desarrollo usa el proxy de Vite (/api â†’ localhost:8000)
-// En producciÃ³n usa VITE_API_URL (tu backend en Render)
 const baseURL = import.meta.env.VITE_API_URL
   ? import.meta.env.VITE_API_URL
   : '/api'
@@ -20,7 +18,7 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
+    if (err.response?.status === 401 && window.location.pathname !== '/login') {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       window.location.href = '/login'
@@ -68,4 +66,3 @@ export const getCelulas = () => api.get('/celulas/')
 
 export const deleteIngreso = (id) => api.delete(`/tesoreria/ingresos/${id}`)
 export const deleteGasto = (id) => api.delete(`/tesoreria/gastos/${id}`)
-
