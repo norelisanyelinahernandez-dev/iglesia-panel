@@ -11,6 +11,7 @@ import Pastora from './pages/Pastora'
 import Programa from './pages/Programa'
 import Anuncios from './pages/Anuncios'
 import Asistencia from './pages/Asistencia'
+import Reportes from './pages/Reportes'
 function PrivateRoute({ children }) {
   const { user } = useAuth()
   return user ? children : <Navigate to="/login" replace />
@@ -33,6 +34,7 @@ function AppRoutes() {
               <Route path="/programa"    element={<Programa />} />
               <Route path="/anuncios"    element={<Anuncios />} />
               <Route path="/asistencia"  element={<Asistencia />} />
+              <Route path="/reportes"    element={<Reportes />} />
               <Route path="*"            element={<Navigate to="/" replace />} />
             </Routes>
           </Layout>
