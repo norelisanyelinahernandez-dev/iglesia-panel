@@ -11,7 +11,7 @@ function Modal({ title, onClose, children }) {
       <div className="modal">
         <div className="modal-header">
           <h3 className="modal-title">{title}</h3>
-          <button className="modal-close" onClick={onClose}>\u00d7</button>
+          <button className="modal-close" onClick={onClose}>×</button>
         </div>
         {children}
       </div>
@@ -114,7 +114,7 @@ export default function Eventos() {
                 <button className="btn btn-ghost" style={{ flex:1, justifyContent:'center', fontSize:12, padding:'6px' }} onClick={()=>loadAsistencia(ev)}>
                   Ver asistencia
                 </button>
-                <button className="btn btn-danger" style={{ padding:'6px 10px', fontSize:12 }} onClick={()=>handleDelete(ev.id)}>\u2715</button>
+                <button className="btn btn-danger" style={{ padding:'6px 10px', fontSize:12 }} onClick={()=>handleDelete(ev.id)}>✕</button>
               </div>
             </div>
           ))}
@@ -161,8 +161,8 @@ export default function Eventos() {
         <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&setAsistenciaEvento(null)}>
           <div className="modal" style={{ maxWidth:550 }}>
             <div className="modal-header">
-              <h3 className="modal-title">Asistencia \u2013 {asistenciaEvento.nombre}</h3>
-              <button className="modal-close" onClick={()=>setAsistenciaEvento(null)}>\u00d7</button>
+              <h3 className="modal-title">Asistencia – {asistenciaEvento.nombre}</h3>
+              <button className="modal-close" onClick={()=>setAsistenciaEvento(null)}>×</button>
             </div>
 
             {asistenciaData && (
@@ -204,4 +204,6 @@ export default function Eventos() {
     </div>
   )
 }
+
+
 
