@@ -2,16 +2,17 @@
 import { useAuth } from './AuthContext'
 
 const PERMISOS = {
-  admin:      ['panel','miembros','tesoreria','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo'],
-  pastor:     ['panel','miembros','tesoreria','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo'],
-  pastora:    ['panel','miembros','tesoreria','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo'],
-  copastor:   ['panel','miembros','tesoreria','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo'],
-  copastora:  ['panel','miembros','tesoreria','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo'],
-  secretaria: ['panel','miembros','tesoreria','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo'],
+  admin:      ['panel','miembros','tesoreria','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo','ver_balance'],
+  pastor:     ['panel','miembros','tesoreria','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo','ver_balance'],
+  pastora:    ['panel','miembros','tesoreria','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo','ver_balance'],
+  copastor:   ['panel','miembros','tesoreria','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo','ver_balance'],
+  copastora:  ['panel','miembros','tesoreria','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo','ver_balance'],
+  secretaria: ['panel','miembros','tesoreria','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','respaldo','ver_balance'],
+  tesorero:   ['panel','tesoreria','reportes','respaldo','ver_balance'],
+  tesorera:   ['panel','tesoreria','reportes','respaldo','ver_balance'],
   diacono:    ['panel','miembros','eventos','asistencia','programa'],
   maestra:    ['panel','programa','asistencia','anuncios'],
-  tesorero:   ['panel','tesoreria','reportes','respaldo'],
-  tesorera:   ['panel','tesoreria','reportes','respaldo'],
+  miembro:    ['panel','programa','eventos'],
 }
 
 const PermisosContext = createContext(null)
@@ -19,7 +20,7 @@ const PermisosContext = createContext(null)
 export function PermisosProvider({ children }) {
   const { user } = useAuth()
   const rol = user?.rol?.toLowerCase() || ''
-  const permisos = PERMISOS[rol] || ['panel']
+  const permisos = PERMISOS[rol] || ['panel','programa','eventos']
 
   const puede = (seccion) => permisos.includes(seccion)
 
