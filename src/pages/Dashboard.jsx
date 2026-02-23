@@ -3,6 +3,7 @@ import { getResumenMensual, getMiembros, getEventos, getInventario } from '../ap
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { useAuth } from '../context/AuthContext'
 import { usePermisos } from '../context/PermisosContext'
+import InstalarApp from '../components/InstalarApp'
 
 const fmt = (n) => new Intl.NumberFormat('es-DO', { style: 'currency', currency: 'DOP', maximumFractionDigits: 0 }).format(n)
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
@@ -41,7 +42,6 @@ export default function Dashboard() {
           getEventos(),
           getInventario({ limit: 1 }),
         ])
-
         if (r.status === 'fulfilled') {
           const data = r.value.data
           setResumen(data)
@@ -78,6 +78,8 @@ export default function Dashboard() {
           <p className="page-subtitle">Resumen del sistema — {new Date().toLocaleDateString('es-DO', { weekday:'long', year:'numeric', month:'long', day:'numeric' })}</p>
         </div>
       </div>
+
+      <InstalarApp />
 
       <div className="grid-4" style={{ marginBottom: 28 }}>
         <div className="stat-card">
@@ -172,7 +174,7 @@ export default function Dashboard() {
                   <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 11 }} tickFormatter={v => `${v/1000}k`} axisLine={false} tickLine={false} />
                   <Tooltip content={<CustomTooltip />} />
                   <Bar dataKey="total_ingresos" name="Ingresos" fill="var(--green)" radius={[4,4,0,0]} opacity={0.9} />
-                  <Bar dataKey="total_gastos"   name="Gastos"   fill="var(--red)"   radius={[4,4,0,0]} opacity={0.9} />
+                  <Bar dataKey="total_gastos" name="Gastos" fill="var(--red)" radius={[4,4,0,0]} opacity={0.9} />
                 </BarChart>
               </ResponsiveContainer>
             )}
