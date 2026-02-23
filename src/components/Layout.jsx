@@ -15,6 +15,7 @@ const NAV = [
   { to: '/pastora',     label: 'Pastora',    seccion: 'pastora' },
   { to: '/programa',    label: 'Programa',   seccion: 'programa' },
   { to: '/anuncios',    label: 'Anuncios',   seccion: 'anuncios' },
+  { to: '/documentos',  label: 'Documentos', seccion: 'documentos' },
   { to: '/respaldo',    label: 'Respaldo',   seccion: 'respaldo' },
 ]
 
