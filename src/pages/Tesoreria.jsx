@@ -164,6 +164,8 @@ export default function Tesoreria() {
     { id:'gastos', label:'Gastos' },
     { id:'diezmos', label:'Diezmos' },
     { id:'ofrendas', label:'Ofrendas' },
+    { id:'central', label:'Para la Central' },
+    { id:'central', label:'Para la Central' },
   ]
 
   return (
@@ -429,6 +431,55 @@ export default function Tesoreria() {
         </div>
       )}
 
+      {tab === 'central' && (
+        <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
+          <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+            <label className="form-label" style={{ margin:0 }}>Mes:</label>
+            <input type="month" defaultValue={new Date().toISOString().slice(0,7)} id="mesCentral" onChange={e => { document.getElementById('resCentral').setAttribute('data-mes', e.target.value) }} className="form-input" style={{ width:'auto' }} />
+          </div>
+          {(() => {
+            const catDiezmo = catIng.find(c => c.nombre === 'Diezmo')
+            const catOfrenda = catIng.find(c => c.nombre === 'Ofrenda')
+            const mes = new Date().toISOString().slice(0,7)
+            const diezmosMes = ingresos.filter(i => i.categoria_id === catDiezmo?.id && i.fecha?.slice(0,7) === mes)
+            const ofrendasMes = ingresos.filter(i => i.categoria_id === catOfrenda?.id && i.fecha?.slice(0,7) === mes)
+            const totalD = diezmosMes.reduce((a,b) => a + parseFloat(b.monto||0), 0)
+            const totalO = ofrendasMes.reduce((a,b) => a + parseFloat(b.monto||0), 0)
+            return (
+              <div style={{ display:'flex', flexDirection:'column', gap:16 }} id="resCentral">
+                <div className="grid-2">
+                  <div className="stat-card" style={{ border:'1px solid var(--gold)', textAlign:'center' }}>
+                    <div style={{ fontSize:28, marginBottom:8 }}>🏦</div>
+                    <div style={{ fontSize:12, color:'var(--text-muted)', marginBottom:4 }}>Total diezmos del mes</div>
+                    <div style={{ fontSize:20, fontWeight:700, color:'var(--gold)' }}>{fmt(totalD)}</div>
+                    <div style={{ marginTop:12, paddingTop:12, borderTop:'1px solid var(--border)' }}>
+                      <div style={{ fontSize:12, color:'var(--text-muted)' }}>Diezmo de diezmo a llevar (10%)</div>
+                      <div style={{ fontSize:24, fontWeight:700, color:'var(--green)', marginTop:4 }}>{fmt(totalD * 0.1)}</div>
+                    </div>
+                  </div>
+                  <div className="stat-card" style={{ border:'1px solid var(--green)', textAlign:'center' }}>
+                    <div style={{ fontSize:28, marginBottom:8 }}>💝</div>
+                    <div style={{ fontSize:12, color:'var(--text-muted)', marginBottom:4 }}>Total ofrendas del mes</div>
+                    <div style={{ fontSize:20, fontWeight:700, color:'var(--gold)' }}>{fmt(totalO)}</div>
+                    <div style={{ marginTop:12, paddingTop:12, borderTop:'1px solid var(--border)' }}>
+                      <div style={{ fontSize:12, color:'var(--text-muted)' }}>Diezmo de ofrenda a llevar (10%)</div>
+                      <div style={{ fontSize:24, fontWeight:700, color:'var(--green)', marginTop:4 }}>{fmt(totalO * 0.1)}</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="card" style={{ border:'2px solid var(--gold)', textAlign:'center', padding:20 }}>
+                  <div style={{ fontSize:13, color:'var(--text-muted)', marginBottom:8 }}>Resumen para llevar a la Iglesia Central — se llevan por separado</div>
+                  <div style={{ display:'flex', justifyContent:'center', gap:40, flexWrap:'wrap' }}>
+                    <div><div style={{ fontSize:12, color:'var(--text-muted)' }}>Diezmo de diezmo</div><div style={{ fontSize:22, fontWeight:700, color:'var(--gold)' }}>{fmt(totalD * 0.1)}</div></div>
+                    <div><div style={{ fontSize:12, color:'var(--text-muted)' }}>Diezmo de ofrenda</div><div style={{ fontSize:22, fontWeight:700, color:'var(--gold)' }}>{fmt(totalO * 0.1)}</div></div>
+                  </div>
+                </div>
+              </div>
+            )
+          })()}
+        </div>
+      )}
+
       {modal === 'ingreso' && (
         <Modal title="Registrar Ingreso" onClose={() => setModal(null)}>
           {error && <div className="alert alert-error">{error}</div>}
@@ -501,3 +552,6 @@ export default function Tesoreria() {
     </div>
   )
 }
+
+
+
