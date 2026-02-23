@@ -1,4 +1,5 @@
 ﻿import { useState, useEffect } from 'react'
+import DatePicker from '../components/DatePicker'
 import { getMiembros } from '../api/client'
 
 const STORAGE_KEY = 'asistencia_iglesia'
@@ -276,6 +277,7 @@ export default function Asistencia() {
     </div>
   )
 }
+
 
 
 
