@@ -247,160 +247,133 @@ function MiembroForm({ initial, onSave, onClose }) {
 
 function PerfilModal({ miembro, onClose, onEdit }) {
   const capDisplay = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : str
-  const campo = (label, value) => value ? (
-    <div style={{ marginBottom:8 }}>
-      <span style={{ color:'var(--text-muted)', fontSize:12 }}>{label}: </span>
-      <span style={{ fontWeight:500 }}>{value}</span>
+  const fmtDate = (d) => d ? new Date(d + 'T00:00:00').toLocaleDateString('es-DO', { day:'2-digit', month:'long', year:'numeric' }) : null
+
+  const InfoRow = ({ icon, label, value }) => value ? (
+    <div style={{ display:'flex', alignItems:'flex-start', gap:10, padding:'8px 0', borderBottom:'1px solid var(--border)' }}>
+      <span style={{ fontSize:15, minWidth:20, textAlign:'center', marginTop:1 }}>{icon}</span>
+      <div style={{ flex:1 }}>
+        <div style={{ fontSize:11, color:'var(--text-muted)', textTransform:'uppercase', letterSpacing:0.5, marginBottom:2 }}>{label}</div>
+        <div style={{ fontSize:13, fontWeight:500, color:'var(--text)', whiteSpace:'pre-wrap' }}>{value}</div>
+      </div>
     </div>
   ) : null
 
-  const seccion = (titulo, campos) => (
-    <div style={{ marginBottom:16 }}>
-      <div style={{ background:'var(--bg-card)', borderLeft:'3px solid var(--gold)', padding:'5px 10px', marginBottom:10, borderRadius:'0 6px 6px 0' }}>
+  const SeccionPerfil = ({ titulo, icono, children }) => (
+    <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:12, overflow:'hidden', marginBottom:12 }}>
+      <div style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 16px', background:'var(--surface-2)', borderBottom:'1px solid var(--border)' }}>
+        <span style={{ fontSize:16 }}>{icono}</span>
         <span style={{ fontFamily:'var(--font-heading)', fontWeight:700, fontSize:12, color:'var(--gold)', textTransform:'uppercase', letterSpacing:1 }}>{titulo}</span>
       </div>
-      <div style={{ paddingLeft:8 }}>{campos}</div>
+      <div style={{ padding:'4px 16px 8px' }}>{children}</div>
+    </div>
+  )
+
+  const StatCard = ({ label, value, color }) => (
+    <div style={{ background:'var(--surface-2)', border:'1px solid var(--border)', borderRadius:10, padding:'10px 14px', flex:1, textAlign:'center' }}>
+      <div style={{ fontSize:15, fontWeight:700, color: color || 'var(--gold)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{value || '—'}</div>
+      <div style={{ fontSize:11, color:'var(--text-muted)', marginTop:2 }}>{label}</div>
     </div>
   )
 
   const imprimir = () => {
     const ventana = window.open('', '_blank')
-    ventana.document.write(`
-      <html>
-      <head>
-        <title>Ficha de Miembro - ${miembro.nombres} ${miembro.apellidos}</title>
-        <style>
-          body { font-family: Arial, sans-serif; padding: 30px; color: #000; }
-          h1 { font-size: 20px; margin-bottom: 4px; }
-          h2 { font-size: 13px; color: #b8860b; text-transform: uppercase; letter-spacing: 1px; border-left: 3px solid #b8860b; padding-left: 8px; margin: 16px 0 8px; }
-          .campo { margin-bottom: 6px; font-size: 13px; }
-          .label { color: #666; }
-          .header { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; border-bottom: 2px solid #b8860b; padding-bottom: 16px; }
-          .foto { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #b8860b; }
-          .foto-placeholder { width: 80px; height: 80px; border-radius: 50%; background: #eee; border: 2px solid #b8860b; display: flex; align-items: center; justify-content: center; font-size: 30px; }
-          .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-          .iglesia { font-size: 12px; color: #b8860b; font-weight: bold; }
-          .versiculo { font-style: italic; font-size: 11px; color: #666; text-align: center; margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px; }
-        </style>
-      </head>
-      <body>
-        <div class="header">
-          ${miembro.foto ? `<img src="${miembro.foto}" class="foto" />` : '<div class="foto-placeholder">👤</div>'}
-          <div>
-            <p class="iglesia">Ministerio San Juan 7:38 - Del Semillero 1/11</p>
-            <h1>${miembro.nombres} ${miembro.apellidos}</h1>
-            <p style="margin:0; font-size:13px; color:#666;">${miembro.rol || ''} | ${miembro.estado || ''}</p>
-          </div>
-        </div>
-        <h2>I. Información Personal</h2>
-        <div class="grid">
-          ${miembro.cedula ? `<div class="campo"><span class="label">Cédula: </span>${miembro.cedula}</div>` : ''}
-          ${miembro.fecha_nacimiento ? `<div class="campo"><span class="label">Nacimiento: </span>${new Date(miembro.fecha_nacimiento).toLocaleDateString('es-DO')}</div>` : ''}
-          ${miembro.telefono ? `<div class="campo"><span class="label">Teléfono: </span>${miembro.telefono}</div>` : ''}
-          ${miembro.email ? `<div class="campo"><span class="label">Email: </span>${miembro.email}</div>` : ''}
-          ${miembro.genero ? `<div class="campo"><span class="label">Género: </span>${miembro.genero === 'M' ? 'Masculino' : miembro.genero === 'F' ? 'Femenino' : miembro.genero}</div>` : ''}
-          ${miembro.estado_civil ? `<div class="campo"><span class="label">Estado civil: </span>${miembro.estado_civil}</div>` : ''}
-        </div>
-        ${miembro.direccion ? `<div class="campo"><span class="label">Dirección: </span>${miembro.direccion}</div>` : ''}
-        <h2>II. Información Familiar</h2>
-        <div class="grid">
-          ${miembro.nombre_conyuge ? `<div class="campo"><span class="label">Cónyuge: </span>${miembro.nombre_conyuge}</div>` : ''}
-          ${miembro.telefono_conyuge ? `<div class="campo"><span class="label">Tel. cónyuge: </span>${miembro.telefono_conyuge}</div>` : ''}
-          ${miembro.numero_hijos ? `<div class="campo"><span class="label">Número de hijos: </span>${miembro.numero_hijos}</div>` : ''}
-          ${miembro.telefono_emergencia ? `<div class="campo"><span class="label">Tel. emergencia: </span>${miembro.telefono_emergencia}</div>` : ''}
-        </div>
-        ${miembro.nombres_hijos ? `<div class="campo"><span class="label">Hijos: </span><pre style="font-family:Arial;font-size:13px;margin:4px 0">${miembro.nombres_hijos}</pre></div>` : ''}
-        <h2>III. Información Espiritual</h2>
-        <div class="grid">
-          ${miembro.fecha_conversion ? `<div class="campo"><span class="label">Conversión: </span>${new Date(miembro.fecha_conversion).toLocaleDateString('es-DO')}</div>` : ''}
-          ${miembro.fecha_bautismo ? `<div class="campo"><span class="label">Bautismo: </span>${new Date(miembro.fecha_bautismo).toLocaleDateString('es-DO')}</div>` : ''}
-          ${miembro.iglesia_bautismo ? `<div class="campo"><span class="label">Iglesia bautismo: </span>${miembro.iglesia_bautismo}</div>` : ''}
-          ${miembro.tiempo_en_iglesia ? `<div class="campo"><span class="label">Tiempo en iglesia: </span>${miembro.tiempo_en_iglesia}</div>` : ''}
-          ${miembro.miembro_activo ? `<div class="campo"><span class="label">Miembro activo: </span>${miembro.miembro_activo}</div>` : ''}
-        </div>
-        <h2>IV. Servicio y Ministerio</h2>
-        ${miembro.ministerio_actual ? `<div class="campo"><span class="label">Ministerio actual: </span>${miembro.ministerio_actual}</div>` : ''}
-        ${miembro.ministerios_anteriores ? `<div class="campo"><span class="label">Ministerios anteriores: </span>${miembro.ministerios_anteriores}</div>` : ''}
-        ${miembro.dones_talentos ? `<div class="campo"><span class="label">Dones y talentos: </span>${miembro.dones_talentos}</div>` : ''}
-        ${miembro.disponibilidad ? `<div class="campo"><span class="label">Disponibilidad: </span>${miembro.disponibilidad}</div>` : ''}
-        <h2>V. Cuidado Pastoral</h2>
-        <div class="grid">
-          ${miembro.visitas_pastorales ? `<div class="campo"><span class="label">Visitas pastorales: </span>${miembro.visitas_pastorales}</div>` : ''}
-          ${miembro.consejeria_pastoral ? `<div class="campo"><span class="label">Consejería: </span>${miembro.consejeria_pastoral}</div>` : ''}
-        </div>
-        ${miembro.motivo_oracion ? `<div class="campo"><span class="label">Motivo de oración: </span>${miembro.motivo_oracion}</div>` : ''}
-        ${miembro.notas ? `<div class="campo"><span class="label">Notas: </span>${miembro.notas}</div>` : ''}
-        <div class="versiculo">"El que cree en mí, como dice la Escritura, de su interior correrán ríos de agua viva." — Juan 7:38</div>
-      </body>
-      </html>
-    `)
+    ventana.document.write('<html><head><title>Ficha - ' + miembro.nombres + ' ' + miembro.apellidos + '</title><style>body{font-family:Arial,sans-serif;padding:30px;color:#000}h1{font-size:20px;margin-bottom:4px}h2{font-size:13px;color:#b8860b;text-transform:uppercase;letter-spacing:1px;border-left:3px solid #b8860b;padding-left:8px;margin:16px 0 8px}.campo{margin-bottom:6px;font-size:13px}.label{color:#666}.header{display:flex;align-items:center;gap:20px;margin-bottom:20px;border-bottom:2px solid #b8860b;padding-bottom:16px}.foto{width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid #b8860b}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.versiculo{font-style:italic;font-size:11px;color:#666;text-align:center;margin-top:20px;border-top:1px solid #ccc;padding-top:10px}</style></head><body>' +
+      '<div class="header">' + (miembro.foto ? '<img src="' + miembro.foto + '" class="foto"/>' : '<div style="width:80px;height:80px;border-radius:50%;background:#eee;border:2px solid #b8860b;display:flex;align-items:center;justify-content:center;font-size:30px">&#128100;</div>') +
+      '<div><p style="margin:0;font-size:12px;color:#b8860b;font-weight:bold">Ministerio San Juan 7:38 - Del Semillero 1/11</p><h1>' + miembro.nombres + ' ' + miembro.apellidos + '</h1><p style="margin:0;font-size:13px;color:#666">' + (miembro.rol||'') + ' | ' + (miembro.estado||'') + '</p></div></div>' +
+      '<h2>I. Informacion Personal</h2><div class="grid">' +
+      (miembro.cedula ? '<div class="campo"><span class="label">Cedula: </span>' + miembro.cedula + '</div>' : '') +
+      (miembro.fecha_nacimiento ? '<div class="campo"><span class="label">Nacimiento: </span>' + new Date(miembro.fecha_nacimiento + 'T00:00:00').toLocaleDateString('es-DO') + '</div>' : '') +
+      (miembro.telefono ? '<div class="campo"><span class="label">Telefono: </span>' + miembro.telefono + '</div>' : '') +
+      (miembro.email ? '<div class="campo"><span class="label">Email: </span>' + miembro.email + '</div>' : '') +
+      '</div>' +
+      (miembro.direccion ? '<div class="campo"><span class="label">Direccion: </span>' + miembro.direccion + '</div>' : '') +
+      '<h2>II. Informacion Espiritual</h2><div class="grid">' +
+      (miembro.fecha_conversion ? '<div class="campo"><span class="label">Conversion: </span>' + new Date(miembro.fecha_conversion + 'T00:00:00').toLocaleDateString('es-DO') + '</div>' : '') +
+      (miembro.fecha_bautismo ? '<div class="campo"><span class="label">Bautismo: </span>' + new Date(miembro.fecha_bautismo + 'T00:00:00').toLocaleDateString('es-DO') + '</div>' : '') +
+      (miembro.iglesia_bautismo ? '<div class="campo"><span class="label">Iglesia bautismo: </span>' + miembro.iglesia_bautismo + '</div>' : '') +
+      (miembro.tiempo_en_iglesia ? '<div class="campo"><span class="label">Tiempo en iglesia: </span>' + miembro.tiempo_en_iglesia + '</div>' : '') +
+      '</div>' +
+      (miembro.ministerio_actual ? '<div class="campo"><span class="label">Ministerio actual: </span>' + miembro.ministerio_actual + '</div>' : '') +
+      (miembro.notas ? '<div class="campo"><span class="label">Notas: </span>' + miembro.notas + '</div>' : '') +
+      '<div class="versiculo">El que cree en mi, como dice la Escritura, de su interior correran rios de agua viva. - Juan 7:38</div>' +
+      '</body></html>')
     ventana.document.close()
     ventana.print()
   }
 
+  const ROL_COLOR = { pastor:'var(--gold)', 'co-pastor':'var(--gold)', diacono:'var(--blue)', lider:'var(--blue)', miembro:'var(--green)', visitante:'var(--amber)', secretario:'var(--blue)', tesorero:'var(--blue)', maestro:'var(--blue)' }
+  const ESTADO_COLOR = { activo:'var(--green)', inactivo:'var(--red)', visita:'var(--amber)', trasladado:'var(--blue)' }
+
   return (
-    <Modal title={`${miembro.nombres} ${miembro.apellidos}`} onClose={onClose}>
-      <div style={{ display:'flex', justifyContent:'space-between', marginBottom:16, gap:10, flexWrap:'wrap' }}>
-        <div style={{ display:'flex', alignItems:'center', gap:16 }}>
-          {miembro.foto ? (
-            <img src={miembro.foto} alt="Foto" style={{ width:70, height:70, borderRadius:'50%', objectFit:'cover', border:'3px solid var(--gold)' }} />
-          ) : (
-            <div style={{ width:70, height:70, borderRadius:'50%', background:'var(--bg-card)', border:'3px solid var(--gold)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:30 }}>👤</div>
-          )}
-          <div>
-            <div style={{ fontWeight:700, fontSize:18 }}>{miembro.nombres} {miembro.apellidos}</div>
-            <div style={{ color:'var(--gold)', fontSize:13 }}>{miembro.rol} | {miembro.estado}</div>
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal" style={{ maxWidth:640, width:'95%' }}>
+        <div style={{ background:'linear-gradient(135deg, var(--surface-2) 0%, var(--surface-3) 100%)', borderRadius:'var(--radius-lg) var(--radius-lg) 0 0', padding:'24px 24px 20px', position:'relative', overflow:'hidden' }}>
+          <div style={{ position:'absolute', top:0, right:0, width:200, height:200, background:'var(--gold-dim)', borderRadius:'50%', transform:'translate(60px,-60px)' }} />
+          <button onClick={onClose} style={{ position:'absolute', top:16, right:16, background:'none', border:'none', color:'var(--text-muted)', fontSize:22, cursor:'pointer', zIndex:1 }}>×</button>
+          <div style={{ display:'flex', alignItems:'center', gap:20, position:'relative', zIndex:1 }}>
+            {miembro.foto ? (
+              <img src={miembro.foto} alt="Foto" style={{ width:90, height:90, borderRadius:'50%', objectFit:'cover', border:'3px solid var(--gold)', boxShadow:'0 0 20px rgba(201,168,76,0.4)' }} />
+            ) : (
+              <div style={{ width:90, height:90, borderRadius:'50%', background:'var(--surface)', border:'3px solid var(--gold)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:38 }}>👤</div>
+            )}
+            <div style={{ flex:1 }}>
+              <div style={{ fontFamily:'var(--font-heading)', fontSize:22, fontWeight:700, color:'var(--text)', lineHeight:1.2 }}>{miembro.nombres}</div>
+              <div style={{ fontFamily:'var(--font-heading)', fontSize:22, fontWeight:700, color:'var(--gold)', lineHeight:1.2, marginBottom:8 }}>{miembro.apellidos}</div>
+              <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+                <span style={{ background: ROL_COLOR[miembro.rol] ? ROL_COLOR[miembro.rol]+'22' : 'var(--surface)', border:'1px solid '+(ROL_COLOR[miembro.rol]||'var(--border)'), color: ROL_COLOR[miembro.rol]||'var(--text)', borderRadius:20, padding:'3px 12px', fontSize:12, fontWeight:600 }}>{capDisplay(miembro.rol)}</span>
+                <span style={{ background: ESTADO_COLOR[miembro.estado] ? ESTADO_COLOR[miembro.estado]+'22' : 'var(--surface)', border:'1px solid '+(ESTADO_COLOR[miembro.estado]||'var(--border)'), color: ESTADO_COLOR[miembro.estado]||'var(--text)', borderRadius:20, padding:'3px 12px', fontSize:12, fontWeight:600 }}>{capDisplay(miembro.estado)}</span>
+              </div>
+            </div>
+          </div>
+          <div style={{ display:'flex', gap:8, marginTop:16 }}>
+            <StatCard label="Tiempo en iglesia" value={miembro.tiempo_en_iglesia} />
+            <StatCard label="Ministerio" value={miembro.ministerio_actual} />
+            <StatCard label="Miembro activo" value={miembro.miembro_activo} color={miembro.miembro_activo==='Si' ? 'var(--green)' : 'var(--red)'} />
           </div>
         </div>
-        <div style={{ display:'flex', gap:8 }}>
-          <button className="btn btn-ghost" style={{ fontSize:13, padding:'5px 14px' }} onClick={imprimir}>Imprimir ficha</button>
-          <button className="btn btn-gold" style={{ fontSize:13, padding:'5px 14px' }} onClick={onEdit}>Editar</button>
+        <div style={{ maxHeight:'55vh', overflowY:'auto', padding:'16px 20px' }}>
+          <SeccionPerfil titulo="Información Personal" icono="👤">
+            <InfoRow icon="🪪" label="Cédula" value={miembro.cedula} />
+            <InfoRow icon="🎂" label="Fecha de nacimiento" value={fmtDate(miembro.fecha_nacimiento)} />
+            <InfoRow icon="📱" label="Teléfono" value={miembro.telefono} />
+            <InfoRow icon="✉️" label="Correo electrónico" value={miembro.email} />
+            <InfoRow icon="⚧" label="Género" value={miembro.genero==='M' ? 'Masculino' : miembro.genero==='F' ? 'Femenino' : miembro.genero} />
+            <InfoRow icon="💍" label="Estado civil" value={capDisplay(miembro.estado_civil)} />
+            <InfoRow icon="📍" label="Dirección" value={miembro.direccion} />
+          </SeccionPerfil>
+          <SeccionPerfil titulo="Información Familiar" icono="👨‍👩‍👧‍👦">
+            <InfoRow icon="💑" label="Cónyuge" value={miembro.nombre_conyuge} />
+            <InfoRow icon="📞" label="Teléfono del cónyuge" value={miembro.telefono_conyuge} />
+            <InfoRow icon="👶" label="Número de hijos" value={miembro.numero_hijos ? String(miembro.numero_hijos) : null} />
+            {miembro.nombres_hijos && <InfoRow icon="📋" label="Detalle de hijos" value={miembro.nombres_hijos} />}
+            <InfoRow icon="🚨" label="Teléfono de emergencia" value={miembro.telefono_emergencia} />
+          </SeccionPerfil>
+          <SeccionPerfil titulo="Información Espiritual" icono="✝️">
+            <InfoRow icon="🕊️" label="Fecha de conversión" value={fmtDate(miembro.fecha_conversion)} />
+            <InfoRow icon="💧" label="Fecha de bautismo" value={fmtDate(miembro.fecha_bautismo)} />
+            <InfoRow icon="⛪" label="Iglesia de bautismo" value={miembro.iglesia_bautismo} />
+            <InfoRow icon="⏳" label="Tiempo en la iglesia" value={miembro.tiempo_en_iglesia} />
+          </SeccionPerfil>
+          <SeccionPerfil titulo="Servicio y Ministerio" icono="🙌">
+            <InfoRow icon="⭐" label="Ministerio actual" value={miembro.ministerio_actual} />
+            <InfoRow icon="📜" label="Ministerios anteriores" value={miembro.ministerios_anteriores} />
+            <InfoRow icon="🎁" label="Dones o talentos" value={miembro.dones_talentos} />
+            <InfoRow icon="🗓️" label="Disponibilidad" value={miembro.disponibilidad} />
+          </SeccionPerfil>
+          <SeccionPerfil titulo="Cuidado Pastoral" icono="🤲">
+            <InfoRow icon="🏠" label="Visitas pastorales" value={miembro.visitas_pastorales} />
+            <InfoRow icon="💬" label="Consejería pastoral" value={miembro.consejeria_pastoral} />
+            <InfoRow icon="🙏" label="Motivo de oración" value={miembro.motivo_oracion} />
+            <InfoRow icon="📝" label="Notas adicionales" value={miembro.notas} />
+          </SeccionPerfil>
+        </div>
+        <div style={{ display:'flex', gap:10, padding:'14px 20px', borderTop:'1px solid var(--border)', background:'var(--surface)' }}>
+          <button className="btn btn-ghost" style={{ flex:1, justifyContent:'center' }} onClick={imprimir}>🖨️ Imprimir ficha</button>
+          <button className="btn btn-gold" style={{ flex:1, justifyContent:'center' }} onClick={onEdit}>✏️ Editar perfil</button>
         </div>
       </div>
-
-      {seccion('I. Información Personal', <>
-        {campo('Cédula', miembro.cedula)}
-        {campo('Fecha de nacimiento', miembro.fecha_nacimiento ? new Date(miembro.fecha_nacimiento).toLocaleDateString('es-DO') : null)}
-        {campo('Teléfono', miembro.telefono)}
-        {campo('Correo', miembro.email)}
-        {campo('Género', miembro.genero === 'M' ? 'Masculino' : miembro.genero === 'F' ? 'Femenino' : miembro.genero)}
-        {campo('Estado civil', capDisplay(miembro.estado_civil))}
-        {campo('Dirección', miembro.direccion)}
-      </>)}
-      {seccion('II. Información Familiar', <>
-        {campo('Cónyuge', miembro.nombre_conyuge)}
-        {campo('Teléfono cónyuge', miembro.telefono_conyuge)}
-        {campo('Número de hijos', miembro.numero_hijos)}
-        {campo('Teléfono de emergencia', miembro.telefono_emergencia)}
-        {miembro.nombres_hijos && (
-          <div style={{ marginBottom:8 }}>
-            <span style={{ color:'var(--text-muted)', fontSize:12 }}>Hijos: </span>
-            <pre style={{ fontFamily:'inherit', fontSize:13, margin:'4px 0', whiteSpace:'pre-wrap' }}>{miembro.nombres_hijos}</pre>
-          </div>
-        )}
-      </>)}
-      {seccion('III. Información Espiritual', <>
-        {campo('Fecha de conversión', miembro.fecha_conversion ? new Date(miembro.fecha_conversion).toLocaleDateString('es-DO') : null)}
-        {campo('Fecha de bautismo', miembro.fecha_bautismo ? new Date(miembro.fecha_bautismo).toLocaleDateString('es-DO') : null)}
-        {campo('Iglesia de bautismo', miembro.iglesia_bautismo)}
-        {campo('Tiempo en la iglesia', miembro.tiempo_en_iglesia)}
-        {campo('Miembro activo', miembro.miembro_activo)}
-        {campo('Rol', capDisplay(miembro.rol))}
-        {campo('Estado', capDisplay(miembro.estado))}
-      </>)}
-      {seccion('IV. Servicio y Ministerio', <>
-        {campo('Ministerio actual', miembro.ministerio_actual)}
-        {campo('Ministerios anteriores', miembro.ministerios_anteriores)}
-        {campo('Dones o talentos', miembro.dones_talentos)}
-        {campo('Disponibilidad', miembro.disponibilidad)}
-      </>)}
-      {seccion('V. Cuidado Pastoral', <>
-        {campo('Visitas pastorales', miembro.visitas_pastorales)}
-        {campo('Consejería pastoral', miembro.consejeria_pastoral)}
-        {campo('Motivo de oración', miembro.motivo_oracion)}
-        {campo('Notas', miembro.notas)}
-      </>)}
-    </Modal>
+    </div>
   )
 }
 
