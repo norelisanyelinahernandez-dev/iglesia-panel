@@ -56,7 +56,7 @@ export default function Documentos() {
   }
 
   const eliminar = (id) => {
-    if (!confirm('Eliminar este documento?')) return
+    if (!confirm('¿Eliminar este documento?')) return
     const nuevos = documentos.filter(d => d.id !== id)
     setDocumentos(nuevos)
     localStorage.setItem(STORAGE_KEY, JSON.stringify(nuevos))
@@ -208,3 +208,4 @@ export default function Documentos() {
     </div>
   )
 }
+

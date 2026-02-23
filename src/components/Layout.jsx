@@ -7,7 +7,7 @@ import './Layout.css'
 const NAV = [
   { to: '/',            label: 'Panel',      seccion: 'panel' },
   { to: '/miembros',    label: 'Miembros',   seccion: 'miembros' },
-  { to: '/tesoreria',   label: 'Tesoreria',  seccion: 'tesoreria' },
+  { to: '/Tesorería',   label: 'Tesorería',  seccion: 'Tesorería' },
   { to: '/finanzas',    label: 'Finanzas',   seccion: 'finanzas' },
   { to: '/reportes',    label: 'Reportes',   seccion: 'reportes' },
   { to: '/inventario',  label: 'Inventario', seccion: 'inventario' },
@@ -43,7 +43,7 @@ export default function Layout({ children }) {
           <div>
             <div className="logo-name" style={{ fontSize:12, lineHeight:1.3 }}>Ministerio San Juan 7:38</div>
             <div className="logo-sub" style={{ fontSize:10 }}>Del Semillero 1/11</div>
-            <div className="logo-sub">Panel de gestion</div>
+            <div className="logo-sub">Panel de gestión</div>
           </div>
         </div>
         <nav className="sidebar-nav">
@@ -67,7 +67,7 @@ export default function Layout({ children }) {
               <div className="user-role">{user?.rol}</div>
             </div>
           </div>
-          <button className="logout-btn" onClick={handleLogout} title="Cerrar sesion">X</button>
+          <button className="logout-btn" onClick={handleLogout} title="Cerrar sesión">X</button>
         </div>
       </aside>
 
@@ -89,4 +89,5 @@ export default function Layout({ children }) {
     </div>
   )
 }
+
 

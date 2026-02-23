@@ -138,7 +138,7 @@ function MiembroForm({ initial, onSave, onClose }) {
         <Field label="Fecha de conversion">{inp('fecha_conversion','date')}</Field>
         <Field label="Fecha de bautismo">{inp('fecha_bautismo','date')}</Field>
         <Field label="Iglesia donde fue bautizado">{inp('iglesia_bautismo')}</Field>
-        <Field label="Tiempo en esta iglesia">{inp('tiempo_en_iglesia','','Ej: 2 anos')}</Field>
+        <Field label="Tiempo en esta iglesia">{inp('tiempo_en_iglesia','','Ej: 2 años')}</Field>
         <Field label="Miembro activo">{sel('miembro_activo',[['Si','Si'],['No','No']])}</Field>
         <Field label="Rol">{sel('rol',[['miembro','Miembro'],['lider','Lider'],['diacono','Diacono'],['co-pastor','Co-Pastor'],['pastor','Pastor'],['visitante','Visitante']])}</Field>
         <Field label="Estado">{sel('estado',[['activo','Activo'],['inactivo','Inactivo'],['visita','Visita'],['trasladado','Trasladado']])}</Field>
@@ -452,3 +452,4 @@ export default function Miembros() {
     </div>
   )
 }
+

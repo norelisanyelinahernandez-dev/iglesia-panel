@@ -24,14 +24,14 @@ export default function Respaldo() {
         const miembros = m.value.data.map(x => ({
           Nombres: x.nombres,
           Apellidos: x.apellidos,
-          Cedula: x.cedula || '',
-          Telefono: x.telefono || '',
+          Cédula: x.cedula || '',
+          Teléfono: x.telefono || '',
           Email: x.email || '',
-          Genero: x.genero || '',
+          Género: x.genero || '',
           Estado_Civil: x.estado_civil || '',
-          Direccion: x.direccion || '',
+          Dirección: x.direccion || '',
           Fecha_Nacimiento: x.fecha_nacimiento || '',
-          Fecha_Conversion: x.fecha_conversion || '',
+          Fecha_Conversión: x.fecha_conversion || '',
           Fecha_Bautismo: x.fecha_bautismo || '',
           Iglesia_Bautismo: x.iglesia_bautismo || '',
           Tiempo_Iglesia: x.tiempo_en_iglesia || '',
@@ -50,7 +50,7 @@ export default function Respaldo() {
           Fecha: x.fecha,
           Categoria_ID: x.categoria_id,
           Monto: x.monto,
-          Descripcion: x.descripcion || '',
+          Descripción: x.descripcion || '',
         }))
         const ws = XLSX.utils.json_to_sheet(ingresos)
         XLSX.utils.book_append_sheet(wb, ws, 'Ingresos')
@@ -61,7 +61,7 @@ export default function Respaldo() {
           Fecha: x.fecha,
           Categoria_ID: x.categoria_id,
           Monto: x.monto,
-          Descripcion: x.descripcion || '',
+          Descripción: x.descripcion || '',
           Beneficiario: x.beneficiario || '',
         }))
         const ws = XLSX.utils.json_to_sheet(gastos)
@@ -73,7 +73,7 @@ export default function Respaldo() {
           Nombre: x.nombre,
           Fecha: x.fecha,
           Lugar: x.lugar || '',
-          Descripcion: x.descripcion || '',
+          Descripción: x.descripcion || '',
           Estado: x.estado || '',
         }))
         const ws = XLSX.utils.json_to_sheet(eventos)
@@ -86,7 +86,7 @@ export default function Respaldo() {
           Categoria: x.categoria || '',
           Cantidad: x.cantidad,
           Estado: x.estado || '',
-          Descripcion: x.descripcion || '',
+          Descripción: x.descripcion || '',
         }))
         const ws = XLSX.utils.json_to_sheet(inventario)
         XLSX.utils.book_append_sheet(wb, ws, 'Inventario')
@@ -109,14 +109,14 @@ export default function Respaldo() {
       const miembros = data.map(x => ({
         Nombres: x.nombres,
         Apellidos: x.apellidos,
-        Cedula: x.cedula || '',
-        Telefono: x.telefono || '',
+        Cédula: x.cedula || '',
+        Teléfono: x.telefono || '',
         Email: x.email || '',
-        Genero: x.genero === 'M' ? 'Masculino' : x.genero === 'F' ? 'Femenino' : x.genero || '',
+        Género: x.genero === 'M' ? 'Masculino' : x.genero === 'F' ? 'Femenino' : x.genero || '',
         Estado_Civil: x.estado_civil || '',
-        Direccion: x.direccion || '',
+        Dirección: x.direccion || '',
         Fecha_Nacimiento: x.fecha_nacimiento || '',
-        Fecha_Conversion: x.fecha_conversion || '',
+        Fecha_Conversión: x.fecha_conversion || '',
         Fecha_Bautismo: x.fecha_bautismo || '',
         Iglesia_Bautismo: x.iglesia_bautismo || '',
         Tiempo_Iglesia: x.tiempo_en_iglesia || '',
@@ -160,7 +160,7 @@ export default function Respaldo() {
           Fecha: x.fecha,
           Categoria_ID: x.categoria_id,
           Monto: x.monto,
-          Descripcion: x.descripcion || '',
+          Descripción: x.descripcion || '',
         })))
         XLSX.utils.book_append_sheet(wb, ws, 'Ingresos')
       }
@@ -169,7 +169,7 @@ export default function Respaldo() {
           Fecha: x.fecha,
           Categoria_ID: x.categoria_id,
           Monto: x.monto,
-          Descripcion: x.descripcion || '',
+          Descripción: x.descripcion || '',
           Beneficiario: x.beneficiario || '',
         })))
         XLSX.utils.book_append_sheet(wb, ws, 'Gastos')
@@ -255,3 +255,4 @@ export default function Respaldo() {
     </div>
   )
 }
+

@@ -1,12 +1,12 @@
 ﻿import { useState, useEffect } from 'react'
 import { getMiembros } from '../api/client'
 
-const DIAS = ['Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo']
+const DIAS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo']
 
 const TIPOS = [
   'Culto de avivamiento',
-  'Estudio biblico',
-  'Escuela de ninos',
+  'Estudio bíblico',
+  'Escuela de niños',
   'Visita a enfermos',
   'Celula',
   'Retiro congregacional',
@@ -15,8 +15,8 @@ const TIPOS = [
 
 const ICONOS_TIPO = {
   'Culto de avivamiento': '🔥',
-  'Estudio biblico': '📖',
-  'Escuela de ninos': '👧',
+  'Estudio bíblico': '📖',
+  'Escuela de niños': '👧',
   'Visita a enfermos': '🏥',
   'Celula': '🏠',
   'Retiro congregacional': '⛺',
@@ -27,21 +27,21 @@ const ICONOS_TIPO = {
 const PARTES_POR_TIPO = {
   'Culto de avivamiento': ['Oracion de apertura','Direccion','Devocional','Alabanzas','Mensaje','Oracion de cierre'],
   'Celula': ['Oracion de apertura','Direccion','Devocional','Alabanzas','Mensaje','Oracion de cierre'],
-  'Estudio biblico': ['Oracion de apertura','Encargado del estudio'],
-  'Escuela de ninos': ['Encargado'],
+  'Estudio bíblico': ['Oracion de apertura','Encargado del estudio'],
+  'Escuela de niños': ['Encargado'],
   'Visita a enfermos': [],
   'Retiro congregacional': [],
   'Culto unido': [],
 }
 
 const VERSICULOS = [
-  { texto: 'No dejando de congregarnos, como algunos tienen por costumbre, sino exhortandonos.', ref: 'Hebreos 10:25' },
-  { texto: 'Porque donde estan dos o tres congregados en mi nombre, alli estoy yo en medio de ellos.', ref: 'Mateo 18:20' },
-  { texto: 'Yo me alegre con los que me decian: A la casa de Jehova iremos.', ref: 'Salmos 122:1' },
+  { texto: 'No dejando de congregarnos, como algunos tienen por costumbre, sino exhortándonos.', ref: 'Hebreos 10:25' },
+  { texto: 'Porque donde están dos o tres congregados en mi nombre, alli estoy yo en medio de ellos.', ref: 'Mateo 18:20' },
+  { texto: 'Yo me alegre con los que me decían: A la casa de Jehova iremos.', ref: 'Salmos 122:1' },
   { texto: 'Una cosa he demandado a Jehova; que este yo en la casa de Jehova todos los dias de mi vida.', ref: 'Salmos 27:4' },
-  { texto: 'Y perseveraban en la doctrina de los apostoles, en la comunion unos con otros, en el partimiento del pan y en las oraciones.', ref: 'Hechos 2:42' },
-  { texto: 'Engrandezcan a Jehova conmigo, y exaltemos su nombre a una.', ref: 'Salmos 34:3' },
-  { texto: 'Cantad a Jehova cantico nuevo; su alabanza sea en la congregacion de los santos.', ref: 'Salmos 149:1' },
+  { texto: 'Y perseveraban en la doctrina de los apóstoles, en la comunión unos con otros, en el partimiento del pan y en las oraciones.', ref: 'Hechos 2:42' },
+  { texto: 'Engrandezcan a Jehová conmigo, y exaltemos su nombre a una.', ref: 'Salmos 34:3' },
+  { texto: 'Cantad a Jehová cántico nuevo; su alabanza sea en la congregación de los santos.', ref: 'Salmos 149:1' },
 ]
 
 const getNumSemana = (fecha) => {
@@ -387,3 +387,4 @@ export default function Programa() {
     </div>
   )
 }
+

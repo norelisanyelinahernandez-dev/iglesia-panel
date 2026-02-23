@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { getInventario, createItem, updateItem, deleteItem, getPrestamos, createPrestamo, updatePrestamo, getCategoriasInventario } from '../api/client'
 
 const ESTADO_BADGE = { excelente:'badge-green', bueno:'badge-green', regular:'badge-amber', dañado:'badge-red', dado_de_baja:'badge-red' }
@@ -12,7 +12,7 @@ function Modal({ title, onClose, children }) {
       <div className="modal">
         <div className="modal-header">
           <h3 className="modal-title">{title}</h3>
-          <button className="modal-close" onClick={onClose}>×</button>
+          <button className="modal-close" onClick={onClose}>Ã—</button>
         </div>
         {children}
       </div>
@@ -80,7 +80,7 @@ export default function Inventario() {
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('¿Eliminar este item?')) return
+    if (!confirm('Â¿Eliminar este item?')) return
     try { await deleteItem(id); load() } catch(_) {}
   }
 
@@ -92,7 +92,7 @@ export default function Inventario() {
           <p className="page-subtitle">{items.length} items registrados</p>
         </div>
         <div style={{ display:'flex', gap:10 }}>
-          <button className="btn btn-ghost" onClick={() => { setError(''); setModal('prestamo') }}>Registrar préstamo</button>
+          <button className="btn btn-ghost" onClick={() => { setError(''); setModal('prestamo') }}>Registrar Préstamo</button>
           <button className="btn btn-gold" onClick={openNew}>+ Agregar item</button>
         </div>
       </div>
@@ -120,28 +120,28 @@ export default function Inventario() {
         <>
           <div style={{ marginBottom:16 }}>
             <div className="search-bar">
-              <span className="search-icon">⌕</span>
+              <span className="search-icon">âŒ•</span>
               <input placeholder="Buscar item..." value={buscar} onChange={e=>setBuscar(e.target.value)} />
             </div>
           </div>
           <div className="card">
             <div className="table-wrap">
               <table>
-                <thead><tr><th>Nombre</th><th>Categoría</th><th>Cantidad</th><th>Estado</th><th>Ubicación</th><th>Marca/Modelo</th><th></th></tr></thead>
+                <thead><tr><th>Nombre</th><th>CategorÃ­a</th><th>Cantidad</th><th>Estado</th><th>UbicaciÃ³n</th><th>Marca/Modelo</th><th></th></tr></thead>
                 <tbody>
                   {loading ? <tr><td colSpan={7} style={{ textAlign:'center', padding:40 }}><span className="spinner"/></td></tr>
                   : filtered.map(i => (
                     <tr key={i.id}>
                       <td style={{ fontWeight:500 }}>{i.nombre}</td>
-                      <td style={{ color:'var(--text-muted)' }}>{categorias.find(c=>c.id===i.categoria_id)?.nombre || '—'}</td>
+                      <td style={{ color:'var(--text-muted)' }}>{categorias.find(c=>c.id===i.categoria_id)?.nombre || 'â€”'}</td>
                       <td style={{ fontWeight:600, color:'var(--blue)' }}>{i.cantidad}</td>
                       <td><span className={`badge ${ESTADO_BADGE[i.estado]}`}>{i.estado}</span></td>
-                      <td style={{ color:'var(--text-muted)' }}>{i.ubicacion || '—'}</td>
-                      <td style={{ color:'var(--text-muted)', fontSize:12 }}>{[i.marca, i.modelo].filter(Boolean).join(' / ') || '—'}</td>
+                      <td style={{ color:'var(--text-muted)' }}>{i.ubicacion || 'â€”'}</td>
+                      <td style={{ color:'var(--text-muted)', fontSize:12 }}>{[i.marca, i.modelo].filter(Boolean).join(' / ') || 'â€”'}</td>
                       <td>
                         <div style={{ display:'flex', gap:6 }}>
                           <button className="btn btn-ghost" style={{ padding:'5px 10px', fontSize:12 }} onClick={()=>openEdit(i)}>Editar</button>
-                          <button className="btn btn-danger" style={{ padding:'5px 10px', fontSize:12 }} onClick={()=>handleDelete(i.id)}>✕</button>
+                          <button className="btn btn-danger" style={{ padding:'5px 10px', fontSize:12 }} onClick={()=>handleDelete(i.id)}>âœ•</button>
                         </div>
                       </td>
                     </tr>
@@ -161,17 +161,17 @@ export default function Inventario() {
               <tbody>
                 {loading ? <tr><td colSpan={6} style={{ textAlign:'center', padding:40 }}><span className="spinner"/></td></tr>
                 : prestamos.length === 0
-                  ? <tr><td colSpan={6} style={{ textAlign:'center', padding:30, color:'var(--text-muted)' }}>Sin préstamos registrados</td></tr>
+                  ? <tr><td colSpan={6} style={{ textAlign:'center', padding:30, color:'var(--text-muted)' }}>Sin Préstamos registrados</td></tr>
                   : prestamos.map(p => (
                     <tr key={p.id}>
                       <td style={{ fontWeight:500 }}>{items.find(i=>i.id===p.item_id)?.nombre || p.item_id}</td>
-                      <td>{p.nombre_externo || p.miembro_id || '—'}</td>
+                      <td>{p.nombre_externo || p.miembro_id || 'â€”'}</td>
                       <td style={{ color:'var(--text-muted)' }}>{new Date(p.fecha_salida).toLocaleDateString('es-DO')}</td>
-                      <td style={{ color:'var(--text-muted)' }}>{p.fecha_retorno_esperada ? new Date(p.fecha_retorno_esperada).toLocaleDateString('es-DO') : '—'}</td>
+                      <td style={{ color:'var(--text-muted)' }}>{p.fecha_retorno_esperada ? new Date(p.fecha_retorno_esperada).toLocaleDateString('es-DO') : 'â€”'}</td>
                       <td><span className={`badge ${PRESTAMO_BADGE[p.estado]}`}>{p.estado}</span></td>
                       <td>
                         {p.estado === 'prestado' && (
-                          <button className="btn btn-ghost" style={{ padding:'5px 12px', fontSize:12 }} onClick={()=>devolverPrestamo(p.id)}>✓ Devolver</button>
+                          <button className="btn btn-ghost" style={{ padding:'5px 12px', fontSize:12 }} onClick={()=>devolverPrestamo(p.id)}>âœ“ Devolver</button>
                         )}
                       </td>
                     </tr>
@@ -193,9 +193,9 @@ export default function Inventario() {
                 <input value={form.nombre} onChange={e=>setForm({...form,nombre:e.target.value})} className="form-input" required />
               </div>
               <div className="form-group">
-                <label className="form-label">Categoría *</label>
+                <label className="form-label">CategorÃ­a *</label>
                 <select value={form.categoria_id} onChange={e=>setForm({...form,categoria_id:e.target.value})} className="form-input" required>
-                  <option value="">— Seleccionar —</option>
+                  <option value="">â€” Seleccionar â€”</option>
                   {categorias.map(c=><option key={c.id} value={c.id}>{c.nombre}</option>)}
                 </select>
               </div>
@@ -210,7 +210,7 @@ export default function Inventario() {
                 <input type="number" value={form.cantidad} onChange={e=>setForm({...form,cantidad:e.target.value})} className="form-input" min="0" />
               </div>
               <div className="form-group">
-                <label className="form-label">Valor adquisición</label>
+                <label className="form-label">Valor adquisiciÃ³n</label>
                 <input type="number" value={form.valor_adquisicion} onChange={e=>setForm({...form,valor_adquisicion:e.target.value})} className="form-input" min="0" step="0.01" />
               </div>
               <div className="form-group">
@@ -222,11 +222,11 @@ export default function Inventario() {
                 <input value={form.modelo} onChange={e=>setForm({...form,modelo:e.target.value})} className="form-input" />
               </div>
               <div className="form-group">
-                <label className="form-label">N° de serie</label>
+                <label className="form-label">NÂ° de serie</label>
                 <input value={form.numero_serie} onChange={e=>setForm({...form,numero_serie:e.target.value})} className="form-input" />
               </div>
               <div className="form-group">
-                <label className="form-label">Ubicación</label>
+                <label className="form-label">UbicaciÃ³n</label>
                 <input value={form.ubicacion} onChange={e=>setForm({...form,ubicacion:e.target.value})} className="form-input" />
               </div>
             </div>
@@ -240,13 +240,13 @@ export default function Inventario() {
 
       {/* Prestamo Modal */}
       {modal === 'prestamo' && (
-        <Modal title="Registrar préstamo" onClose={()=>setModal(null)}>
+        <Modal title="Registrar Préstamo" onClose={()=>setModal(null)}>
           {error && <div className="alert alert-error">{error}</div>}
           <form onSubmit={submitPrestamo} style={{ display:'flex', flexDirection:'column', gap:14 }}>
             <div className="form-group">
               <label className="form-label">Item *</label>
               <select value={prestamoForm.item_id} onChange={e=>setPrestamoForm({...prestamoForm,item_id:e.target.value})} className="form-input" required>
-                <option value="">— Seleccionar —</option>
+                <option value="">â€” Seleccionar â€”</option>
                 {items.filter(i=>i.cantidad>0).map(i=><option key={i.id} value={i.id}>{i.nombre}</option>)}
               </select>
             </div>
@@ -260,7 +260,7 @@ export default function Inventario() {
             </div>
             <div style={{ display:'flex', gap:10, justifyContent:'flex-end' }}>
               <button type="button" className="btn btn-ghost" onClick={()=>setModal(null)}>Cancelar</button>
-              <button type="submit" className="btn btn-gold" disabled={saving}>{saving?'Guardando...':'Registrar préstamo'}</button>
+              <button type="submit" className="btn btn-gold" disabled={saving}>{saving?'Guardando...':'Registrar Préstamo'}</button>
             </div>
           </form>
         </Modal>
@@ -268,3 +268,4 @@ export default function Inventario() {
     </div>
   )
 }
+

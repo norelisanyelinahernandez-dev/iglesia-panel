@@ -73,7 +73,7 @@ export default function Finanzas() {
   }
 
   const eliminarDeuda = (id) => {
-    if (!confirm('Eliminar este compromiso?')) return
+    if (!confirm('¿Eliminar este compromiso?')) return
     const nuevas = deudas.filter(d => d.id !== id)
     setDeudas(nuevas)
     localStorage.setItem(STORAGE_DEUDAS, JSON.stringify(nuevas))
@@ -119,7 +119,7 @@ export default function Finanzas() {
           {guardado && <div className="alert alert-success" style={{ marginBottom:16 }}>Presupuesto guardado correctamente</div>}
 
           <div className="card" style={{ marginBottom:16 }}>
-            <h3 style={{ fontFamily:'var(--font-heading)', fontSize:15, fontWeight:600, marginBottom:14 }}>Definir presupuesto {anio} por categoria</h3>
+            <h3 style={{ fontFamily:'var(--font-heading)', fontSize:15, fontWeight:600, marginBottom:14 }}>Definir presupuesto {anio} por categoría</h3>
             <div className="grid-2" style={{ gap:12 }}>
               {catGas.map(cat => (
                 <div key={cat.id} className="form-group">
@@ -145,7 +145,7 @@ export default function Finanzas() {
             {loading ? (
               <div style={{ textAlign:'center', padding:30 }}><span className="spinner" /></div>
             ) : gastoPorCategoria.length === 0 ? (
-              <p style={{ color:'var(--text-muted)', fontSize:13 }}>No hay datos de gastos aun.</p>
+              <p style={{ color:'var(--text-muted)', fontSize:13 }}>No hay datos de gastos aún.</p>
             ) : gastoPorCategoria.map(cat => (
               <div key={cat.id} style={{ marginBottom:16 }}>
                 <div style={{ display:'flex', justifyContent:'space-between', marginBottom:6 }}>
@@ -286,3 +286,4 @@ export default function Finanzas() {
     </div>
   )
 }
+

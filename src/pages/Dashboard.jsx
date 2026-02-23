@@ -68,7 +68,7 @@ export default function Dashboard() {
   }, [])
 
   const hora = new Date().getHours()
-  const saludo = hora < 12 ? 'Buenos dias' : hora < 18 ? 'Buenas tardes' : 'Buenas noches'
+  const saludo = hora < 12 ? 'Buenos días' : hora < 18 ? 'Buenas tardes' : 'Buenas noches'
 
   return (
     <div className="page">
@@ -121,7 +121,7 @@ export default function Dashboard() {
         {loading ? (
           <div style={{ textAlign:'center', padding:20 }}><span className="spinner" /></div>
         ) : cumpleanios.length === 0 ? (
-          <p style={{ color:'var(--text-muted)', fontSize:13 }}>Ningun miembro cumple años este mes.</p>
+          <p style={{ color:'var(--text-muted)', fontSize:13 }}>Ningún miembro cumple años este mes.</p>
         ) : (
           <div style={{ display:'flex', flexWrap:'wrap', gap:10 }}>
             {cumpleanios.map(m => {
@@ -139,7 +139,7 @@ export default function Dashboard() {
                   <div>
                     <div style={{ fontWeight:700, fontSize:14, color: esHoy ? '#000' : 'var(--text)' }}>{m.nombres} {m.apellidos}</div>
                     <div style={{ fontSize:12, color: esHoy ? '#333' : 'var(--text-muted)' }}>
-                      {esHoy ? 'Hoy es su cumpleaños!' : `Dia ${dia}`} — {edad} años
+                      {esHoy ? 'Hoy es su cumpleaños!' : `Día ${dia}`} — {edad} años
                     </div>
                   </div>
                 </div>
@@ -212,3 +212,4 @@ export default function Dashboard() {
     </div>
   )
 }
+

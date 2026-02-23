@@ -36,7 +36,7 @@ export default function Anuncios() {
   }
 
   const eliminar = (i) => {
-    if (!confirm('Eliminar este anuncio?')) return
+    if (!confirm('¿Eliminar este anuncio?')) return
     const nuevos = anuncios.filter((_, j) => j !== i)
     setAnuncios(nuevos)
     localStorage.setItem(STORAGE_KEY, JSON.stringify(nuevos))
@@ -128,7 +128,7 @@ export default function Anuncios() {
               </div>
               <div className="form-group">
                 <label className="form-label">Contenido *</label>
-                <textarea name="contenido" value={form.contenido} onChange={h} className="form-input" rows={4} style={{ resize:'vertical' }} placeholder="Escribe aqui el detalle del anuncio..." />
+                <textarea name="contenido" value={form.contenido} onChange={h} className="form-input" rows={4} style={{ resize:'vertical' }} placeholder="Escribe aquí el detalle del anuncio..." />
               </div>
               <div className="grid-2" style={{ gap:12 }}>
                 <div className="form-group">
@@ -157,3 +157,4 @@ export default function Anuncios() {
     </div>
   )
 }
+

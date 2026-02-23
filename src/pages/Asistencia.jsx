@@ -5,8 +5,8 @@ const STORAGE_KEY = 'asistencia_iglesia'
 
 const TIPOS = [
   'Culto de avivamiento',
-  'Estudio biblico',
-  'Escuela de ninos',
+  'Estudio bíblico',
+  'Escuela de niños',
   'Celula',
   'Retiro congregacional',
   'Culto unido',
@@ -67,7 +67,7 @@ export default function Asistencia() {
   }
 
   const eliminarRegistro = (id) => {
-    if (!confirm('Eliminar este registro?')) return
+    if (!confirm('¿Eliminar este registro?')) return
     const nuevos = registros.filter(r => r.id !== id)
     setRegistros(nuevos)
     localStorage.setItem(STORAGE_KEY, JSON.stringify(nuevos))
@@ -276,3 +276,4 @@ export default function Asistencia() {
     </div>
   )
 }
+
