@@ -82,11 +82,7 @@ export default function Dashboard() {
       <InstalarApp />
 
       <div className="grid-4" style={{ marginBottom: 28 }}>
-        <div className="stat-card">
-          <div className="stat-icon">✦</div>
-          <div className="stat-value">{loading ? '—' : stats.miembros}</div>
-          <div className="stat-label">Miembros activos</div>
-        </div>
+        {puede('ver_balance') && (<div className="stat-card"><div className="stat-icon">✦</div><div className="stat-value">{loading ? '—' : stats.miembros}</div><div className="stat-label">Miembros activos</div></div>)}
         <div className="stat-card">
           <div className="stat-icon">◆</div>
           <div className="stat-value">{loading ? '—' : stats.eventos}</div>
@@ -212,4 +208,5 @@ export default function Dashboard() {
     </div>
   )
 }
+
 
