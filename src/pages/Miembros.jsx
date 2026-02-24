@@ -228,6 +228,24 @@ function MiembroForm({ initial, onSave, onClose }) {
         <FullWidth><Field label="Disponibilidad"><input name="disponibilidad" value={form.disponibilidad||''} onChange={hCapFirst} className="form-input" placeholder="Ej: Lunes y viernes, tarde" /></Field></FullWidth>
       </Section>
 
+            <Section title="VI. Ocupacion y Educacion">
+        <Field label="Ocupacion / Profesion"><input name="ocupacion" value={form.ocupacion||''} onChange={hCapFirst} className="form-input" placeholder="Ej: Ingeniero, Maestro, Comerciante" /></Field>
+        <Field label="Lugar de trabajo"><input name="lugar_trabajo" value={form.lugar_trabajo||''} onChange={hCapFirst} className="form-input" /></Field>
+        <FullWidth><Field label="Nivel educativo">{sel('nivel_educativo',[['','-- Seleccionar --'],['primaria','Primaria'],['secundaria','Secundaria'],['tecnico','Tecnico'],['universitario','Universitario'],['postgrado','Postgrado / Maestria'],['doctorado','Doctorado']])}</Field></FullWidth>
+      </Section>
+
+      <Section title="VII. Redes Sociales">
+        <Field label="WhatsApp"><input name="whatsapp" value={form.whatsapp||''} onChange={hTel('whatsapp')} className="form-input" placeholder="809-000-0000" /></Field>
+        <Field label="Facebook"><input name="facebook" value={form.facebook||''} onChange={h} className="form-input" placeholder="Nombre en Facebook" /></Field>
+        <FullWidth><Field label="Instagram"><input name="instagram" value={form.instagram||''} onChange={h} className="form-input" placeholder="@usuario" /></Field></FullWidth>
+      </Section>
+
+      <Section title="VIII. Historial Medico">
+        <Field label="Tipo de sangre">{sel('tipo_sangre',[['','-- Seleccionar --'],['A+','A+'],['A-','A-'],['B+','B+'],['B-','B-'],['AB+','AB+'],['AB-','AB-'],['O+','O+'],['O-','O-']])}</Field>
+        <FullWidth><Field label="Condicion medica especial">{ta('condicion_medica',2)}</Field></FullWidth>
+        <FullWidth><Field label="Alergias">{ta('alergias',2)}</Field></FullWidth>
+      </Section>
+
       <Section title="V. Cuidado Pastoral">
         <Field label="¿Visitas pastorales?">{sel('visitas_pastorales',[['No','No'],['Si','Sí']])}</Field>
         <Field label="¿Consejería pastoral?">{sel('consejeria_pastoral',[['No','No'],['Si','Sí']])}</Field>
