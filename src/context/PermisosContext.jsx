@@ -22,10 +22,25 @@ export function PermisosProvider({ children }) {
   const rol = user?.rol?.toLowerCase() || ''
   const permisos = PERMISOS[rol] || ['panel','programa','eventos']
 
+  // Roles con permiso de edicion total
+  const ROLES_EDITOR = ['admin','pastor','pastora','secretaria','secretario']
+  // Roles que solo editan finanzas
+  const ROLES_TESORERO = ['tesorero','tesorera']
+
   const puede = (seccion) => permisos.includes(seccion)
 
+  // puedeEditar(seccion): true si puede modificar datos en esa seccion
+  const puedeEditar = (seccion) => {
+    if (user?.tipo === 'miembro') return false        // miembros: nunca editan
+    if (ROLES_EDITOR.includes(rol)) return true       // admin/pastor/secretario: editan todo
+    if (ROLES_TESORERO.includes(rol)) {               // tesorero/a: solo finanzas
+      return ['tesoreria','finanzas'].includes(seccion)
+    }
+    return false  // copastor/a, diacono, maestra, etc: solo lectura
+  }
+
   return (
-    <PermisosContext.Provider value={{ puede, permisos, rol }}>
+    <PermisosContext.Provider value={{ puede, puedeEditar, permisos, rol }}>
       {children}
     </PermisosContext.Provider>
   )

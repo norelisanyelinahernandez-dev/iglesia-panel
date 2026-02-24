@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useAuth } from '../context/AuthContext'
+import { usePermisos } from '../context/PermisosContext'
 import { getAnuncios, createAnuncio, updateAnuncio, deleteAnuncio } from '../api/client'
 
 const PRIORIDAD_BADGE = {
@@ -11,8 +11,8 @@ const PRIORIDAD_BADGE = {
 const emptyForm = () => ({ titulo:'', contenido:'', prioridad:'media', fecha_expira:'' })
 
 export default function Anuncios() {
-  const { user } = useAuth()
-  const isMiembro = user?.tipo === 'miembro'
+  const { puedeEditar } = usePermisos()
+  const puedeEdit = puedeEditar('anuncios')
   const [anuncios, setAnuncios] = useState([])
   const [form, setForm] = useState(emptyForm())
   const [editando, setEditando] = useState(null)
@@ -68,7 +68,7 @@ export default function Anuncios() {
           <h1 className="page-title">Anuncios</h1>
           <p className="page-subtitle">{activos.length} anuncio{activos.length !== 1 ? 's' : ''} activo{activos.length !== 1 ? 's' : ''}</p>
         </div>
-        {!isMiembro && <button className="btn btn-gold" onClick={() => { setForm(emptyForm()); setEditando(null); setModal(true) }}>+ Nuevo anuncio</button>}
+        {puedeEdit && <button className="btn btn-gold" onClick={() => { setForm(emptyForm()); setEditando(null); setModal(true) }}>+ Nuevo anuncio</button>}
       </div>
 
       {loading && <div style={{ textAlign:'center', padding:40 }}><span className="spinner" /></div>}

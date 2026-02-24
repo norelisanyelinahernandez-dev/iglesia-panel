@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect } from 'react'
-import { useAuth } from '../context/AuthContext'
+import { usePermisos } from '../context/PermisosContext'
 import { getMiembros, getPrograma, savePrograma, getProgramaSemanas } from '../api/client'
 
 const DIAS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo']
@@ -236,8 +236,8 @@ function DiaCard({ diaData, onChange, miembros }) {
 }
 
 export default function Programa() {
-  const { user } = useAuth()
-  const isMiembro = user?.tipo === 'miembro'
+  const { puedeEditar } = usePermisos()
+  const puedeEdit = puedeEditar('programa')
   const [miembros, setMiembros] = useState([])
   const [modoSimple, setModoSimple] = useState(false)
   const [semanaViendo, setSemanaViendo] = useState(semanaActual())
@@ -327,20 +327,20 @@ export default function Programa() {
         </div>
         <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
           <button className="btn btn-ghost" onClick={() => setVistaHistorial(!vistaHistorial)}>{vistaHistorial ? 'Ver actual' : 'Historial'}</button>
-          {!isMiembro && (
+          {puedeEdit && (
             <button className="btn btn-ghost" onClick={() => { setModoSimple(!modoSimple); window.speechSynthesis?.cancel() }}>
               {modoSimple ? 'Modo admin' : '🔊 Modo facil'}
             </button>
           )}
-          {(modoSimple || isMiembro) && (
+          {(modoSimple || !puedeEdit) && (
             <button onClick={escucharTodo}
               style={{ background:'var(--gold)', border:'none', borderRadius:8, padding:'8px 20px', fontWeight:700, fontSize:15, cursor:'pointer' }}>
               🔊 Escuchar todo
             </button>
           )}
-          {!isMiembro && !modoSimple && esActual && <button className="btn btn-ghost" onClick={limpiar}>Limpiar</button>}
-          {!isMiembro && !modoSimple && esActual && <button className="btn btn-ghost" onClick={() => window.print()}>Imprimir</button>}
-          {!isMiembro && !modoSimple && esActual && <button className="btn btn-gold" onClick={guardar}>Guardar</button>}
+          {puedeEdit && !modoSimple && esActual && <button className="btn btn-ghost" onClick={limpiar}>Limpiar</button>}
+          {puedeEdit && !modoSimple && esActual && <button className="btn btn-ghost" onClick={() => window.print()}>Imprimir</button>}
+          {puedeEdit && !modoSimple && esActual && <button className="btn btn-gold" onClick={guardar}>Guardar</button>}
         </div>
       </div>
 
@@ -382,7 +382,7 @@ export default function Programa() {
             <span style={{ color:'var(--gold)', fontSize:12, fontWeight:600 }}>-- {versiculo.ref}</span>
           </div>
 
-          {(modoSimple || isMiembro)
+          {(modoSimple || !puedeEdit)
             ? semanaData.map((d,i) => <DiaCardSimple key={d.dia} diaData={d} miembros={miembros} onEscuchar={escucharDia} />)
             : semanaData.map((d,i) => <DiaCard key={d.dia} diaData={d} index={i} onChange={data => updateDia(i, data)} miembros={miembros} />)
           }
