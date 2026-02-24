@@ -431,8 +431,7 @@ function exportarExcel(miembros) {
 
   // Construir CSV con BOM para que Excel lo abra bien en español
   const bom = '﻿'
-  const csv = bom + [headers, ...rows].map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('
-')
+  const csv = bom + [headers, ...rows].map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('\r\n')
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
