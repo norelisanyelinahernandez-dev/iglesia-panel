@@ -19,6 +19,7 @@ import Reportes from './pages/Reportes'
 import Respaldo from './pages/Respaldo'
 import Finanzas from './pages/Finanzas'
 import Documentos from './pages/Documentos'
+import MiPerfilMiembro from './pages/MiPerfilMiembro'
 
 function PrivateRoute({ children }) {
   const { user } = useAuth()
@@ -34,7 +35,8 @@ function AppRoutes() {
   const { user } = useAuth()
   return (
     <Routes>
-      <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
+      <Route path="/login" element={user ? <Navigate to={user.tipo === 'miembro' ? '/mi-perfil' : '/'} replace /> : <Login />} />
+      <Route path="/mi-perfil" element={user?.tipo === 'miembro' ? <MiPerfilMiembro /> : <Navigate to="/login" replace />} />
       <Route path="/*" element={
         <PrivateRoute>
           <PermisosProvider>
