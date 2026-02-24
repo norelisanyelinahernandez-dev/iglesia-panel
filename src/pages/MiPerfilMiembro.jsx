@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
-import { getMiembros, getEventos } from '../api/client'
+import { getMiembroById, getEventos } from '../api/client'
 
 const fmtDate = (d) => d ? new Date(d + 'T00:00:00').toLocaleDateString('es-DO', { day:'2-digit', month:'long', year:'numeric' }) : null
 const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1) : ''
@@ -35,14 +35,19 @@ export default function MiPerfilMiembro() {
     const load = async () => {
       try {
         const [m, e] = await Promise.allSettled([
-          getMiembros({ limit: 500 }),
+          getMiembroById(user?.id),
           getEventos()
         ])
         if (m.status === 'fulfilled') {
-          const todos = m.value.data
-          const encontrado = todos.find(x => x.id === user?.id)
-          setMiembro(encontrado || null)
-          if (esRolAvanzado) setTotalMiembros(todos.filter(x => x.estado === 'activo').length)
+          setMiembro(m.value.data || null)
+        }
+        if (esRolAvanzado) {
+          // Intentar obtener total de miembros activos
+          try {
+            const { getMiembros } = await import('../api/client')
+            const todos = await getMiembros({ limit: 500 })
+            setTotalMiembros(todos.data.filter(x => x.estado === 'activo').length)
+          } catch (_) {}
         }
         if (e.status === 'fulfilled') {
           const hoy = new Date()

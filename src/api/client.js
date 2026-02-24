@@ -19,9 +19,13 @@ api.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err.response?.status === 401 && window.location.pathname !== '/login') {
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-      window.location.href = '/login'
+      // Solo redirigir si es sesión de admin, no de miembro
+      const user = (() => { try { return JSON.parse(localStorage.getItem('user')) } catch { return null } })()
+      if (!user || user.tipo !== 'miembro') {
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        window.location.href = '/login'
+      }
     }
     return Promise.reject(err)
   }
@@ -61,6 +65,7 @@ export const deleteEvento = (id) => api.delete(`/eventos/${id}`)
 export const getAsistencia = (eventoId) => api.get(`/eventos/${eventoId}/asistencia`)
 export const registrarAsistencia = (eventoId, data) => api.post(`/eventos/${eventoId}/asistencia`, data)
 
+export const getMiembroById = (id) => api.get(`/miembros/${id}`)
 export const getMinisterios = () => api.get('/ministerios/')
 export const getCelulas = () => api.get('/celulas/')
 
