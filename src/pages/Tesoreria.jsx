@@ -375,21 +375,24 @@ export default function Tesoreria() {
           </div>
 
           <div className="card">
-            <h3 style={{ fontFamily:'var(--font-heading)', fontSize:16, fontWeight:600, marginBottom:12 }}>Diezmos por miembro - {anio}</h3>
+            <h3 style={{ fontFamily:'var(--font-heading)', fontSize:16, fontWeight:600, marginBottom:12 }}>Diezmos registrados - {anio}</h3>
             <div className="table-wrap">
               <table>
-                <thead><tr><th>#</th><th>Miembro</th><th>Total diezmado</th><th>Envio Central (10%)</th><th>Pagos</th></tr></thead>
+                <thead><tr><th>Fecha</th><th>Miembro</th><th>Monto</th><th>Acciones</th></tr></thead>
                 <tbody>
-                  {loading ? <tr><td colSpan={5} style={{ textAlign:'center', padding:40 }}><span className="spinner" /></td></tr>
-                  : diezmos.length === 0
-                    ? <tr><td colSpan={5} style={{ textAlign:'center', padding:30, color:'var(--text-muted)' }}>Sin registros</td></tr>
-                    : diezmos.map((d,i) => (
-                      <tr key={i}>
-                        <td style={{ color:'var(--text-muted)' }}>{i+1}</td>
-                        <td style={{ fontWeight:500 }}>{d.miembro}</td>
-                        <td style={{ fontWeight:600, color:'var(--gold)' }}>{fmt(d.total)}</td>
-                        <td style={{ fontWeight:600, color:'var(--green)' }}>{fmt(d.total * 0.1)}</td>
-                        <td><span className="badge badge-blue">{d.pagos} pagos</span></td>
+                  {loading ? <tr><td colSpan={4} style={{ textAlign:'center', padding:40 }}><span className="spinner" /></td></tr>
+                  : ingresos.filter(i => catIng.find(c=>c.id===i.categoria_id)?.nombre === 'Diezmo').length === 0
+                    ? <tr><td colSpan={4} style={{ textAlign:'center', padding:30, color:'var(--text-muted)' }}>Sin registros</td></tr>
+                    : ingresos.filter(i => catIng.find(c=>c.id===i.categoria_id)?.nombre === 'Diezmo').map(i => (
+                      <tr key={i.id}>
+                        <td style={{ color:'var(--text-muted)' }}>{new Date(i.fecha).toLocaleDateString('es-DO')}</td>
+                        <td style={{ fontWeight:500 }}>{miembros.find(m=>m.id===i.miembro_id) ? `${miembros.find(m=>m.id===i.miembro_id).nombres} ${miembros.find(m=>m.id===i.miembro_id).apellidos}` : '-'}</td>
+                        <td style={{ fontWeight:600, color:'var(--gold)' }}>{fmt(i.monto)}</td>
+                        <td>
+                          <button onClick={() => eliminarIngreso(i.id)} style={{ background:'none', border:'none', cursor:'pointer', color:'var(--red)', fontSize:13 }}>
+                            Eliminar
+                          </button>
+                        </td>
                       </tr>
                     ))}
                 </tbody>
