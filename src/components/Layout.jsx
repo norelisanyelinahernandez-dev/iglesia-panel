@@ -47,7 +47,11 @@ const NAV = [
 export default function Layout({ children }) {
   const { user, logout } = useAuth()
   const { puede } = usePermisos()
-  const navItems = user?.tipo === 'miembro' ? NAV_MIEMBRO : NAV_ADMIN.filter(({ seccion }) => puede(seccion))
+  // Roles que usan el panel de admin (menu completo filtrado por permisos)
+  const ROLES_PANEL_ADMIN = ['admin','pastor','pastora','secretaria','secretario','copastor','copastora','tesorero','tesorera','diacono','maestra']
+  const rol = user?.rol?.toLowerCase() || ''
+  const esPortalMiembro = user?.tipo === 'miembro' && !ROLES_PANEL_ADMIN.includes(rol)
+  const navItems = esPortalMiembro ? NAV_MIEMBRO : NAV.filter(({ seccion }) => puede(seccion))
   const navigate = useNavigate()
   const [menuAbierto, setMenuAbierto] = useState(false)
 
@@ -68,7 +72,7 @@ export default function Layout({ children }) {
           <div>
             <div className="logo-name" style={{ fontSize:12, lineHeight:1.3 }}>Ministerio San Juan 7:38</div>
             <div className="logo-sub" style={{ fontSize:10 }}>Del Semillero 1/11</div>
-            <div className="logo-sub">{user?.tipo === 'miembro' ? 'Portal del miembro' : 'Panel de gestión'}</div>
+            <div className="logo-sub">{esPortalMiembro ? 'Portal del miembro' : 'Panel de gestión'}</div>
           </div>
         </div>
         <nav className="sidebar-nav">
