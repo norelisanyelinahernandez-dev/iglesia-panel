@@ -46,8 +46,8 @@ const NAV = [
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth()
-  const navItems = user?.tipo === 'miembro' ? NAV_MIEMBRO : NAV_ADMIN.filter(({ seccion }) => puede(seccion))
   const { puede } = usePermisos()
+  const navItems = user?.tipo === 'miembro' ? NAV_MIEMBRO : NAV_ADMIN.filter(({ seccion }) => puede(seccion))
   const navigate = useNavigate()
   const [menuAbierto, setMenuAbierto] = useState(false)
 
