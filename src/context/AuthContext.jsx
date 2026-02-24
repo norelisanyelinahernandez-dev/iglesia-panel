@@ -12,7 +12,7 @@ export function AuthProvider({ children }) {
   const loginMiembro = useCallback(async (datos) => {
     const { data } = await api.post('/auth/login-miembro', datos)
     localStorage.setItem('token', data.access_token)
-    const userData = { nombre: data.nombre, rol: 'miembro', tipo: 'miembro', id: data.id }
+    const userData = { nombre: data.nombre, rol: data.rol, tipo: 'miembro', id: data.id }
     localStorage.setItem('user', JSON.stringify(userData))
     setUser(userData)
     return userData
