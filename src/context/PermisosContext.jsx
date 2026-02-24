@@ -12,7 +12,7 @@ const PERMISOS = {
   tesorera:   ['panel','tesoreria','finanzas','reportes','respaldo','ver_balance'],
   diacono:    ['panel','miembros','eventos','asistencia','programa'],
   maestra:    ['panel','programa','asistencia','anuncios'],
-  miembro:    ['panel','programa','eventos'],
+  miembro:    ['panel','eventos','pastora','programa'],
 }
 
 const PermisosContext = createContext(null)

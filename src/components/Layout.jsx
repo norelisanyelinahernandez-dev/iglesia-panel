@@ -4,6 +4,30 @@ import { useAuth } from '../context/AuthContext'
 import { usePermisos } from '../context/PermisosContext'
 import './Layout.css'
 
+const NAV_ADMIN = [
+  { to: '/',            label: 'Panel',           icono: '🏠', seccion: 'panel' },
+  { to: '/miembros',    label: 'Miembros',         icono: '👥', seccion: 'miembros' },
+  { to: '/tesoreria',   label: 'Tesorería',        icono: '💰', seccion: 'tesoreria' },
+  { to: '/finanzas',    label: 'Finanzas',         icono: '📊', seccion: 'finanzas' },
+  { to: '/reportes',    label: 'Reportes',         icono: '📋', seccion: 'reportes' },
+  { to: '/inventario',  label: 'Inventario',       icono: '📦', seccion: 'inventario' },
+  { to: '/eventos',     label: 'Eventos',          icono: '📅', seccion: 'eventos' },
+  { to: '/asistencia',  label: 'Asistencia',       icono: '✅', seccion: 'asistencia' },
+  { to: '/pastora',     label: 'Pastora',          icono: '✝️', seccion: 'pastora' },
+  { to: '/programa',    label: 'Programa',         icono: '📖', seccion: 'programa' },
+  { to: '/anuncios',    label: 'Anuncios',         icono: '📢', seccion: 'anuncios' },
+  { to: '/documentos',  label: 'Documentos',       icono: '📄', seccion: 'documentos' },
+  { to: '/respaldo',    label: 'Respaldo',         icono: '💾', seccion: 'respaldo' },
+]
+
+const NAV_MIEMBRO = [
+  { to: '/miembro/',         label: 'Panel',        icono: '🏠', seccion: 'panel' },
+  { to: '/miembro/eventos',  label: 'Eventos',      icono: '📅', seccion: 'eventos' },
+  { to: '/miembro/programa', label: 'Programa',     icono: '📖', seccion: 'programa' },
+  { to: '/miembro/perfil',   label: 'Mi Perfil',    icono: '👤', seccion: 'panel' },
+  { to: '/miembro/pastora',  label: 'Info Pastoral',icono: '✝️', seccion: 'pastora' },
+]
+
 const NAV = [
   { to: '/',            label: 'Panel',           icono: '🏠', seccion: 'panel' },
   { to: '/miembros',    label: 'Miembros',         icono: '👥', seccion: 'miembros' },
@@ -22,6 +46,7 @@ const NAV = [
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth()
+  const navItems = user?.tipo === 'miembro' ? NAV_MIEMBRO : NAV_ADMIN.filter(({ seccion }) => puede(seccion))
   const { puede } = usePermisos()
   const navigate = useNavigate()
   const [menuAbierto, setMenuAbierto] = useState(false)
@@ -43,11 +68,11 @@ export default function Layout({ children }) {
           <div>
             <div className="logo-name" style={{ fontSize:12, lineHeight:1.3 }}>Ministerio San Juan 7:38</div>
             <div className="logo-sub" style={{ fontSize:10 }}>Del Semillero 1/11</div>
-            <div className="logo-sub">Panel de gestión</div>
+            <div className="logo-sub">{user?.tipo === 'miembro' ? 'Portal del miembro' : 'Panel de gestión'}</div>
           </div>
         </div>
         <nav className="sidebar-nav">
-          {NAV.filter(({ seccion }) => puede(seccion)).map(({ to, label, icono }) => (
+          {navItems.map(({ to, label, icono }) => (
             <NavLink
               key={to}
               to={to}

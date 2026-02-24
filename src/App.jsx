@@ -20,6 +20,7 @@ import Respaldo from './pages/Respaldo'
 import Finanzas from './pages/Finanzas'
 import Documentos from './pages/Documentos'
 import MiPerfilMiembro from './pages/MiPerfilMiembro'
+import DashboardMiembro from './pages/DashboardMiembro'
 
 function PrivateRoute({ children }) {
   const { user } = useAuth()
@@ -35,8 +36,32 @@ function AppRoutes() {
   const { user } = useAuth()
   return (
     <Routes>
-      <Route path="/login" element={user ? <Navigate to={user.tipo === 'miembro' ? '/mi-perfil' : '/'} replace /> : <Login />} />
-      <Route path="/mi-perfil" element={user?.tipo === 'miembro' ? <MiPerfilMiembro /> : <Navigate to="/login" replace />} />
+      <Route path="/login" element={user ? <Navigate to={user.tipo === 'miembro' ? '/miembro/' : '/'} replace /> : <Login />} />
+      <Route path="/mi-perfil" element={
+        user?.tipo === 'miembro' ? (
+          <PermisosProvider>
+            <Layout>
+              <MiPerfilMiembro />
+            </Layout>
+          </PermisosProvider>
+        ) : <Navigate to="/login" replace />
+      } />
+      <Route path="/miembro/*" element={
+        user?.tipo === 'miembro' ? (
+          <PermisosProvider>
+            <Layout>
+              <Routes>
+                <Route path="/" element={<DashboardMiembro />} />
+                <Route path="/eventos" element={<Eventos />} />
+                <Route path="/programa" element={<Programa />} />
+                <Route path="/pastora" element={<Pastora />} />
+                <Route path="/perfil" element={<MiPerfilMiembro />} />
+                <Route path="*" element={<Navigate to="/miembro/" replace />} />
+              </Routes>
+            </Layout>
+          </PermisosProvider>
+        ) : <Navigate to="/login" replace />
+      } />
       <Route path="/*" element={
         <PrivateRoute>
           <PermisosProvider>
