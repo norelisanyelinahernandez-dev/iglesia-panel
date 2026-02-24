@@ -50,7 +50,14 @@ export default function Eventos() {
       await createEvento({ ...form, fecha_inicio: new Date(form.fecha_inicio).toISOString() })
       load(); setModal(null)
       setForm({ nombre:'', tipo:'culto', descripcion:'', fecha_inicio:'', fecha_fin:'', lugar:'' })
-    } catch(err) { setError(err.response?.data?.detail || 'Error') }
+    } catch(err) {
+      const detail = err.response?.data?.detail
+      if (Array.isArray(detail)) {
+        setError(detail.map(d => d.msg || JSON.stringify(d)).join(', '))
+      } else {
+        setError(typeof detail === 'string' ? detail : 'Error al crear evento')
+      }
+    }
     setSaving(false)
   }
 
