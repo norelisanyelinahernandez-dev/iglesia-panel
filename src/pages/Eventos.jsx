@@ -47,7 +47,18 @@ export default function Eventos() {
   const submitEvento = async (e) => {
     e.preventDefault(); setSaving(true); setError('')
     try {
-      await createEvento({ ...form, fecha_inicio: new Date(form.fecha_inicio).toISOString() })
+      if (!form.fecha_inicio) { setError("La fecha es requerida"); setSaving(false); return }
+      const d = new Date(form.fecha_inicio)
+      if (isNaN(d.getTime())) { setError("Fecha inválida"); setSaving(false); return }
+      const payload = {
+        nombre: form.nombre,
+        tipo: form.tipo || null,
+        descripcion: form.descripcion || null,
+        lugar: form.lugar || null,
+        fecha_inicio: d.toISOString(),
+        fecha_fin: form.fecha_fin ? new Date(form.fecha_fin).toISOString() : null,
+      }
+      await createEvento(payload)
       load(); setModal(null)
       setForm({ nombre:'', tipo:'culto', descripcion:'', fecha_inicio:'', fecha_fin:'', lugar:'' })
     } catch(err) {
