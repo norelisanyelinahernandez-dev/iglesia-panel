@@ -1,6 +1,5 @@
-﻿import { useState, useEffect } from 'react'
-
-const STORAGE_KEY = 'anuncios_iglesia'
+import { useState, useEffect } from 'react'
+import { getAnuncios, createAnuncio, updateAnuncio, deleteAnuncio } from '../api/client'
 
 const PRIORIDAD_BADGE = {
   alta: { label:'Urgente', color:'var(--red)' },
@@ -11,40 +10,47 @@ const PRIORIDAD_BADGE = {
 const emptyForm = () => ({ titulo:'', contenido:'', prioridad:'media', fecha_expira:'' })
 
 export default function Anuncios() {
-  const [anuncios, setAnuncios] = useState(() => {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [] }
-    catch { return [] }
-  })
+  const [anuncios, setAnuncios] = useState([])
   const [form, setForm] = useState(emptyForm())
   const [editando, setEditando] = useState(null)
   const [modal, setModal] = useState(false)
+  const [loading, setLoading] = useState(true)
   const h = (e) => setForm({ ...form, [e.target.name]: e.target.value })
 
-  const guardar = () => {
+  const cargar = async () => {
+    try {
+      const { data } = await getAnuncios()
+      setAnuncios(data)
+    } catch (_) {}
+    setLoading(false)
+  }
+
+  useEffect(() => { cargar() }, [])
+
+  const guardar = async () => {
     if (!form.titulo || !form.contenido) return
-    let nuevos
-    if (editando !== null) {
-      nuevos = anuncios.map((a, i) => i === editando ? { ...form, fecha: a.fecha } : a)
+    try {
+      const payload = { ...form, fecha_expira: form.fecha_expira || null }
+      if (editando !== null) {
+        await updateAnuncio(editando, payload)
+      } else {
+        await createAnuncio(payload)
+      }
       setEditando(null)
-    } else {
-      nuevos = [{ ...form, fecha: new Date().toISOString() }, ...anuncios]
-    }
-    setAnuncios(nuevos)
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(nuevos))
-    setForm(emptyForm())
-    setModal(false)
+      setForm(emptyForm())
+      setModal(false)
+      cargar()
+    } catch (_) {}
   }
 
-  const eliminar = (i) => {
+  const eliminar = async (id) => {
     if (!confirm('¿Eliminar este anuncio?')) return
-    const nuevos = anuncios.filter((_, j) => j !== i)
-    setAnuncios(nuevos)
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(nuevos))
+    try { await deleteAnuncio(id); cargar() } catch (_) {}
   }
 
-  const editar = (i) => {
-    setForm(anuncios[i])
-    setEditando(i)
+  const editar = (a) => {
+    setForm({ titulo: a.titulo, contenido: a.contenido, prioridad: a.prioridad, fecha_expira: a.fecha_expira || '' })
+    setEditando(a.id)
     setModal(true)
   }
 
@@ -62,15 +68,17 @@ export default function Anuncios() {
         <button className="btn btn-gold" onClick={() => { setForm(emptyForm()); setEditando(null); setModal(true) }}>+ Nuevo anuncio</button>
       </div>
 
-      {activos.length === 0 && (
+      {loading && <div style={{ textAlign:'center', padding:40 }}><span className="spinner" /></div>}
+
+      {!loading && activos.length === 0 && (
         <div className="card" style={{ textAlign:'center', padding:40, color:'var(--text-muted)' }}>
           <div style={{ fontSize:40, marginBottom:12 }}>📢</div>
           <p>No hay anuncios activos. Crea uno nuevo.</p>
         </div>
       )}
 
-      {activos.map((a, i) => (
-        <div key={i} className="card" style={{ marginBottom:14, borderLeft:`3px solid ${PRIORIDAD_BADGE[a.prioridad]?.color || 'var(--gold)'}` }}>
+      {activos.map((a) => (
+        <div key={a.id} className="card" style={{ marginBottom:14, borderLeft:`3px solid ${PRIORIDAD_BADGE[a.prioridad]?.color || 'var(--gold)'}` }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:12 }}>
             <div style={{ flex:1 }}>
               <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:8 }}>
@@ -90,8 +98,8 @@ export default function Anuncios() {
               <p style={{ color:'var(--text-muted)', fontSize:14, lineHeight:1.6, whiteSpace:'pre-wrap' }}>{a.contenido}</p>
             </div>
             <div style={{ display:'flex', gap:6, flexShrink:0 }}>
-              <button className="btn btn-ghost" style={{ padding:'5px 10px', fontSize:12 }} onClick={() => editar(i)}>Editar</button>
-              <button className="btn btn-danger" style={{ padding:'5px 10px', fontSize:12 }} onClick={() => eliminar(i)}>✕</button>
+              <button className="btn btn-ghost" style={{ padding:'5px 10px', fontSize:12 }} onClick={() => editar(a)}>Editar</button>
+              <button className="btn btn-danger" style={{ padding:'5px 10px', fontSize:12 }} onClick={() => eliminar(a.id)}>✕</button>
             </div>
           </div>
         </div>
@@ -100,14 +108,14 @@ export default function Anuncios() {
       {expirados.length > 0 && (
         <div style={{ marginTop:24 }}>
           <h3 style={{ color:'var(--text-muted)', fontSize:13, textTransform:'uppercase', letterSpacing:1, marginBottom:12 }}>Anuncios expirados</h3>
-          {expirados.map((a, i) => (
-            <div key={i} className="card" style={{ marginBottom:10, opacity:0.5 }}>
+          {expirados.map((a) => (
+            <div key={a.id} className="card" style={{ marginBottom:10, opacity:0.5 }}>
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                 <div>
                   <span style={{ fontWeight:600, fontSize:14 }}>{a.titulo}</span>
                   <span style={{ color:'var(--text-muted)', fontSize:12, marginLeft:10 }}>Expiró: {new Date(a.fecha_expira).toLocaleDateString('es-DO')}</span>
                 </div>
-                <button className="btn btn-danger" style={{ padding:'4px 10px', fontSize:12 }} onClick={() => eliminar(anuncios.indexOf(a))}>✕</button>
+                <button className="btn btn-danger" style={{ padding:'4px 10px', fontSize:12 }} onClick={() => eliminar(a.id)}>✕</button>
               </div>
             </div>
           ))}
@@ -141,7 +149,7 @@ export default function Anuncios() {
                 </div>
                 <div className="form-group">
                   <label className="form-label">Fecha de expiracion</label>
-                  <DatePicker name="fecha_expira" value={form.fecha_expira} onChange={h} />
+                  <input name="fecha_expira" type="date" value={form.fecha_expira} onChange={h} className="form-input" />
                 </div>
               </div>
               <div style={{ display:'flex', gap:10, justifyContent:'flex-end', marginTop:4 }}>
@@ -157,6 +165,3 @@ export default function Anuncios() {
     </div>
   )
 }
-
-
-

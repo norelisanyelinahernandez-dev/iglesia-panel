@@ -1,37 +1,34 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
+import { getPastora, savePastora } from '../api/client'
 
-const STORAGE_KEY = 'perfil_pastora'
-
-const EMPTY = {
-  nombre: '',
-  cargo: '',
-  telefono: '',
-  email: '',
-  direccion: '',
-  biografia: '',
-  versiculo: '',
-  anios_ministerio: '',
-  especialidad: '',
-  foto_url: ''
-}
+const EMPTY = { nombre:'', cargo:'', telefono:'', email:'', direccion:'', biografia:'', versiculo:'', anios_ministerio:'', especialidad:'', foto_url:'' }
 
 export default function Pastora() {
-  const [perfil, setPerfil] = useState(() => {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || EMPTY } catch { return EMPTY }
-  })
+  const [perfil, setPerfil] = useState(EMPTY)
   const [editando, setEditando] = useState(false)
-  const [form, setForm] = useState(perfil)
+  const [form, setForm] = useState(EMPTY)
   const [guardado, setGuardado] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    getPastora().then(r => {
+      const data = r.data || EMPTY
+      setPerfil(data)
+      setForm(data)
+    }).catch(() => {}).finally(() => setLoading(false))
+  }, [])
 
   const h = (e) => setForm({ ...form, [e.target.name]: e.target.value })
 
-  const guardar = (e) => {
+  const guardar = async (e) => {
     e.preventDefault()
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(form))
-    setPerfil(form)
-    setEditando(false)
-    setGuardado(true)
-    setTimeout(() => setGuardado(false), 3000)
+    try {
+      await savePastora(form)
+      setPerfil(form)
+      setEditando(false)
+      setGuardado(true)
+      setTimeout(() => setGuardado(false), 3000)
+    } catch (_) {}
   }
 
   const campo = (label, value) => value ? (
@@ -40,6 +37,8 @@ export default function Pastora() {
       <div style={{ fontWeight:500 }}>{value}</div>
     </div>
   ) : null
+
+  if (loading) return <div style={{ textAlign:'center', padding:60 }}><span className="spinner" /></div>
 
   return (
     <div className="page">
@@ -78,7 +77,6 @@ export default function Pastora() {
               {campo('Dirección', perfil.direccion)}
               {!perfil.telefono && !perfil.email && !perfil.direccion && <p style={{ color:'var(--text-muted)', fontSize:13 }}>Sin información de contacto</p>}
             </div>
-
             <div className="card">
               <div style={{ borderLeft:'3px solid var(--gold)', paddingLeft:10, marginBottom:14 }}>
                 <span style={{ fontFamily:'var(--font-heading)', fontWeight:700, fontSize:13, color:'var(--gold)', textTransform:'uppercase', letterSpacing:1 }}>Ministerio</span>
@@ -87,9 +85,8 @@ export default function Pastora() {
               {campo('Biografía', perfil.biografia)}
               {!perfil.especialidad && !perfil.biografia && <p style={{ color:'var(--text-muted)', fontSize:13 }}>Sin información ministerial</p>}
             </div>
-
             {perfil.versiculo && (
-              <div className="card" style={{ borderLeft:'3px solid var(--gold)', background:'var(--bg-card)' }}>
+              <div className="card" style={{ borderLeft:'3px solid var(--gold)' }}>
                 <p style={{ fontStyle:'italic', fontSize:15, color:'var(--text)', marginBottom:6 }}>"{perfil.versiculo}"</p>
                 <span style={{ color:'var(--gold)', fontSize:12, fontWeight:600 }}>— Versículo favorito</span>
               </div>
@@ -132,13 +129,12 @@ export default function Pastora() {
               <label className="form-label">Dirección</label>
               <input name="direccion" value={form.direccion} onChange={h} className="form-input" />
             </div>
-
             <div style={{ borderLeft:'3px solid var(--gold)', paddingLeft:10, margin:'8px 0 4px' }}>
               <span style={{ fontFamily:'var(--font-heading)', fontWeight:700, fontSize:13, color:'var(--gold)', textTransform:'uppercase', letterSpacing:1 }}>Ministerio</span>
             </div>
             <div className="form-group">
               <label className="form-label">Especialidad ministerial</label>
-              <input name="especialidad" value={form.especialidad} onChange={h} className="form-input" placeholder="Ej: Predicación, Consejería pastoral" />
+              <input name="especialidad" value={form.especialidad} onChange={h} className="form-input" />
             </div>
             <div className="form-group">
               <label className="form-label">Biografía</label>
@@ -148,7 +144,6 @@ export default function Pastora() {
               <label className="form-label">Versículo favorito</label>
               <input name="versiculo" value={form.versiculo} onChange={h} className="form-input" placeholder="Ej: Juan 7:38" />
             </div>
-
             <div style={{ display:'flex', gap:10, justifyContent:'flex-end', marginTop:6 }}>
               <button type="button" className="btn btn-ghost" onClick={() => setEditando(false)}>Cancelar</button>
               <button type="submit" className="btn btn-gold">💾 Guardar perfil</button>

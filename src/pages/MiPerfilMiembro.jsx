@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
-import { getMiembroById, getEventos } from '../api/client'
+import { getMiembroById, getEventos, getAnuncios, getPastora, getPrograma } from '../api/client'
 
 const fmtDate = (d) => d ? new Date(d + 'T00:00:00').toLocaleDateString('es-DO', { day:'2-digit', month:'long', year:'numeric' }) : null
 const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1) : ''
@@ -17,19 +17,16 @@ export default function MiPerfilMiembro() {
 
   const esRolAvanzado = ROLES_AVANZADOS.includes(user?.rol?.toLowerCase())
 
-  // Datos de localStorage
-  const anuncios = (() => { try { return JSON.parse(localStorage.getItem('anuncios_iglesia')) || [] } catch { return [] } })()
-  const pastora = (() => { try { return JSON.parse(localStorage.getItem('pastora_info')) || null } catch { return null } })()
-  const programas = (() => { try { return JSON.parse(localStorage.getItem('programas_semanales')) || {} } catch { return {} } })()
+  const [anuncios, setAnuncios] = useState([])
+  const [pastora, setPastora] = useState(null)
+  const [programaSemana, setProgramaSemana] = useState(null)
 
-  // Semana actual
   const getSemana = () => {
     const d = new Date()
     d.setDate(d.getDate() + 4 - (d.getDay() || 7))
     const yearStart = new Date(d.getFullYear(), 0, 1)
     return `${d.getFullYear()}-W${Math.ceil((((d - yearStart) / 86400000) + 1) / 7).toString().padStart(2, '0')}`
   }
-  const programaSemana = programas[getSemana()] || null
 
   useEffect(() => {
     const load = async () => {
@@ -53,6 +50,10 @@ export default function MiPerfilMiembro() {
           const hoy = new Date()
           setEventos(e.value.data.filter(ev => new Date(ev.fecha) >= hoy).slice(0, 5))
         }
+        // Cargar contenido público
+        try { const ra = await getAnuncios(); setAnuncios(ra.data || []) } catch (_) {}
+        try { const rp = await getPastora(); setPastora(rp.data || null) } catch (_) {}
+        try { const rpr = await getPrograma(getSemana()); setProgramaSemana(rpr.data?.datos || null) } catch (_) {}
       } catch (_) {}
       setLoading(false)
     }

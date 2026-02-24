@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect } from 'react'
-import { getMiembros } from '../api/client'
+import { getMiembros, getPrograma, savePrograma, getProgramaSemanas } from '../api/client'
 
 const DIAS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo']
 
@@ -238,10 +238,7 @@ export default function Programa() {
   const [miembros, setMiembros] = useState([])
   const [modoSimple, setModoSimple] = useState(false)
   const [semanaViendo, setSemanaViendo] = useState(semanaActual())
-  const [programas, setProgramas] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('programas_semanales')) || {} }
-    catch { return {} }
-  })
+  const [programas, setProgramas] = useState({})
   const [guardado, setGuardado] = useState(false)
   const [vistaHistorial, setVistaHistorial] = useState(false)
   const versiculo = VERSICULOS[new Date().getDay() % VERSICULOS.length]
@@ -250,6 +247,15 @@ export default function Programa() {
 
   useEffect(() => {
     getMiembros({ limit:200 }).then(r => setMiembros(r.data)).catch(()=>{})
+    // Cargar programas desde API
+    getProgramaSemanas().then(r => {
+      const semanas = r.data || []
+      Promise.all(semanas.map(s => getPrograma(s))).then(results => {
+        const obj = {}
+        results.forEach(r2 => { if (r2.data) obj[r2.data.semana] = r2.data.datos })
+        setProgramas(obj)
+      })
+    }).catch(()=>{})
   }, [])
 
   const updateDia = (index, data) => {
@@ -257,20 +263,21 @@ export default function Programa() {
     nueva[index] = data
     const nuevos = { ...programas, [semanaViendo]: nueva }
     setProgramas(nuevos)
-    localStorage.setItem('programas_semanales', JSON.stringify(nuevos))
   }
 
-  const guardar = () => {
-    localStorage.setItem('programas_semanales', JSON.stringify(programas))
-    setGuardado(true)
-    setTimeout(() => setGuardado(false), 3000)
+  const guardar = async () => {
+    try {
+      await savePrograma(semanaViendo, semanaData)
+      setGuardado(true)
+      setTimeout(() => setGuardado(false), 3000)
+    } catch (_) {}
   }
 
-  const limpiar = () => {
+  const limpiar = async () => {
     if (!confirm('Deseas limpiar el programa de esta semana?')) return
     const nuevos = { ...programas, [semanaViendo]: DIAS.map(emptyDia) }
     setProgramas(nuevos)
-    localStorage.setItem('programas_semanales', JSON.stringify(nuevos))
+    try { await savePrograma(semanaViendo, DIAS.map(emptyDia)) } catch (_) {}
   }
 
   const escucharTodo = () => {

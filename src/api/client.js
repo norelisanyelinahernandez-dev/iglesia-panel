@@ -71,3 +71,13 @@ export const getCelulas = () => api.get('/celulas/')
 
 export const deleteIngreso = (id) => api.delete(`/tesoreria/ingresos/${id}`)
 export const deleteGasto = (id) => api.delete(`/tesoreria/gastos/${id}`)
+// Contenido público
+export const getAnuncios = () => api.get('/contenido/anuncios')
+export const createAnuncio = (data) => api.post('/contenido/anuncios', data)
+export const updateAnuncio = (id, data) => api.put(`/contenido/anuncios/${id}`, data)
+export const deleteAnuncio = (id) => api.delete(`/contenido/anuncios/${id}`)
+export const getPastora = () => api.get('/contenido/pastora')
+export const savePastora = (data) => api.put('/contenido/pastora', data)
+export const getPrograma = (semana) => api.get(`/contenido/programa/${semana}`)
+export const getProgramaSemanas = () => api.get('/contenido/programa')
+export const savePrograma = (semana, datos) => api.put(`/contenido/programa/${semana}`, { datos })
