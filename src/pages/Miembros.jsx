@@ -410,6 +410,90 @@ function PerfilModal({ miembro, onClose, onEdit }) {
   )
 }
 
+function exportarExcel(miembros) {
+  const CAMPOS = [
+    ['nombres','Nombres'],['apellidos','Apellidos'],['cedula','Cédula'],['telefono','Teléfono'],
+    ['email','Correo'],['rol','Rol'],['estado','Estado'],['genero','Género'],['estado_civil','Estado civil'],
+    ['fecha_nacimiento','Fecha nacimiento'],['fecha_conversion','Fecha conversión'],['fecha_bautismo','Fecha bautismo'],
+    ['iglesia_bautismo','Iglesia bautismo'],['direccion','Dirección'],['telefono_emergencia','Tel. emergencia'],
+    ['nombre_conyuge','Cónyuge'],['telefono_conyuge','Tel. cónyuge'],['tiene_hijos','Tiene hijos'],
+    ['numero_hijos','Núm. hijos'],['nombres_hijos','Nombres hijos'],['ocupacion','Ocupación'],
+    ['lugar_trabajo','Lugar trabajo'],['nivel_educativo','Nivel educativo'],['whatsapp','WhatsApp'],
+    ['facebook','Facebook'],['instagram','Instagram'],['tipo_sangre','Tipo sangre'],
+    ['condicion_medica','Condición médica'],['alergias','Alergias'],['ministerio_actual','Ministerio actual'],
+    ['ministerios_anteriores','Ministerios anteriores'],['dones_talentos','Dones/talentos'],
+    ['disponibilidad','Disponibilidad'],['tiempo_en_iglesia','Tiempo en iglesia'],
+    ['miembro_activo','Miembro activo'],['visitas_pastorales','Visitas pastorales'],
+    ['consejeria_pastoral','Consejería pastoral'],['motivo_oracion','Motivo oración'],['notas','Notas'],
+  ]
+  const headers = CAMPOS.map(c => c[1])
+  const rows = miembros.map(m => CAMPOS.map(c => m[c[0]] ?? ''))
+
+  // Construir CSV con BOM para que Excel lo abra bien en español
+  const bom = '﻿'
+  const csv = bom + [headers, ...rows].map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('
+')
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'miembros_' + new Date().toISOString().slice(0,10) + '.csv'
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+function exportarPDF(miembros) {
+  const ventana = window.open('', '_blank')
+  const fmtDate = (d) => d ? new Date(d + 'T00:00:00').toLocaleDateString('es-DO', { day:'2-digit', month:'long', year:'numeric' }) : '—'
+  const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1) : '—'
+
+  const filas = miembros.map((m, i) => `
+    <div style="page-break-inside:avoid;border:1px solid #ddd;border-radius:8px;padding:14px 18px;margin-bottom:14px;background:${i%2===0?'#fff':'#fafafa'}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;border-bottom:1px solid #eee;padding-bottom:6px">
+        <div>
+          <span style="font-size:16px;font-weight:700;color:#000">${m.nombres} ${m.apellidos}</span>
+          <span style="margin-left:10px;font-size:12px;color:#666">${cap(m.rol)} · ${cap(m.estado)}</span>
+        </div>
+        <span style="font-size:11px;color:#999">#${i+1}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:12px">
+        ${m.cedula ? `<div><span style="color:#888">Cédula:</span> ${m.cedula}</div>` : ''}
+        ${m.telefono ? `<div><span style="color:#888">Teléfono:</span> ${m.telefono}</div>` : ''}
+        ${m.email ? `<div><span style="color:#888">Correo:</span> ${m.email}</div>` : ''}
+        ${m.fecha_nacimiento ? `<div><span style="color:#888">Nacimiento:</span> ${fmtDate(m.fecha_nacimiento)}</div>` : ''}
+        ${m.fecha_bautismo ? `<div><span style="color:#888">Bautismo:</span> ${fmtDate(m.fecha_bautismo)}</div>` : ''}
+        ${m.ministerio_actual ? `<div><span style="color:#888">Ministerio:</span> ${m.ministerio_actual}</div>` : ''}
+        ${m.direccion ? `<div style="grid-column:span 2"><span style="color:#888">Dirección:</span> ${m.direccion}</div>` : ''}
+        ${m.ocupacion ? `<div><span style="color:#888">Ocupación:</span> ${m.ocupacion}</div>` : ''}
+        ${m.tipo_sangre ? `<div><span style="color:#888">Sangre:</span> ${m.tipo_sangre}</div>` : ''}
+        ${m.nombre_conyuge ? `<div><span style="color:#888">Cónyuge:</span> ${m.nombre_conyuge}</div>` : ''}
+        ${m.numero_hijos ? `<div><span style="color:#888">Hijos:</span> ${m.numero_hijos}</div>` : ''}
+        ${m.whatsapp ? `<div><span style="color:#888">WhatsApp:</span> ${m.whatsapp}</div>` : ''}
+        ${m.notas ? `<div style="grid-column:span 3"><span style="color:#888">Notas:</span> ${m.notas}</div>` : ''}
+      </div>
+    </div>
+  `).join('')
+
+  ventana.document.write(`
+    <html><head><title>Directorio de Miembros</title>
+    <style>body{font-family:Arial,sans-serif;padding:30px;color:#000;max-width:900px;margin:0 auto}
+    @media print{body{padding:10px}}</style></head>
+    <body>
+      <div style="text-align:center;margin-bottom:24px;border-bottom:2px solid #b8860b;padding-bottom:16px">
+        <p style="margin:0;font-size:12px;color:#b8860b;font-weight:bold;letter-spacing:1px">MINISTERIO SAN JUAN 7:38</p>
+        <h1 style="margin:6px 0;font-size:24px">Directorio de Miembros</h1>
+        <p style="margin:0;font-size:12px;color:#666">Generado el ${new Date().toLocaleDateString('es-DO', {day:'2-digit',month:'long',year:'numeric'})} · ${miembros.length} registros</p>
+      </div>
+      ${filas}
+      <div style="text-align:center;margin-top:20px;font-size:10px;color:#999;border-top:1px solid #eee;padding-top:10px">
+        El que cree en mí, como dice la Escritura, de su interior correrán ríos de agua viva. — Juan 7:38
+      </div>
+    </body></html>
+  `)
+  ventana.document.close()
+  ventana.print()
+}
+
 export default function Miembros() {
   const [miembros, setMiembros] = useState([])
   const [loading, setLoading] = useState(true)
@@ -446,7 +530,11 @@ export default function Miembros() {
           <h1 className="page-title">Miembros</h1>
           <p className="page-subtitle">{miembros.length} registros encontrados</p>
         </div>
-        <button className="btn btn-gold" onClick={() => setModal('nuevo')}>+ Nuevo miembro</button>
+        <div style={{ display:'flex', gap:8 }}>
+          <button className="btn btn-ghost" onClick={() => exportarExcel(miembros)} title="Exportar a Excel">📊 Excel</button>
+          <button className="btn btn-ghost" onClick={() => exportarPDF(miembros)} title="Exportar a PDF">🖨️ PDF</button>
+          <button className="btn btn-gold" onClick={() => setModal('nuevo')}>+ Nuevo miembro</button>
+        </div>
       </div>
 
       <div style={{ display:'flex', gap:12, marginBottom:20, flexWrap:'wrap' }}>
