@@ -26,17 +26,18 @@ export function PermisosProvider({ children }) {
   const ROLES_EDITOR = ['admin','pastor','pastora','secretaria','secretario']
   // Roles que solo editan finanzas
   const ROLES_TESORERO = ['tesorero','tesorera']
+  // Roles de solo lectura (aunque sean miembros con rol especial)
+  const ROLES_READONLY = ['copastor','copastora','diacono','maestra','miembro']
 
   const puede = (seccion) => permisos.includes(seccion)
 
   // puedeEditar(seccion): true si puede modificar datos en esa seccion
   const puedeEditar = (seccion) => {
-    if (user?.tipo === 'miembro') return false        // miembros: nunca editan
     if (ROLES_EDITOR.includes(rol)) return true       // admin/pastor/secretario: editan todo
     if (ROLES_TESORERO.includes(rol)) {               // tesorero/a: solo finanzas
       return ['tesoreria','finanzas'].includes(seccion)
     }
-    return false  // copastor/a, diacono, maestra, etc: solo lectura
+    return false  // copastor/a, diacono, maestra, miembro: solo lectura
   }
 
   return (
