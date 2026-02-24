@@ -49,9 +49,6 @@ export default function DatePicker({ value, onChange, placeholder, name, require
   const firstDay = new Date(year, month, 1).getDay()
   const daysInMonth = new Date(year, month+1, 0).getDate()
 
-  const prevMonth = () => setView(new Date(year, month-1, 1))
-  const nextMonth = () => setView(new Date(year, month+1, 1))
-
   const selectDay = (day) => {
     const date = new Date(year, month, day)
     onChange({ target: { name, value: toInputValue(date) } })
@@ -64,6 +61,24 @@ export default function DatePicker({ value, onChange, placeholder, name, require
   const cells = []
   for (let i=0; i<firstDay; i++) cells.push(null)
   for (let d=1; d<=daysInMonth; d++) cells.push(d)
+
+  // Rango de años: 100 años atrás hasta 5 años adelante
+  const currentYear = today.getFullYear()
+  const years = []
+  for (let y = currentYear + 5; y >= currentYear - 100; y--) years.push(y)
+
+  const selectStyle = {
+    background: 'var(--surface-2)',
+    border: '1px solid var(--border)',
+    borderRadius: 6,
+    color: 'var(--gold)',
+    fontFamily: 'var(--font-heading)',
+    fontWeight: 600,
+    fontSize: 14,
+    padding: '4px 6px',
+    cursor: 'pointer',
+    outline: 'none',
+  }
 
   return (
     <div ref={ref} style={{ position:'relative', width:'100%' }}>
@@ -79,10 +94,23 @@ export default function DatePicker({ value, onChange, placeholder, name, require
 
       {open && (
         <div style={{ position:'absolute', top:'calc(100% + 6px)', left:0, zIndex:1000, background:'var(--surface)', border:'1px solid var(--border)', borderRadius:'var(--radius-lg)', boxShadow:'var(--shadow-lg)', padding:16, minWidth:280, userSelect:'none' }}>
-          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:12 }}>
-            <button type="button" onClick={prevMonth} style={{ background:'none', border:'none', color:'var(--text-muted)', cursor:'pointer', fontSize:20, padding:'2px 10px', borderRadius:6 }}>&#8249;</button>
-            <div style={{ fontFamily:'var(--font-heading)', fontWeight:600, fontSize:15, color:'var(--gold)' }}>{MESES[month]} {year}</div>
-            <button type="button" onClick={nextMonth} style={{ background:'none', border:'none', color:'var(--text-muted)', cursor:'pointer', fontSize:20, padding:'2px 10px', borderRadius:6 }}>&#8250;</button>
+          
+          {/* Selectores de mes y año */}
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:8, marginBottom:12 }}>
+            <select
+              value={month}
+              onChange={e => setView(new Date(year, parseInt(e.target.value), 1))}
+              style={selectStyle}
+            >
+              {MESES.map((m, i) => <option key={i} value={i}>{m}</option>)}
+            </select>
+            <select
+              value={year}
+              onChange={e => setView(new Date(parseInt(e.target.value), month, 1))}
+              style={selectStyle}
+            >
+              {years.map(y => <option key={y} value={y}>{y}</option>)}
+            </select>
           </div>
 
           <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:2, marginBottom:6 }}>
