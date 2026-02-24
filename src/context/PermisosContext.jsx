@@ -8,6 +8,7 @@ const PERMISOS = {
   copastor:   ['panel','miembros','tesoreria','finanzas','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','documentos','respaldo','ver_balance'],
   copastora:  ['panel','miembros','tesoreria','finanzas','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','documentos','respaldo','ver_balance'],
   secretaria: ['panel','miembros','tesoreria','finanzas','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','documentos','respaldo','ver_balance'],
+  secretario: ['panel','miembros','tesoreria','finanzas','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','documentos','respaldo','ver_balance'],
   tesorero:   ['panel','tesoreria','finanzas','reportes','respaldo','ver_balance'],
   tesorera:   ['panel','tesoreria','finanzas','reportes','respaldo','ver_balance'],
   diacono:    ['panel','miembros','eventos','asistencia','programa'],
