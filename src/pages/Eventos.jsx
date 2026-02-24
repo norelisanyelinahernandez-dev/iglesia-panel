@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState } from 'react'
+import { useAuth } from '../context/AuthContext'
 import DatePicker from '../components/DatePicker'
 import { getEventos, createEvento, deleteEvento, getAsistencia, registrarAsistencia } from '../api/client'
 
@@ -21,6 +22,8 @@ function Modal({ title, onClose, children }) {
 }
 
 export default function Eventos() {
+  const { user } = useAuth()
+  const isMiembro = user?.tipo === 'miembro'
   const [eventos, setEventos] = useState([])
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(null)
@@ -95,7 +98,7 @@ export default function Eventos() {
           <h1 className="page-title">Eventos</h1>
           <p className="page-subtitle">{eventos.length} eventos registrados</p>
         </div>
-        <button className="btn btn-gold" onClick={() => { setError(''); setModal('nuevo') }}>+ Nuevo evento</button>
+        {!isMiembro && <button className="btn btn-gold" onClick={() => { setError(''); setModal('nuevo') }}>+ Nuevo evento</button>}
       </div>
 
       <div style={{ display:'flex', gap:10, marginBottom:24, flexWrap:'wrap' }}>
@@ -133,7 +136,7 @@ export default function Eventos() {
                 <button className="btn btn-ghost" style={{ flex:1, justifyContent:'center', fontSize:12, padding:'6px' }} onClick={()=>loadAsistencia(ev)}>
                   Ver asistencia
                 </button>
-                <button className="btn btn-danger" style={{ padding:'6px 10px', fontSize:12 }} onClick={()=>handleDelete(ev.id)}>✕</button>
+                {!isMiembro && <button className="btn btn-danger" style={{ padding:'6px 10px', fontSize:12 }} onClick={()=>handleDelete(ev.id)}>✕</button>}
               </div>
             </div>
           ))}
