@@ -208,6 +208,7 @@ export default function Inventario() {
         </div>
         <div style={{ display:'flex', gap:10 }}>
           <button className="btn btn-ghost" onClick={() => { setError(''); setModal('prestamo') }}>Registrar Préstamo</button>
+          <button className="btn btn-ghost" style={{ fontSize:13 }} onClick={imprimirInventario}>🖨️ Imprimir</button>
           <button className="btn btn-gold" onClick={openNew}>+ Agregar item</button>
         </div>
       </div>
