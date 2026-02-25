@@ -3,7 +3,6 @@ import DatePicker from '../components/DatePicker'
 import { getInventario, createItem, updateItem, deleteItem, getPrestamos, createPrestamo, updatePrestamo, getCategoriasInventario } from '../api/client'
 
 // Notificacion de exito
-  const [confirmDelId, setConfirmDelId] = React.useState ? require('react').useState(null)[0] : null
 function mostrarExito(mensaje) {
   const existing = document.getElementById('_success_toast')
   if (existing) existing.remove()
