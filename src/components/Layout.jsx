@@ -1,7 +1,8 @@
-﻿import { useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { usePermisos } from '../context/PermisosContext'
+import { getAnuncios } from '../api/client'
 import './Layout.css'
 
 const NAV_ADMIN = [
@@ -15,17 +16,17 @@ const NAV_ADMIN = [
   { to: '/asistencia',  label: 'Asistencia',       icono: '✅', seccion: 'asistencia' },
   { to: '/pastora',     label: 'Pastora',          icono: '✝️', seccion: 'pastora' },
   { to: '/programa',    label: 'Programa',         icono: '📖', seccion: 'programa' },
-  { to: '/anuncios',    label: 'Anuncios',         icono: '📢', seccion: 'anuncios' },
+  { to: '/anuncios',    label: 'Anuncios',         icono: '📢', seccion: 'anuncios', badge: true },
   { to: '/documentos',  label: 'Documentos',       icono: '📄', seccion: 'documentos' },
   { to: '/respaldo',    label: 'Respaldo',         icono: '💾', seccion: 'respaldo' },
-  { to: '/configuracion', label: 'Configuración',     icono: '⚙️', seccion: 'configuracion' },
+  { to: '/configuracion', label: 'Configuración',  icono: '⚙️', seccion: 'configuracion' },
 ]
 
 const NAV_MIEMBRO = [
   { to: '/miembro/',          label: 'Panel',        icono: '🏠', seccion: 'panel' },
   { to: '/miembro/eventos',   label: 'Eventos',      icono: '📅', seccion: 'eventos' },
   { to: '/miembro/programa',  label: 'Programa',     icono: '📖', seccion: 'programa' },
-  { to: '/miembro/anuncios',  label: 'Anuncios',     icono: '📢', seccion: 'anuncios' },
+  { to: '/miembro/anuncios',  label: 'Anuncios',     icono: '📢', seccion: 'anuncios', badge: true },
   { to: '/miembro/perfil',    label: 'Mi Perfil',    icono: '👤', seccion: 'panel' },
   { to: '/miembro/pastora',   label: 'Info Pastoral',icono: '✝️', seccion: 'pastora' },
 ]
@@ -41,28 +42,53 @@ const NAV = [
   { to: '/asistencia',  label: 'Asistencia',       icono: '✅', seccion: 'asistencia' },
   { to: '/pastora',     label: 'Pastora',          icono: '✝️', seccion: 'pastora' },
   { to: '/programa',    label: 'Programa',         icono: '📖', seccion: 'programa' },
-  { to: '/anuncios',    label: 'Anuncios',         icono: '📢', seccion: 'anuncios' },
+  { to: '/anuncios',    label: 'Anuncios',         icono: '📢', seccion: 'anuncios', badge: true },
   { to: '/documentos',  label: 'Documentos',       icono: '📄', seccion: 'documentos' },
   { to: '/respaldo',    label: 'Respaldo',         icono: '💾', seccion: 'respaldo' },
-  { to: '/configuracion', label: 'Configuración',     icono: '⚙️', seccion: 'configuracion' },
+  { to: '/configuracion', label: 'Configuración',  icono: '⚙️', seccion: 'configuracion' },
 ]
+
+const ANUNCIOS_KEY = 'anuncios_visto_en'
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth()
   const { puede } = usePermisos()
-  // Roles que usan el panel de admin (menu completo filtrado por permisos)
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [menuAbierto, setMenuAbierto] = useState(false)
+  const [hayAnunciosNuevos, setHayAnunciosNuevos] = useState(false)
+
   const ROLES_PANEL_ADMIN = ['admin','pastor','pastora','secretaria','secretario','copastor','copastora','tesorero','tesorera','diacono','maestra']
   const rol = user?.rol?.toLowerCase() || ''
   const esPortalMiembro = user?.tipo === 'miembro' && !ROLES_PANEL_ADMIN.includes(rol)
   const navItems = esPortalMiembro ? NAV_MIEMBRO : NAV.filter(({ seccion }) => puede(seccion))
-  const navigate = useNavigate()
-  const [menuAbierto, setMenuAbierto] = useState(false)
 
-  const handleLogout = () => {
-    logout()
-    navigate('/login')
-  }
+  // Detectar si está en página de anuncios y marcar como visto
+  const enAnuncios = location.pathname.includes('anuncios')
+  useEffect(() => {
+    if (enAnuncios) {
+      localStorage.setItem(ANUNCIOS_KEY, new Date().toISOString())
+      setHayAnunciosNuevos(false)
+    }
+  }, [enAnuncios])
 
+  // Verificar si hay anuncios nuevos al cargar
+  useEffect(() => {
+    if (enAnuncios) return
+    getAnuncios().then(r => {
+      const lista = r.data || []
+      if (lista.length === 0) return
+      const visto = localStorage.getItem(ANUNCIOS_KEY)
+      if (!visto) { setHayAnunciosNuevos(true); return }
+      const ultimoAnuncio = lista.reduce((max, a) => {
+        const f = new Date(a.created_at || a.fecha || 0)
+        return f > max ? f : max
+      }, new Date(0))
+      setHayAnunciosNuevos(ultimoAnuncio > new Date(visto))
+    }).catch(() => {})
+  }, [])
+
+  const handleLogout = () => { logout(); navigate('/login') }
   const cerrarMenu = () => setMenuAbierto(false)
 
   return (
@@ -79,16 +105,23 @@ export default function Layout({ children }) {
           </div>
         </div>
         <nav className="sidebar-nav">
-          {navItems.map(({ to, label, icono }) => (
+          {navItems.map(({ to, label, icono, badge }) => (
             <NavLink
               key={to}
               to={to}
-              end={to === '/'}
+              end={to === '/' || to === '/miembro/'}
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
               onClick={cerrarMenu}
             >
               <span className="nav-icon">{icono}</span>
-              <span>{label}</span>
+              <span style={{ flex:1 }}>{label}</span>
+              {badge && hayAnunciosNuevos && (
+                <span style={{
+                  width:8, height:8, borderRadius:'50%',
+                  background:'#e74c3c', flexShrink:0,
+                  boxShadow:'0 0 6px rgba(231,76,60,0.8)'
+                }} />
+              )}
             </NavLink>
           ))}
         </nav>
