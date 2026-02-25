@@ -55,6 +55,7 @@ function AppRoutes() {
                 <Route path="/" element={<DashboardMiembro />} />
                 <Route path="/eventos" element={<Eventos />} />
                 <Route path="/programa" element={<Programa />} />
+                <Route path="/anuncios" element={<Anuncios />} />
                 <Route path="/pastora" element={<Pastora />} />
                 <Route path="/perfil" element={<MiPerfilMiembro />} />
                 <Route path="*" element={<Navigate to="/miembro/" replace />} />

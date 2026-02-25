@@ -22,11 +22,12 @@ const NAV_ADMIN = [
 ]
 
 const NAV_MIEMBRO = [
-  { to: '/miembro/',         label: 'Panel',        icono: '🏠', seccion: 'panel' },
-  { to: '/miembro/eventos',  label: 'Eventos',      icono: '📅', seccion: 'eventos' },
-  { to: '/miembro/programa', label: 'Programa',     icono: '📖', seccion: 'programa' },
-  { to: '/miembro/perfil',   label: 'Mi Perfil',    icono: '👤', seccion: 'panel' },
-  { to: '/miembro/pastora',  label: 'Info Pastoral',icono: '✝️', seccion: 'pastora' },
+  { to: '/miembro/',          label: 'Panel',        icono: '🏠', seccion: 'panel' },
+  { to: '/miembro/eventos',   label: 'Eventos',      icono: '📅', seccion: 'eventos' },
+  { to: '/miembro/programa',  label: 'Programa',     icono: '📖', seccion: 'programa' },
+  { to: '/miembro/anuncios',  label: 'Anuncios',     icono: '📢', seccion: 'anuncios' },
+  { to: '/miembro/perfil',    label: 'Mi Perfil',    icono: '👤', seccion: 'panel' },
+  { to: '/miembro/pastora',   label: 'Info Pastoral',icono: '✝️', seccion: 'pastora' },
 ]
 
 const NAV = [
