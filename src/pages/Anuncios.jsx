@@ -127,7 +127,7 @@ export default function Anuncios() {
               <p style={{ color:'var(--text-muted)', fontSize:14, lineHeight:1.6, whiteSpace:'pre-wrap' }}>{a.contenido}</p>
             </div>
             <div style={{ display:'flex', gap:6, flexShrink:0 }}>
-              <button className="btn btn-ghost" style={{ padding:'5px 10px', fontSize:12 }} onClick={() => editar(a)}>Editar</button>
+              {puedeEdit && <button className="btn btn-ghost" style={{ padding:'5px 10px', fontSize:12 }} onClick={() => editar(a)}>Editar</button>}
               <button className="btn btn-danger" style={{ padding:'5px 10px', fontSize:12 }} onClick={() => setConfirmDel(a.id)}>âœ•</button>
             </div>
           </div>
@@ -211,5 +211,6 @@ export default function Anuncios() {
     </div>
   )
 }
+
 
 
