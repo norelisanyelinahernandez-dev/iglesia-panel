@@ -128,14 +128,7 @@ export default function Asistencia() {
     setPresentes(init)
   }
 
-  const eliminarRegistro = (id) => {
-    setConfirmDel(id); return // modal
-    if (!confirmDel) return
-    const nuevos = registros.filter(r => r.id !== id)
-    setRegistros(nuevos)
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(nuevos))
-    setVerRegistro(null)
-  }
+  const eliminarRegistro = (id) => setConfirmDel(id)
 
   const miembrosFiltrados = miembros.filter(m =>
     `${m.nombres} ${m.apellidos}`.toLowerCase().includes(buscar.toLowerCase())
@@ -386,6 +379,7 @@ export default function Asistencia() {
     </div>
   )
 }
+
 
 
 

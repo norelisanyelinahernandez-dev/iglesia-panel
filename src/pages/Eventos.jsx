@@ -109,12 +109,10 @@ export default function Eventos() {
   }
 
   
-  const confirmarEliminar = (id) => setConfirmDel(id)
-const handleDelete = async () => {
-    setConfirmDel(id); return // modal
+  const handleDelete = async () => {
     if (!confirmDel) return
-    try { await deleteEvento(confirmDel); setConfirmDel(null); load()
-  } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
+    try { await deleteEvento(confirmDel); setConfirmDel(null); load() } catch(_) { mostrarError('No se pudo eliminar.') }
+  }
   }
 
   return (
@@ -162,7 +160,7 @@ const handleDelete = async () => {
                 <button className="btn btn-ghost" style={{ flex:1, justifyContent:'center', fontSize:12, padding:'6px' }} onClick={()=>loadAsistencia(ev)}>
                   Ver asistencia
                 </button>
-                {puedeEdit && <button className="btn btn-danger" style={{ padding:'6px 10px', fontSize:12 }} onClick={()=>handleDelete(ev.id)}>✕</button>}
+                {puedeEdit && <button className="btn btn-danger" style={{ padding:'6px 10px', fontSize:12 }} onClick={() => setConfirmDel(ev.id)}>✕</button>}
               </div>
             </div>
           ))}
@@ -270,6 +268,7 @@ const handleDelete = async () => {
     </div>
   )
 }
+
 
 
 

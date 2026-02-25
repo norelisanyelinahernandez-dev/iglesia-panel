@@ -285,10 +285,7 @@ export default function Programa() {
     } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
   }
 
-  const limpiar = async () => {
-    setConfirmDel(id); return // modal
-    if (!confirmDel) return
-    const nuevos = { ...programas, [semanaViendo]: DIAS.map(emptyDia) }
+  const limpiar = () => setConfirmDel('limpiar')
     setProgramas(nuevos)
     try { await savePrograma(semanaViendo, DIAS.map(emptyDia)) } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
   }
@@ -427,4 +424,5 @@ export default function Programa() {
     </div>
   )
 }
+
 

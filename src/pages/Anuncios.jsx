@@ -70,12 +70,9 @@ export default function Anuncios() {
   }
 
   
-  const confirmarEliminar = (id) => setConfirmDel(id)
-const eliminar = async () => {
-    setConfirmDel(id); return // modal
+  const handleDelete = async () => {
     if (!confirmDel) return
-    try { await deleteAnuncio(confirmDel); cargar(); setConfirmDel(null)
-  } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
+    try { await deleteAnuncio(confirmDel); setConfirmDel(null); cargar() } catch(_) { mostrarError('No se pudo eliminar.') }
   }
 
   const editar = (a) => {
@@ -120,7 +117,7 @@ const eliminar = async () => {
                 </span>
                 {a.fecha_expira && (
                   <span style={{ color:'var(--text-muted)', fontSize:12 }}>
-                    Â· Expira: {new Date(a.fecha_expira).toLocaleDateString('es-DO')}
+                    · Expira: {new Date(a.fecha_expira).toLocaleDateString('es-DO')}
                   </span>
                 )}
               </div>
@@ -129,7 +126,7 @@ const eliminar = async () => {
             </div>
             <div style={{ display:'flex', gap:6, flexShrink:0 }}>
               <button className="btn btn-ghost" style={{ padding:'5px 10px', fontSize:12 }} onClick={() => editar(a)}>Editar</button>
-              <button className="btn btn-danger" style={{ padding:'5px 10px', fontSize:12 }} onClick={() => setConfirmDel(a.id)}>âœ•</button>
+              <button className="btn btn-danger" style={{ padding:'5px 10px', fontSize:12 }} onClick={() => setConfirmDel(a.id)}>✕</button>
             </div>
           </div>
         </div>
@@ -143,9 +140,9 @@ const eliminar = async () => {
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                 <div>
                   <span style={{ fontWeight:600, fontSize:14 }}>{a.titulo}</span>
-                  <span style={{ color:'var(--text-muted)', fontSize:12, marginLeft:10 }}>ExpirÃ³: {new Date(a.fecha_expira).toLocaleDateString('es-DO')}</span>
+                  <span style={{ color:'var(--text-muted)', fontSize:12, marginLeft:10 }}>Expiró: {new Date(a.fecha_expira).toLocaleDateString('es-DO')}</span>
                 </div>
-                <button className="btn btn-danger" style={{ padding:'4px 10px', fontSize:12 }} onClick={() => setConfirmDel(a.id)}>âœ•</button>
+                <button className="btn btn-danger" style={{ padding:'4px 10px', fontSize:12 }} onClick={() => setConfirmDel(a.id)}>✕</button>
               </div>
             </div>
           ))}
@@ -157,7 +154,7 @@ const eliminar = async () => {
           <div className="modal" style={{ maxWidth:520 }}>
             <div className="modal-header">
               <h3 className="modal-title">{editando !== null ? 'Editar anuncio' : 'Nuevo anuncio'}</h3>
-              <button className="modal-close" onClick={() => setModal(false)}>Ã—</button>
+              <button className="modal-close" onClick={() => setModal(false)}>×</button>
             </div>
             <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
               <div className="form-group">
@@ -166,7 +163,7 @@ const eliminar = async () => {
               </div>
               <div className="form-group">
                 <label className="form-label">Contenido *</label>
-                <textarea name="contenido" value={form.contenido} onChange={h} className="form-input" rows={4} style={{ resize:'vertical' }} placeholder="Escribe aquÃ­ el detalle del anuncio..." />
+                <textarea name="contenido" value={form.contenido} onChange={h} className="form-input" rows={4} style={{ resize:'vertical' }} placeholder="escribe aquí el detalle del anuncio..." />
               </div>
               <div className="grid-2" style={{ gap:12 }}>
                 <div className="form-group">
@@ -178,7 +175,7 @@ const eliminar = async () => {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Fecha de expiraciÃ³n</label>
+                  <label className="form-label">Fecha de expiración</label>
                   <DatePicker name="fecha_expira" value={form.fecha_expira} onChange={h} />
                 </div>
               </div>
@@ -213,4 +210,5 @@ const eliminar = async () => {
     </div>
   )
 }
+
 
