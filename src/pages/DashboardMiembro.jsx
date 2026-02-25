@@ -59,7 +59,7 @@ export default function DashboardMiembro() {
         </div>
       </div>
 
-      {/* Versiculo del dia */}
+      {/* Versículo del día */}
       <div className="card" style={{ marginBottom:20, borderLeft:'4px solid var(--gold)', background:'linear-gradient(135deg, var(--surface-2), var(--surface))' }}>
         <div style={{ display:'flex', alignItems:'flex-start', gap:14 }}>
           <span style={{ fontSize:32, flexShrink:0 }}>✝️</span>
@@ -71,7 +71,7 @@ export default function DashboardMiembro() {
         </div>
       </div>
 
-      {/* Cumpleanos del mes */}
+      {/* Cumpleaños del mes */}
       <div className="card">
         <div style={{ borderLeft:'3px solid var(--gold)', paddingLeft:12, marginBottom:16, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
           <div>
