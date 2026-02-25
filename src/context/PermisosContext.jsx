@@ -2,7 +2,7 @@
 import { useAuth } from './AuthContext'
 
 const PERMISOS = {
-  admin:      ['panel','miembros','tesoreria','finanzas','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','documentos','respaldo','ver_balance'],
+  admin:      ['panel','miembros','tesoreria','finanzas','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','documentos','respaldo','ver_balance','configuracion'],
   pastor:     ['panel','miembros','tesoreria','finanzas','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','documentos','respaldo','ver_balance'],
   pastora:    ['panel','miembros','tesoreria','finanzas','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','documentos','respaldo','ver_balance'],
   copastor:   ['panel','miembros','tesoreria','finanzas','reportes','inventario','eventos','asistencia','pastora','programa','anuncios','documentos','respaldo','ver_balance'],
