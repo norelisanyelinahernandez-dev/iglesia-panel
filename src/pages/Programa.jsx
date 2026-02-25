@@ -245,7 +245,6 @@ export default function Programa() {
       setProgramas(nuevos)
       setConfirmDel(null)
     }
-  } catch(_) { mostrarError('No se pudo eliminar.') }
   }
 
   const [toast, setToast] = useState(null)
