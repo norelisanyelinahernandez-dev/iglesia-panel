@@ -81,6 +81,7 @@ function AppRoutes() {
                 <Route path="/respaldo"   element={<RutaProtegida seccion="respaldo"><Respaldo /></RutaProtegida>} />
                 <Route path="/finanzas"   element={<RutaProtegida seccion="finanzas"><Finanzas /></RutaProtegida>} />
                 <Route path="/documentos" element={<RutaProtegida seccion="documentos"><Documentos /></RutaProtegida>} />
+                <Route path="/configuracion" element={<RutaProtegida seccion="configuracion"><Configuracion /></RutaProtegida>} />
                 <Route path="*"           element={<Navigate to="/" replace />} />
               </Routes>
             </Layout>
