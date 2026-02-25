@@ -101,7 +101,7 @@ export default function Anuncios() {
 
       {!loading && activos.length === 0 && (
         <div className="card" style={{ textAlign:'center', padding:40, color:'var(--text-muted)' }}>
-          <div style={{ fontSize:40, marginBottom:12 }}>ðŸ“¢</div>
+          <div style={{ fontSize:40, marginBottom:12 }}>&#x1F4E2;</div>
           <p>No hay anuncios activos. Crea uno nuevo.</p>
         </div>
       )}
