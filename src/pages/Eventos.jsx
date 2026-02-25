@@ -113,7 +113,6 @@ export default function Eventos() {
     if (!confirmDel) return
     try { await deleteEvento(confirmDel); setConfirmDel(null); load() } catch(_) { mostrarError('No se pudo eliminar.') }
   }
-  }
 
   return (
     <div className="page">
