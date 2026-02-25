@@ -128,7 +128,7 @@ export default function Anuncios() {
             </div>
             <div style={{ display:'flex', gap:6, flexShrink:0 }}>
               {puedeEdit && <button className="btn btn-ghost" style={{ padding:'5px 10px', fontSize:12 }} onClick={() => editar(a)}>Editar</button>}
-              <button className="btn btn-danger" style={{ padding:'5px 10px', fontSize:12 }} onClick={() => setConfirmDel(a.id)}>âœ•</button>
+              {puedeEdit && <button className="btn btn-danger" style={{ padding:'5px 10px', fontSize:12 }} onClick={() => setConfirmDel(a.id)}>✕</button>}
             </div>
           </div>
         </div>
@@ -144,7 +144,7 @@ export default function Anuncios() {
                   <span style={{ fontWeight:600, fontSize:14 }}>{a.titulo}</span>
                   <span style={{ color:'var(--text-muted)', fontSize:12, marginLeft:10 }}>ExpirÃ³: {new Date(a.fecha_expira).toLocaleDateString('es-DO')}</span>
                 </div>
-                <button className="btn btn-danger" style={{ padding:'4px 10px', fontSize:12 }} onClick={() => setConfirmDel(a.id)}>âœ•</button>
+                {puedeEdit && <button className="btn btn-danger" style={{ padding:'4px 10px', fontSize:12 }} onClick={() => setConfirmDel(a.id)}>✕</button>}
               </div>
             </div>
           ))}
