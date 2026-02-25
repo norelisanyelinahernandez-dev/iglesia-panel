@@ -1,222 +1,245 @@
-﻿import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { getMiembros, getIngresos, getGastos, getEventos, getInventario, getCategoriasIngreso, getCategoriasGasto } from '../api/client'
-import * as XLSX from 'xlsx'
+import ExcelJS from 'exceljs'
 
+// ── Estilos profesionales ────────────────────────────────────────────────────
+const COLOR_HEADER_BG  = '1A2E4A'   // azul marino oscuro
+const COLOR_HEADER_FG  = 'FFFFFF'   // blanco
+const COLOR_FILA_PAR   = 'EEF3FA'   // azul muy claro
+const COLOR_FILA_IMPAR = 'FFFFFF'   // blanco
+const COLOR_BORDE      = 'B0BEC5'   // gris suave
+const FONT_NAME        = 'Calibri'
+
+const estiloCelda = (ws, fila, col, valor, esHeader = false, esPareja = false) => {
+  const cell = ws.getCell(fila, col)
+  cell.value = valor
+  cell.font = {
+    name: FONT_NAME,
+    bold: esHeader,
+    color: { argb: esHeader ? COLOR_HEADER_FG : '1A1A2E' },
+    size: esHeader ? 11 : 10,
+  }
+  cell.fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: esHeader ? COLOR_HEADER_BG : (esPareja ? COLOR_FILA_PAR : COLOR_FILA_IMPAR) },
+  }
+  cell.border = {
+    top:    { style: 'thin', color: { argb: COLOR_BORDE } },
+    left:   { style: 'thin', color: { argb: COLOR_BORDE } },
+    bottom: { style: 'thin', color: { argb: COLOR_BORDE } },
+    right:  { style: 'thin', color: { argb: COLOR_BORDE } },
+  }
+  cell.alignment = { vertical: 'middle', wrapText: false }
+}
+
+const crearHoja = (wb, nombre, headers, anchos, filas) => {
+  const ws = wb.addWorksheet(nombre, {
+    views: [{ state: 'frozen', ySplit: 1 }],
+  })
+
+  // Anchos de columna
+  ws.columns = anchos.map((w, i) => ({ key: String(i), width: w }))
+
+  // Fila de encabezado
+  ws.getRow(1).height = 22
+  headers.forEach((h, ci) => estiloCelda(ws, 1, ci + 1, h, true))
+
+  // Filas de datos
+  filas.forEach((fila, ri) => {
+    const rowNum = ri + 2
+    ws.getRow(rowNum).height = 16
+    fila.forEach((val, ci) => estiloCelda(ws, rowNum, ci + 1, val ?? '', false, ri % 2 === 0))
+  })
+
+  // Auto-filtro
+  ws.autoFilter = {
+    from: { row: 1, column: 1 },
+    to:   { row: 1, column: headers.length },
+  }
+
+  return ws
+}
+
+const descargarBlob = async (wb, nombre) => {
+  const buffer = await wb.xlsx.writeBuffer()
+  const blob = new Blob([buffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = nombre
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+// ── Componente ───────────────────────────────────────────────────────────────
 export default function Respaldo() {
   const [loading, setLoading] = useState(false)
   const [mensaje, setMensaje] = useState('')
 
-
-  // Crea una hoja con headers aunque el array esté vacío
-  const crearHoja = (datos, headers, anchos) => {
-    let ws
-    if (datos.length === 0) {
-      // Sin datos: crear hoja solo con la fila de encabezados
-      ws = XLSX.utils.aoa_to_sheet([headers])
-    } else {
-      ws = XLSX.utils.json_to_sheet(datos)
-    }
-    ws['!cols'] = anchos.map(ancho => ({ wch: ancho }))
-    const range = XLSX.utils.decode_range(ws['!ref'] || 'A1')
-    ws['!autofilter'] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: 0, c: range.e.c } }) }
-    return ws
+  // ── Helpers de mapeo ──────────────────────────────────────────────────────
+  const obtenerCategorias = async () => {
+    const [ci, cg] = await Promise.allSettled([getCategoriasIngreso(), getCategoriasGasto()])
+    const mapI = {}
+    if (ci.status === 'fulfilled') ci.value.data.forEach(c => { mapI[c.id] = c.nombre })
+    const mapG = {}
+    if (cg.status === 'fulfilled') cg.value.data.forEach(c => { mapG[c.id] = c.nombre })
+    return { mapI, mapG }
   }
 
+  // ── Respaldo completo ─────────────────────────────────────────────────────
   const exportarExcel = async () => {
-    setLoading(true)
-    setMensaje('')
+    setLoading(true); setMensaje('')
     try {
-      const [m, i, g, e, inv, catI, catG] = await Promise.allSettled([
-        getMiembros({ limit:1000 }),
-        getIngresos({ limit:1000 }),
-        getGastos({ limit:1000 }),
+      const [m, i, g, e, inv] = await Promise.allSettled([
+        getMiembros({ limit: 1000 }),
+        getIngresos({ limit: 1000 }),
+        getGastos({ limit: 1000 }),
         getEventos(),
-        getInventario({ limit:1000 }),
-        getCategoriasIngreso(),
-        getCategoriasGasto(),
+        getInventario({ limit: 1000 }),
       ])
+      const { mapI, mapG } = await obtenerCategorias()
+      const wb = new ExcelJS.Workbook()
+      wb.creator = 'Sistema Iglesia'
+      wb.created = new Date()
 
-      // Mapas de ID → nombre de categoría
-      const mapCatI = {}
-      if (catI.status === 'fulfilled') catI.value.data.forEach(c => { mapCatI[c.id] = c.nombre })
-      const mapCatG = {}
-      if (catG.status === 'fulfilled') catG.value.data.forEach(c => { mapCatG[c.id] = c.nombre })
+      // Miembros
+      const miembrosData = m.status === 'fulfilled' ? m.value.data : []
+      crearHoja(wb, 'Miembros',
+        ['Nombres','Apellidos','Cédula','Teléfono','Email','Género','Estado Civil','Dirección','Fecha Nacimiento','Fecha Conversión','Fecha Bautismo','Iglesia Bautismo','Tiempo Iglesia','Rol','Estado','Ministerio Actual','Dones y Talentos','Notas'],
+        [20,20,14,14,24,12,14,26,16,16,16,22,14,14,12,22,22,26],
+        miembrosData.map(x => [
+          x.nombres, x.apellidos, x.cedula||'', x.telefono||'', x.email||'',
+          x.genero==='M'?'Masculino':x.genero==='F'?'Femenino':x.genero||'',
+          x.estado_civil||'', x.direccion||'', x.fecha_nacimiento||'',
+          x.fecha_conversion||'', x.fecha_bautismo||'', x.iglesia_bautismo||'',
+          x.tiempo_en_iglesia||'', x.rol||'', x.estado||'',
+          x.ministerio_actual||'', x.dones_talentos||'', x.notas||'',
+        ])
+      )
 
-      const wb = XLSX.utils.book_new()
-
-      if (m.status === 'fulfilled') {
-        const miembros = m.value.data.map(x => ({
-          Nombres: x.nombres,
-          Apellidos: x.apellidos,
-          'Cédula': x.cedula || '',
-          'Teléfono': x.telefono || '',
-          Email: x.email || '',
-          'Género': x.genero === 'M' ? 'Masculino' : x.genero === 'F' ? 'Femenino' : x.genero || '',
-          Estado_Civil: x.estado_civil || '',
-          'Dirección': x.direccion || '',
-          Fecha_Nacimiento: x.fecha_nacimiento || '',
-          'Fecha_Conversión': x.fecha_conversion || '',
-          Fecha_Bautismo: x.fecha_bautismo || '',
-          Iglesia_Bautismo: x.iglesia_bautismo || '',
-          Tiempo_Iglesia: x.tiempo_en_iglesia || '',
-          Rol: x.rol || '',
-          Estado: x.estado || '',
-          Ministerio_Actual: x.ministerio_actual || '',
-          Dones_Talentos: x.dones_talentos || '',
-          Notas: x.notas || '',
-        }))
-        const headersMiembrosCompleto = ['Nombres','Apellidos','Cédula','Teléfono','Email','Género','Estado_Civil','Dirección','Fecha_Nacimiento','Fecha_Conversión','Fecha_Bautismo','Iglesia_Bautismo','Tiempo_Iglesia','Rol','Estado','Ministerio_Actual','Dones_Talentos','Notas']
-        XLSX.utils.book_append_sheet(wb, crearHoja(miembros, headersMiembrosCompleto,
-          [18,18,14,14,22,12,14,24,16,16,16,20,14,14,12,20,20,24]), 'Miembros')
-      }
-
-      const ingresosData = i.status === 'fulfilled' ? i.value.data.map(x => ({
-        Fecha: x.fecha,
-        'Categoría': mapCatI[x.categoria_id] || x.categoria_id || '',
-        'Monto (RD$)': x.monto,
-        'Descripción': x.descripcion || '',
-      })) : []
-      XLSX.utils.book_append_sheet(wb, crearHoja(ingresosData,
+      // Ingresos
+      const ingresosData = i.status === 'fulfilled' ? i.value.data : []
+      crearHoja(wb, 'Ingresos',
         ['Fecha','Categoría','Monto (RD$)','Descripción'],
-        [14, 20, 14, 32]), 'Ingresos')
+        [14,22,14,36],
+        ingresosData.map(x => [x.fecha, mapI[x.categoria_id]||'Sin categoría', x.monto, x.descripcion||''])
+      )
 
-      const gastosData = g.status === 'fulfilled' ? g.value.data.map(x => ({
-        Fecha: x.fecha,
-        'Categoría': mapCatG[x.categoria_id] || x.categoria_id || '',
-        'Monto (RD$)': x.monto,
-        'Descripción': x.descripcion || '',
-        Beneficiario: x.beneficiario || '',
-      })) : []
-      XLSX.utils.book_append_sheet(wb, crearHoja(gastosData,
+      // Gastos
+      const gastosData = g.status === 'fulfilled' ? g.value.data : []
+      crearHoja(wb, 'Gastos',
         ['Fecha','Categoría','Monto (RD$)','Descripción','Beneficiario'],
-        [14, 20, 14, 32, 22]), 'Gastos')
+        [14,22,14,36,22],
+        gastosData.map(x => [x.fecha, mapG[x.categoria_id]||'Sin categoría', x.monto, x.descripcion||'', x.beneficiario||''])
+      )
 
-      const eventosData = e.status === 'fulfilled' ? e.value.data.map(x => ({
-        Nombre: x.nombre,
-        Fecha: x.fecha,
-        Lugar: x.lugar || '',
-        'Descripción': x.descripcion || '',
-        Estado: x.estado || '',
-      })) : []
-      XLSX.utils.book_append_sheet(wb, crearHoja(eventosData,
+      // Eventos
+      const eventosData = e.status === 'fulfilled' ? e.value.data : []
+      crearHoja(wb, 'Eventos',
         ['Nombre','Fecha','Lugar','Descripción','Estado'],
-        [28, 14, 20, 36, 12]), 'Eventos')
+        [30,14,22,38,12],
+        eventosData.map(x => [x.nombre, x.fecha, x.lugar||'', x.descripcion||'', x.estado||''])
+      )
 
-      const inventarioData = inv.status === 'fulfilled' ? inv.value.data.map(x => ({
-        Nombre: x.nombre,
-        'Categoría': x.categoria || '',
-        Cantidad: x.cantidad,
-        Estado: x.estado || '',
-        'Descripción': x.descripcion || '',
-      })) : []
-      XLSX.utils.book_append_sheet(wb, crearHoja(inventarioData,
+      // Inventario
+      const inventarioData = inv.status === 'fulfilled' ? inv.value.data : []
+      crearHoja(wb, 'Inventario',
         ['Nombre','Categoría','Cantidad','Estado','Descripción'],
-        [28, 18, 10, 14, 32]), 'Inventario')
+        [30,20,10,14,34],
+        inventarioData.map(x => [x.nombre, x.categoria||'', x.cantidad, x.estado||'', x.descripcion||''])
+      )
 
       const fecha = new Date().toISOString().split('T')[0]
-      XLSX.writeFile(wb, `respaldo_iglesia_${fecha}.xlsx`)
+      await descargarBlob(wb, `respaldo_iglesia_${fecha}.xlsx`)
       setMensaje('Respaldo descargado correctamente')
     } catch(err) {
+      console.error(err)
       setMensaje('Error al generar el respaldo')
     }
     setLoading(false)
   }
 
+  // ── Lista de miembros ─────────────────────────────────────────────────────
   const exportarMiembros = async () => {
-    setLoading(true)
-    setMensaje('')
+    setLoading(true); setMensaje('')
     try {
-      const { data } = await getMiembros({ limit:1000 })
-      const miembros = data.map(x => ({
-        Nombres: x.nombres,
-        Apellidos: x.apellidos,
-        Cédula: x.cedula || '',
-        Teléfono: x.telefono || '',
-        Email: x.email || '',
-        Género: x.genero === 'M' ? 'Masculino' : x.genero === 'F' ? 'Femenino' : x.genero || '',
-        Estado_Civil: x.estado_civil || '',
-        Dirección: x.direccion || '',
-        Fecha_Nacimiento: x.fecha_nacimiento || '',
-        Fecha_Conversión: x.fecha_conversion || '',
-        Fecha_Bautismo: x.fecha_bautismo || '',
-        Iglesia_Bautismo: x.iglesia_bautismo || '',
-        Tiempo_Iglesia: x.tiempo_en_iglesia || '',
-        Rol: x.rol || '',
-        Estado: x.estado || '',
-        Ministerio_Actual: x.ministerio_actual || '',
-        Ministerios_Anteriores: x.ministerios_anteriores || '',
-        Dones_Talentos: x.dones_talentos || '',
-        Disponibilidad: x.disponibilidad || '',
-        Nombre_Conyuge: x.nombre_conyuge || '',
-        Numero_Hijos: x.numero_hijos || '',
-        Telefono_Emergencia: x.telefono_emergencia || '',
-        Visitas_Pastorales: x.visitas_pastorales || '',
-        Consejeria_Pastoral: x.consejeria_pastoral || '',
-        Motivo_Oracion: x.motivo_oracion || '',
-        Notas: x.notas || '',
-      }))
-      const wb = XLSX.utils.book_new()
-      const headersMiembros = ['Nombres','Apellidos','Cédula','Teléfono','Email','Género','Estado_Civil','Dirección','Fecha_Nacimiento','Fecha_Conversión','Fecha_Bautismo','Iglesia_Bautismo','Tiempo_Iglesia','Rol','Estado','Ministerio_Actual','Ministerios_Anteriores','Dones_Talentos','Disponibilidad','Nombre_Conyuge','Numero_Hijos','Telefono_Emergencia','Visitas_Pastorales','Consejeria_Pastoral','Motivo_Oracion','Notas']
-      XLSX.utils.book_append_sheet(wb, crearHoja(miembros, headersMiembros,
-        [18,18,14,14,22,12,14,24,16,16,16,20,14,14,12,20,20,20,14,18,10,18,16,8,12,24]), 'Miembros')
+      const { data } = await getMiembros({ limit: 1000 })
+      const wb = new ExcelJS.Workbook()
+      wb.creator = 'Sistema Iglesia'
+      wb.created = new Date()
+
+      crearHoja(wb, 'Miembros',
+        ['Nombres','Apellidos','Cédula','Teléfono','Email','Género','Estado Civil','Dirección','Fecha Nacimiento','Fecha Conversión','Fecha Bautismo','Iglesia Bautismo','Tiempo Iglesia','Rol','Estado','Ministerio Actual','Ministerios Anteriores','Dones y Talentos','Disponibilidad','Nombre Cónyuge','Nº Hijos','Tel. Emergencia','Visitas Pastorales','Consejería','Motivo Oración','Notas'],
+        [20,20,14,14,24,12,14,26,16,16,16,22,14,14,12,22,22,22,14,20,8,18,16,16,24,26],
+        data.map(x => [
+          x.nombres, x.apellidos, x.cedula||'', x.telefono||'', x.email||'',
+          x.genero==='M'?'Masculino':x.genero==='F'?'Femenino':x.genero||'',
+          x.estado_civil||'', x.direccion||'', x.fecha_nacimiento||'',
+          x.fecha_conversion||'', x.fecha_bautismo||'', x.iglesia_bautismo||'',
+          x.tiempo_en_iglesia||'', x.rol||'', x.estado||'',
+          x.ministerio_actual||'', x.ministerios_anteriores||'',
+          x.dones_talentos||'', x.disponibilidad||'', x.nombre_conyuge||'',
+          x.numero_hijos||'', x.telefono_emergencia||'',
+          x.visitas_pastorales||'', x.consejeria_pastoral||'',
+          x.motivo_oracion||'', x.notas||'',
+        ])
+      )
+
       const fecha = new Date().toISOString().split('T')[0]
-      XLSX.writeFile(wb, `miembros_${fecha}.xlsx`)
+      await descargarBlob(wb, `miembros_${fecha}.xlsx`)
       setMensaje('Lista de miembros descargada correctamente')
     } catch(err) {
+      console.error(err)
       setMensaje('Error al generar el archivo')
     }
     setLoading(false)
   }
 
+  // ── Tesorería ─────────────────────────────────────────────────────────────
   const exportarTesoreria = async () => {
-    setLoading(true)
-    setMensaje('')
+    setLoading(true); setMensaje('')
     try {
-      const [i, g, catI, catG] = await Promise.allSettled([
-        getIngresos({ limit:1000 }),
-        getGastos({ limit:1000 }),
-        getCategoriasIngreso(),
-        getCategoriasGasto(),
+      const [i, g] = await Promise.allSettled([
+        getIngresos({ limit: 1000 }),
+        getGastos({ limit: 1000 }),
       ])
-      const mapCatI = {}
-      if (catI.status === 'fulfilled') catI.value.data.forEach(c => { mapCatI[c.id] = c.nombre })
-      const mapCatG = {}
-      if (catG.status === 'fulfilled') catG.value.data.forEach(c => { mapCatG[c.id] = c.nombre })
+      const { mapI, mapG } = await obtenerCategorias()
+      const wb = new ExcelJS.Workbook()
+      wb.creator = 'Sistema Iglesia'
+      wb.created = new Date()
 
-      const wb = XLSX.utils.book_new()
-      const tIngData = i.status === 'fulfilled' ? i.value.data.map(x => ({
-        Fecha: x.fecha,
-        'Categoría': mapCatI[x.categoria_id] || x.categoria_id || '',
-        'Monto (RD$)': x.monto,
-        'Descripción': x.descripcion || '',
-      })) : []
-      XLSX.utils.book_append_sheet(wb, crearHoja(tIngData,
+      const ingresosData = i.status === 'fulfilled' ? i.value.data : []
+      crearHoja(wb, 'Ingresos',
         ['Fecha','Categoría','Monto (RD$)','Descripción'],
-        [14, 20, 14, 32]), 'Ingresos')
+        [14,22,14,36],
+        ingresosData.map(x => [x.fecha, mapI[x.categoria_id]||'Sin categoría', x.monto, x.descripcion||''])
+      )
 
-      const tGasData = g.status === 'fulfilled' ? g.value.data.map(x => ({
-        Fecha: x.fecha,
-        'Categoría': mapCatG[x.categoria_id] || x.categoria_id || '',
-        'Monto (RD$)': x.monto,
-        'Descripción': x.descripcion || '',
-        Beneficiario: x.beneficiario || '',
-      })) : []
-      XLSX.utils.book_append_sheet(wb, crearHoja(tGasData,
+      const gastosData = g.status === 'fulfilled' ? g.value.data : []
+      crearHoja(wb, 'Gastos',
         ['Fecha','Categoría','Monto (RD$)','Descripción','Beneficiario'],
-        [14, 20, 14, 32, 22]), 'Gastos')
+        [14,22,14,36,22],
+        gastosData.map(x => [x.fecha, mapG[x.categoria_id]||'Sin categoría', x.monto, x.descripcion||'', x.beneficiario||''])
+      )
+
       const fecha = new Date().toISOString().split('T')[0]
-      XLSX.writeFile(wb, `tesoreria_${fecha}.xlsx`)
+      await descargarBlob(wb, `tesoreria_${fecha}.xlsx`)
       setMensaje('Datos de tesorería descargados correctamente')
     } catch(err) {
+      console.error(err)
       setMensaje('Error al generar el archivo')
     }
     setLoading(false)
   }
 
+  // ── UI ────────────────────────────────────────────────────────────────────
   const opciones = [
     {
       titulo: 'Respaldo completo',
-      descripcion: 'Descarga toda la informacion del sistema en un solo archivo Excel con multiples hojas: Miembros, Ingresos, Gastos, Eventos e Inventario.',
+      descripcion: 'Descarga toda la información del sistema en un solo archivo Excel con múltiples hojas: Miembros, Ingresos, Gastos, Eventos e Inventario.',
       icono: '💾',
       color: 'var(--gold)',
       accion: exportarExcel,
@@ -229,7 +252,7 @@ export default function Respaldo() {
       accion: exportarMiembros,
     },
     {
-      titulo: 'Datos de tesoreria',
+      titulo: 'Datos de tesorería',
       descripcion: 'Exporta todos los ingresos y gastos registrados en el sistema en formato Excel.',
       icono: '💰',
       color: 'var(--blue)',
@@ -242,33 +265,28 @@ export default function Respaldo() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Respaldo de datos</h1>
-          <p className="page-subtitle">Exporta la informacion del sistema en formato Excel</p>
+          <p className="page-subtitle">Exporta la información del sistema en formato Excel profesional</p>
         </div>
       </div>
 
       {mensaje && (
-        <div className={`alert ${mensaje.includes('Error') ? 'alert-error' : 'alert-success'}`} style={{ marginBottom:20 }}>
+        <div className={`alert ${mensaje.includes('Error') ? 'alert-error' : 'alert-success'}`} style={{ marginBottom: 20 }}>
           {mensaje.includes('Error') ? '❌' : '✅'} {mensaje}
         </div>
       )}
 
-      <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {opciones.map((op, i) => (
-          <div key={i} className="card" style={{ borderLeft:`3px solid ${op.color}` }}>
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:16, flexWrap:'wrap' }}>
-              <div style={{ display:'flex', alignItems:'center', gap:16 }}>
-                <span style={{ fontSize:36 }}>{op.icono}</span>
+          <div key={i} className="card" style={{ borderLeft: `3px solid ${op.color}` }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                <span style={{ fontSize: 36 }}>{op.icono}</span>
                 <div>
-                  <h3 style={{ fontFamily:'var(--font-heading)', fontSize:16, fontWeight:700, marginBottom:4 }}>{op.titulo}</h3>
-                  <p style={{ color:'var(--text-muted)', fontSize:13 }}>{op.descripcion}</p>
+                  <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: 16, fontWeight: 700, marginBottom: 4 }}>{op.titulo}</h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>{op.descripcion}</p>
                 </div>
               </div>
-              <button
-                onClick={op.accion}
-                disabled={loading}
-                className="btn btn-gold"
-                style={{ flexShrink:0 }}
-              >
+              <button onClick={op.accion} disabled={loading} className="btn btn-gold" style={{ flexShrink: 0 }}>
                 {loading ? 'Generando...' : 'Descargar Excel'}
               </button>
             </div>
@@ -276,13 +294,12 @@ export default function Respaldo() {
         ))}
       </div>
 
-      <div className="card" style={{ marginTop:24, borderLeft:'3px solid var(--text-muted)' }}>
-        <h3 style={{ fontFamily:'var(--font-heading)', fontSize:14, fontWeight:600, marginBottom:8, color:'var(--text-muted)' }}>Recomendaciones</h3>
-        <p style={{ color:'var(--text-muted)', fontSize:13, lineHeight:1.7 }}>
-          Se recomienda hacer un respaldo completo al menos una vez al mes. Los archivos Excel pueden abrirse con Microsoft Excel, Google Sheets o cualquier programa de hojas de calculo. Guarda los archivos en un lugar seguro como Google Drive o un disco externo.
+      <div className="card" style={{ marginTop: 24, borderLeft: '3px solid var(--text-muted)' }}>
+        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: 14, fontWeight: 600, marginBottom: 8, color: 'var(--text-muted)' }}>Recomendaciones</h3>
+        <p style={{ color: 'var(--text-muted)', fontSize: 13, lineHeight: 1.7 }}>
+          Se recomienda hacer un respaldo completo al menos una vez al mes. Los archivos Excel pueden abrirse con Microsoft Excel, Google Sheets o cualquier programa de hojas de cálculo. Guarda los archivos en un lugar seguro como Google Drive o un disco externo.
         </p>
       </div>
     </div>
   )
 }
-
