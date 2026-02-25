@@ -70,6 +70,12 @@ const TIPOS = [
 const hoy = () => new Date().toISOString().split('T')[0]
 
 export default function Asistencia() {
+  const [confirmDel, setConfirmDel] = useState(null)
+  const handleDelete = async () => {
+    if (!confirmDel) return
+    try { await deleteAsistencia(confirmDel); setConfirmDel(null); load() } catch(_) { mostrarError('No se pudo eliminar.') }
+  }
+
   const [toast, setToast] = useState(null)
   const mostrarError = (msg) => setToast({ mensaje: msg, tipo: 'error' })
   const [miembros, setMiembros] = useState([])
@@ -123,7 +129,8 @@ export default function Asistencia() {
   }
 
   const eliminarRegistro = (id) => {
-    if (!confirm('¿Eliminar este registro?')) return
+    setConfirmDel(id); return // modal
+    if (!confirmDel) return
     const nuevos = registros.filter(r => r.id !== id)
     setRegistros(nuevos)
     localStorage.setItem(STORAGE_KEY, JSON.stringify(nuevos))
@@ -359,6 +366,22 @@ export default function Asistencia() {
         </div>
       )}
       {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onClose={() => setToast(null)} />}
+      {confirmDel && (
+        <div className="modal-overlay">
+          <div className="modal" style={{ maxWidth:380 }}>
+            <div style={{ textAlign:'center', padding:'10px 0 4px' }}>
+              <div style={{ fontSize:36, marginBottom:12 }}>&#x26A0;&#xFE0F;</div>
+              <h3 style={{ fontFamily:'var(--font-heading)', fontSize:18, marginBottom:8 }}>&#x00BF;Eliminar registro?</h3>
+              <p style={{ color:'var(--text-muted)', fontSize:13 }}>Esta acci&#x00F3;n no se puede deshacer.</p>
+            </div>
+            <div style={{ display:'flex', gap:10, marginTop:16 }}>
+              <button className="btn btn-ghost" style={{ flex:1 }} onClick={() => setConfirmDel(null)}>Cancelar</button>
+              <button className="btn btn-danger" style={{ flex:1, justifyContent:'center' }} onClick={handleDelete}>S&#x00ED;, eliminar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
 
     </div>
   )

@@ -17,6 +17,12 @@ const CATEGORIAS = [
 const emptyForm = () => ({ nombre:'', categoria:'Actas', fecha:'', descripcion:'', url:'', archivo_nombre:'' })
 
 export default function Documentos() {
+  const [confirmDel, setConfirmDel] = useState(null)
+  const handleDelete = async () => {
+    if (!confirmDel) return
+    try { await deleteDocumento(confirmDel); setConfirmDel(null); load() } catch(_) { mostrarError('No se pudo eliminar.') }
+  }
+
   const [toast, setToast] = useState(null)
   const mostrarError = (msg) => setToast({ mensaje: msg, tipo: 'error' })
   const [documentos, setDocumentos] = useState(() => {
@@ -60,7 +66,8 @@ export default function Documentos() {
   }
 
   const eliminar = (id) => {
-    if (!confirm('¿Eliminar este documento?')) return
+    setConfirmDel(id); return // modal
+    if (!confirmDel) return
     const nuevos = documentos.filter(d => d.id !== id)
     setDocumentos(nuevos)
     localStorage.setItem(STORAGE_KEY, JSON.stringify(nuevos))
@@ -157,7 +164,7 @@ export default function Documentos() {
                       </button>
                     )}
                     <button className="btn btn-ghost" style={{ padding:'5px 10px', fontSize:12 }} onClick={() => editar(documentos.indexOf(doc))}>Editar</button>
-                    <button className="btn btn-danger" style={{ padding:'5px 10px', fontSize:12 }} onClick={() => eliminar(doc.id)}>✕</button>
+                    <button className="btn btn-danger" style={{ padding:'5px 10px', fontSize:12 }} onClick={() => setConfirmDel(doc.id)}>✕</button>
                   </div>
                 </div>
               ))}
@@ -210,6 +217,22 @@ export default function Documentos() {
         </div>
       )}
       {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onClose={() => setToast(null)} />}
+      {confirmDel && (
+        <div className="modal-overlay">
+          <div className="modal" style={{ maxWidth:380 }}>
+            <div style={{ textAlign:'center', padding:'10px 0 4px' }}>
+              <div style={{ fontSize:36, marginBottom:12 }}>&#x26A0;&#xFE0F;</div>
+              <h3 style={{ fontFamily:'var(--font-heading)', fontSize:18, marginBottom:8 }}>&#x00BF;Eliminar documento?</h3>
+              <p style={{ color:'var(--text-muted)', fontSize:13 }}>Esta acci&#x00F3;n no se puede deshacer.</p>
+            </div>
+            <div style={{ display:'flex', gap:10, marginTop:16 }}>
+              <button className="btn btn-ghost" style={{ flex:1 }} onClick={() => setConfirmDel(null)}>Cancelar</button>
+              <button className="btn btn-danger" style={{ flex:1, justifyContent:'center' }} onClick={handleDelete}>S&#x00ED;, eliminar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
 
     </div>
   )
