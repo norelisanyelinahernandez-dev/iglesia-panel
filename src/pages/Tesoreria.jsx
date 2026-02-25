@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState, useRef } from 'react'
+import Toast from '../components/Toast'
 
 const MESES_CORTOS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
 const MESES_LARGOS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
@@ -70,6 +71,8 @@ function Modal({ title, onClose, children }) {
 }
 
 export default function Tesoreria() {
+  const [toast, setToast] = useState(null)
+  const mostrarError = (msg) => setToast({ mensaje: msg, tipo: 'error' })
   const [tab, setTab] = useState('ingresos')
   const [ingresos, setIngresos] = useState([])
   const [gastos, setGastos] = useState([])
@@ -111,7 +114,7 @@ export default function Tesoreria() {
       if (cg.status==='fulfilled') setCatGas(cg.value.data)
       if (d.status==='fulfilled') setDiezmos(d.value.data)
       if (m.status==='fulfilled') setMiembros(m.value.data)
-    } catch(_) {}
+    } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
     setLoading(false)
   }
 
@@ -607,6 +610,8 @@ export default function Tesoreria() {
           </form>
         </Modal>
       )}
+      {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onClose={() => setToast(null)} />}
+
     </div>
   )
 }

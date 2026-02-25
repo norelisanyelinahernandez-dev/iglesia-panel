@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState } from 'react'
+import Toast from '../components/Toast'
 import { usePermisos } from '../context/PermisosContext'
 import DatePicker from '../components/DatePicker'
 import { getEventos, createEvento, deleteEvento, getAsistencia, registrarAsistencia } from '../api/client'
@@ -40,6 +41,8 @@ function Modal({ title, onClose, children }) {
 }
 
 export default function Eventos() {
+  const [toast, setToast] = useState(null)
+  const mostrarError = (msg) => setToast({ mensaje: msg, tipo: 'error' })
   const { puedeEditar } = usePermisos()
   const puedeEdit = puedeEditar('eventos')
   const [eventos, setEventos] = useState([])
@@ -54,7 +57,7 @@ export default function Eventos() {
 
   const load = async () => {
     setLoading(true)
-    try { const { data } = await getEventos(); setEventos(data) } catch(_) {}
+    try { const { data } = await getEventos(); setEventos(data) } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
     setLoading(false)
   }
   useEffect(() => { load() }, [])
@@ -62,7 +65,7 @@ export default function Eventos() {
   const loadAsistencia = async (evento) => {
     setAsistenciaEvento(evento)
     setAsistenciaData(null)
-    try { const { data } = await getAsistencia(evento.id); setAsistenciaData(data) } catch(_) {}
+    try { const { data } = await getAsistencia(evento.id); setAsistenciaData(data) } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
   }
 
   const submitEvento = async (e) => {
@@ -100,13 +103,13 @@ export default function Eventos() {
       const { data } = await getAsistencia(asistenciaEvento.id)
       setAsistenciaData(data)
       setAsForm({ nombre_visita:'', telefono_visita:'' })
-    } catch(_) {}
+    } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
     setSaving(false)
   }
 
   const handleDelete = async (id) => {
     if (!confirm('\u00bfEliminar este evento?')) return
-    try { await deleteEvento(id); load() } catch(_) {}
+    try { await deleteEvento(id); load() } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
   }
 
   return (
@@ -241,6 +244,8 @@ export default function Eventos() {
           </div>
         </div>
       )}
+      {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onClose={() => setToast(null)} />}
+
     </div>
   )
 }

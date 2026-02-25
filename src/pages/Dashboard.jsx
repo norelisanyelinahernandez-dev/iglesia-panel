@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState } from 'react'
+import Toast from '../components/Toast'
 import { getResumenMensual, getMiembros, getEventos, getInventario } from '../api/client'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { useAuth } from '../context/AuthContext'
@@ -23,6 +24,8 @@ const CustomTooltip = ({ active, payload, label }) => {
 }
 
 export default function Dashboard() {
+  const [toast, setToast] = useState(null)
+  const mostrarError = (msg) => setToast({ mensaje: msg, tipo: 'error' })
   const { user } = useAuth()
   const { puede } = usePermisos()
   const [resumen, setResumen] = useState([])
@@ -61,7 +64,7 @@ export default function Dashboard() {
         }
         if (e.status === 'fulfilled') setStats(s => ({ ...s, eventos: e.value.data.length }))
         if (inv.status === 'fulfilled') setStats(s => ({ ...s, inventario: inv.value.data.length }))
-      } catch (_) {}
+      } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
       setLoading(false)
     }
     load()
@@ -205,6 +208,8 @@ export default function Dashboard() {
           </div>
         </>
       )}
+      {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onClose={() => setToast(null)} />}
+
     </div>
   )
 }

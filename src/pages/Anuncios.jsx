@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import Toast from '../components/Toast'
 import { usePermisos } from '../context/PermisosContext'
 import { getAnuncios, createAnuncio, updateAnuncio, deleteAnuncio } from '../api/client'
 import DatePicker from '../components/DatePicker'
@@ -30,6 +31,8 @@ const PRIORIDAD_BADGE = {
 const emptyForm = () => ({ titulo:'', contenido:'', prioridad:'media', fecha_expira:'' })
 
 export default function Anuncios() {
+  const [toast, setToast] = useState(null)
+  const mostrarError = (msg) => setToast({ mensaje: msg, tipo: 'error' })
   const { puedeEditar } = usePermisos()
   const puedeEdit = puedeEditar('anuncios')
   const [anuncios, setAnuncios] = useState([])
@@ -43,7 +46,7 @@ export default function Anuncios() {
     try {
       const { data } = await getAnuncios()
       setAnuncios(data)
-    } catch (_) {}
+    } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
     setLoading(false)
   }
 
@@ -62,12 +65,12 @@ export default function Anuncios() {
       setForm(emptyForm())
       setModal(false)
       cargar()
-    } catch (_) {}
+    } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
   }
 
   const eliminar = async (id) => {
     if (!confirm('¿Eliminar este anuncio?')) return
-    try { await deleteAnuncio(id); cargar() } catch (_) {}
+    try { await deleteAnuncio(id); cargar() } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
   }
 
   const editar = (a) => {
@@ -184,6 +187,8 @@ export default function Anuncios() {
           </div>
         </div>
       )}
+      {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onClose={() => setToast(null)} />}
+
     </div>
   )
 }

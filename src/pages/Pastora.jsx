@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react'
+import Toast from '../components/Toast'
 import { getPastora, savePastora } from '../api/client'
 
 const EMPTY = { nombre:'', cargo:'', telefono:'', email:'', direccion:'', biografia:'', versiculo:'', anios_ministerio:'', especialidad:'', foto_url:'' }
 
 export default function Pastora() {
+  const [toast, setToast] = useState(null)
+  const mostrarError = (msg) => setToast({ mensaje: msg, tipo: 'error' })
   const [perfil, setPerfil] = useState(EMPTY)
   const [editando, setEditando] = useState(false)
   const [form, setForm] = useState(EMPTY)
@@ -28,7 +31,7 @@ export default function Pastora() {
       setEditando(false)
       setGuardado(true)
       setTimeout(() => setGuardado(false), 3000)
-    } catch (_) {}
+    } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
   }
 
   const campo = (label, value) => value ? (
@@ -151,6 +154,8 @@ export default function Pastora() {
           </form>
         </div>
       )}
+      {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onClose={() => setToast(null)} />}
+
     </div>
   )
 }

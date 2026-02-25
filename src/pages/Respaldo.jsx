@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Toast from '../components/Toast'
 import { getMiembros, getIngresos, getGastos, getEventos, getInventario, getCategoriasIngreso, getCategoriasGasto } from '../api/client'
 import ExcelJS from 'exceljs'
 
@@ -86,10 +87,10 @@ const crearHoja = (wb, nombre, headers, anchos, filas, logoBase64 = null) => {
         br: { col: 1, row: 3 },
         editAs: 'oneCell',
       })
-    } catch(_) {}
+    } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
   }
   // Merge col 1 filas 1-3 para reservar espacio al logo
-  try { ws.mergeCells(1, 1, 3, 1) } catch(_) {}
+  try { ws.mergeCells(1, 1, 3, 1) } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
 
   // ── Fila 5: Encabezados de columnas ──────────────────────────────────
   ws.getRow(5).height = 22
@@ -126,6 +127,8 @@ const descargarBlob = async (wb, nombre) => {
 
 // ── Componente ───────────────────────────────────────────────────────────────
 export default function Respaldo() {
+  const [toast, setToast] = useState(null)
+  const mostrarError = (msg) => setToast({ mensaje: msg, tipo: 'error' })
   const [loading, setLoading] = useState(false)
   const [mensaje, setMensaje] = useState('')
 
@@ -163,7 +166,7 @@ export default function Respaldo() {
           const buf = await resp.arrayBuffer()
           logoBase64 = btoa(String.fromCharCode(...new Uint8Array(buf)))
         }
-      } catch(_) {}
+      } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
 
       // Miembros
       const miembrosData = m.status === 'fulfilled' ? m.value.data : []
@@ -238,7 +241,7 @@ export default function Respaldo() {
           const buf = await resp.arrayBuffer()
           logoBase64 = btoa(String.fromCharCode(...new Uint8Array(buf)))
         }
-      } catch(_) {}
+      } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
 
       crearHoja(wb, 'Miembros',
         ['Nombres','Apellidos','Cédula','Teléfono','Email','Género','Estado Civil','Dirección','Fecha Nacimiento','Fecha Conversión','Fecha Bautismo','Iglesia Bautismo','Tiempo Iglesia','Rol','Estado','Ministerio Actual','Ministerios Anteriores','Dones y Talentos','Disponibilidad','Nombre Cónyuge','Nº Hijos','Tel. Emergencia','Visitas Pastorales','Consejería','Motivo Oración','Notas'],
@@ -287,7 +290,7 @@ export default function Respaldo() {
           const buf = await resp.arrayBuffer()
           logoBase64 = btoa(String.fromCharCode(...new Uint8Array(buf)))
         }
-      } catch(_) {}
+      } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
 
       const ingresosData = i.status === 'fulfilled' ? i.value.data : []
       crearHoja(wb, 'Ingresos',
@@ -378,6 +381,8 @@ export default function Respaldo() {
           Se recomienda hacer un respaldo completo al menos una vez al mes. Los archivos Excel pueden abrirse con Microsoft Excel, Google Sheets o cualquier programa de hojas de cálculo. Guarda los archivos en un lugar seguro como Google Drive o un disco externo.
         </p>
       </div>
+      {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onClose={() => setToast(null)} />}
+
     </div>
   )
 }

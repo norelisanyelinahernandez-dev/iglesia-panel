@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import Toast from '../components/Toast'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { getEventos, getAnuncios } from '../api/client'
@@ -41,6 +42,8 @@ const VERSICULOS = [
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
 
 export default function DashboardMiembro() {
+  const [toast, setToast] = useState(null)
+  const mostrarError = (msg) => setToast({ mensaje: msg, tipo: 'error' })
   const { user } = useAuth()
   const navigate = useNavigate()
   const [cumpleanos, setCumpleanos] = useState([])
@@ -76,7 +79,7 @@ export default function DashboardMiembro() {
         if (anunciosRes.status === 'fulfilled') {
           setAnuncios((anunciosRes.value.data || []).slice(0, 3))
         }
-      } catch (_) {}
+      } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
       setLoading(false)
     }
     load()
@@ -172,6 +175,8 @@ export default function DashboardMiembro() {
             })}
           </div>}
       </div>
+      {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onClose={() => setToast(null)} />}
+
     </div>
   )
 }

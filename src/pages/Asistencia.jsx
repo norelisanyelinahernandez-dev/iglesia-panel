@@ -1,4 +1,5 @@
 ﻿import { useState, useEffect } from 'react'
+import Toast from '../components/Toast'
 import DatePicker from '../components/DatePicker'
 import { getMiembros } from '../api/client'
 
@@ -69,6 +70,8 @@ const TIPOS = [
 const hoy = () => new Date().toISOString().split('T')[0]
 
 export default function Asistencia() {
+  const [toast, setToast] = useState(null)
+  const mostrarError = (msg) => setToast({ mensaje: msg, tipo: 'error' })
   const [miembros, setMiembros] = useState([])
   const [registros, setRegistros] = useState(() => {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [] }
@@ -355,6 +358,8 @@ export default function Asistencia() {
           </div>
         </div>
       )}
+      {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onClose={() => setToast(null)} />}
+
     </div>
   )
 }

@@ -1,4 +1,5 @@
 ﻿import { useState, useEffect } from 'react'
+import Toast from '../components/Toast'
 import { getGastos, getCategoriasGasto } from '../api/client'
 import DatePicker from '../components/DatePicker'
 
@@ -59,6 +60,8 @@ const STORAGE_PRESUPUESTO = 'presupuesto_anual'
 const STORAGE_DEUDAS = 'deudas_iglesia'
 
 export default function Finanzas() {
+  const [toast, setToast] = useState(null)
+  const mostrarError = (msg) => setToast({ mensaje: msg, tipo: 'error' })
   const [tab, setTab] = useState('presupuesto')
   const [confirmLimpiar, setConfirmLimpiar] = useState(false)
   const [confirmDeudaId, setConfirmDeudaId] = useState(null)
@@ -90,7 +93,7 @@ export default function Finanzas() {
         ])
         if (g.status === 'fulfilled') setGastos(g.value.data)
         if (cg.status === 'fulfilled') setCatGas(cg.value.data)
-      } catch(_) {}
+      } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
       setLoading(false)
     }
     load()
@@ -445,6 +448,8 @@ export default function Finanzas() {
           </div>
         </div>
       )}
+      {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onClose={() => setToast(null)} />}
+
 
     </div>
   )

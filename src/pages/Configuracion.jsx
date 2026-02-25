@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import Toast from '../components/Toast'
 import { useAuth } from '../context/AuthContext'
 import api from '../api/client'
 
@@ -11,6 +12,8 @@ function mostrarExito(msg) {
 }
 
 export default function Configuracion() {
+  const [toast, setToast] = useState(null)
+  const mostrarError = (msg) => setToast({ mensaje: msg, tipo: 'error' })
   const { user } = useAuth()
   const [usuarios, setUsuarios] = useState([])
   const [loading, setLoading] = useState(true)
@@ -27,7 +30,7 @@ export default function Configuracion() {
     try {
       const { data } = await api.get('/auth/usuarios')
       setUsuarios(data)
-    } catch (_) {}
+    } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
     setLoading(false)
   }
 
@@ -82,7 +85,7 @@ export default function Configuracion() {
       await api.put(`/auth/usuarios/${u.id}/activo`, { activo: !u.activo })
       load()
       mostrarExito(u.activo ? 'Usuario desactivado' : 'Usuario activado')
-    } catch (_) {}
+    } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
   }
 
   const handleEliminar = async (u) => {
@@ -91,7 +94,7 @@ export default function Configuracion() {
       await api.delete(`/auth/usuarios/${u.id}`)
       load()
       mostrarExito('Usuario eliminado')
-    } catch (_) {}
+    } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
   }
 
   return (
@@ -222,6 +225,8 @@ export default function Configuracion() {
           </div>
         </div>
       )}
+      {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onClose={() => setToast(null)} />}
+
     </div>
   )
 }

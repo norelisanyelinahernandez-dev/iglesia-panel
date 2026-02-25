@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import Toast from '../components/Toast'
 import { useAuth } from '../context/AuthContext'
 import api from '../api/client'
 
@@ -7,6 +8,8 @@ const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1) : ''
 const ROLES_AVANZADOS = ['diacono','lider','maestra','maestro','secretaria','secretario','copastor','copastora','pastor','pastora']
 
 export default function MiPerfilMiembro() {
+  const [toast, setToast] = useState(null)
+  const mostrarError = (msg) => setToast({ mensaje: msg, tipo: 'error' })
   const { user } = useAuth()
   const [miembro, setMiembro] = useState(null)
   const [totalMiembros, setTotalMiembros] = useState(null)
@@ -24,9 +27,9 @@ export default function MiPerfilMiembro() {
             const { getMiembros } = await import('../api/client')
             const todos = await getMiembros({ limit: 500 })
             setTotalMiembros(todos.data.filter(x => x.estado === 'activo').length)
-          } catch (_) {}
+          } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
         }
-      } catch (_) {}
+      } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
       setLoading(false)
     }
     load()
@@ -90,6 +93,8 @@ export default function MiPerfilMiembro() {
         <InfoRow icon="📍" label="Dirección" value={miembro?.direccion} />
         <InfoRow icon="💼" label="Ocupación" value={miembro?.ocupacion} />
       </div>
+      {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onClose={() => setToast(null)} />}
+
     </div>
   )
 }

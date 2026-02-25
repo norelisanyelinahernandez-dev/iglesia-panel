@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import Toast from '../components/Toast'
 import DatePicker from '../components/DatePicker'
 import { getInventario, createItem, updateItem, deleteItem, getPrestamos, createPrestamo, updatePrestamo, getCategoriasInventario } from '../api/client'
 
@@ -94,6 +95,8 @@ function Modal({ title, onClose, children }) {
 }
 
 export default function Inventario() {
+  const [toast, setToast] = useState(null)
+  const mostrarError = (msg) => setToast({ mensaje: msg, tipo: 'error' })
   const [items, setItems] = useState([])
   const [confirmDelId, setConfirmDelId] = useState(null)
   const [prestamos, setPrestamos] = useState([])
@@ -115,7 +118,7 @@ export default function Inventario() {
       if (i.status==='fulfilled') setItems(i.value.data)
       if (p.status==='fulfilled') setPrestamos(p.value.data)
       if (c.status==='fulfilled') setCategorias(c.value.data)
-    } catch(_) {}
+    } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
     setLoading(false)
   }
   useEffect(() => { load() }, [])
@@ -163,12 +166,12 @@ export default function Inventario() {
     try {
       await updatePrestamo(id, { fecha_retorno_real: new Date().toISOString().split('T')[0], estado:'devuelto' })
       load()
-    } catch(_) {}
+    } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
   }
 
   const handleDelete = async () => {
     if (!confirmDelId) return
-    try { await deleteItem(confirmDelId); setConfirmDelId(null); load() } catch(_) {}
+    try { await deleteItem(confirmDelId); setConfirmDelId(null); load() } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
   }
 
 
@@ -393,6 +396,8 @@ export default function Inventario() {
           </div>
         </div>
       )}
+      {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onClose={() => setToast(null)} />}
+
 
     </div>
   )

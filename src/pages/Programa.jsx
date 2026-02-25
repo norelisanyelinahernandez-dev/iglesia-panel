@@ -1,4 +1,5 @@
 ﻿import { useState, useEffect } from 'react'
+import Toast from '../components/Toast'
 import { usePermisos } from '../context/PermisosContext'
 import { getMiembros, getPrograma, savePrograma, getProgramaSemanas } from '../api/client'
 
@@ -236,6 +237,8 @@ function DiaCard({ diaData, onChange, miembros }) {
 }
 
 export default function Programa() {
+  const [toast, setToast] = useState(null)
+  const mostrarError = (msg) => setToast({ mensaje: msg, tipo: 'error' })
   const { puedeEditar } = usePermisos()
   const puedeEdit = puedeEditar('programa')
   const [miembros, setMiembros] = useState([])
@@ -273,14 +276,14 @@ export default function Programa() {
       await savePrograma(semanaViendo, semanaData)
       setGuardado(true)
       setTimeout(() => setGuardado(false), 3000)
-    } catch (_) {}
+    } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
   }
 
   const limpiar = async () => {
     if (!confirm('Deseas limpiar el programa de esta semana?')) return
     const nuevos = { ...programas, [semanaViendo]: DIAS.map(emptyDia) }
     setProgramas(nuevos)
-    try { await savePrograma(semanaViendo, DIAS.map(emptyDia)) } catch (_) {}
+    try { await savePrograma(semanaViendo, DIAS.map(emptyDia)) } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
   }
 
   const escucharTodo = () => {
@@ -396,6 +399,8 @@ export default function Programa() {
           body { background: white !important; color: black !important; }
         }
       `}</style>
+      {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onClose={() => setToast(null)} />}
+
     </div>
   )
 }

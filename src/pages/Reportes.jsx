@@ -1,10 +1,13 @@
 ﻿import { useState, useEffect } from 'react'
+import Toast from '../components/Toast'
 import { getIngresos, getGastos, getCategoriasIngreso, getCategoriasGasto } from '../api/client'
 
 const fmt = (n) => new Intl.NumberFormat('es-DO', { style:'currency', currency:'DOP', maximumFractionDigits:0 }).format(n)
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
 
 export default function Reportes() {
+  const [toast, setToast] = useState(null)
+  const mostrarError = (msg) => setToast({ mensaje: msg, tipo: 'error' })
   const [ingresos, setIngresos] = useState([])
   const [gastos, setGastos] = useState([])
   const [catIng, setCatIng] = useState([])
@@ -30,7 +33,7 @@ export default function Reportes() {
         if (g.status === 'fulfilled') setGastos(g.value.data)
         if (ci.status === 'fulfilled') setCatIng(ci.value.data)
         if (cg.status === 'fulfilled') setCatGas(cg.value.data)
-      } catch(_) {}
+      } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
       setLoading(false)
     }
     load()
@@ -316,6 +319,8 @@ export default function Reportes() {
           body { background: white !important; color: black !important; }
         }
       `}</style>
+      {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onClose={() => setToast(null)} />}
+
     </div>
   )
 }

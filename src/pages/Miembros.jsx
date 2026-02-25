@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState } from 'react'
+import Toast from '../components/Toast'
 import DatePicker from '../components/DatePicker'
 import { getMiembros, createMiembro, updateMiembro, deleteMiembro } from '../api/client'
 
@@ -512,6 +513,8 @@ function exportarPDF(miembros) {
 }
 
 export default function Miembros() {
+  const [toast, setToast] = useState(null)
+  const mostrarError = (msg) => setToast({ mensaje: msg, tipo: 'error' })
   const [miembros, setMiembros] = useState([])
   const [loading, setLoading] = useState(true)
   const [buscar, setBuscar] = useState('')
@@ -530,14 +533,14 @@ export default function Miembros() {
       if (buscar) params.buscar = buscar
       const { data } = await getMiembros(params)
       setMiembros(data)
-    } catch (_) {}
+    } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
     setLoading(false)
   }
 
   useEffect(() => { load() }, [filtroEstado, buscar])
 
   const handleDelete = async () => {
-    try { await deleteMiembro(confirmDel); setConfirmDel(null); load() } catch (_) {}
+    try { await deleteMiembro(confirmDel); setConfirmDel(null); load() } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
   }
 
   return (
@@ -653,6 +656,8 @@ export default function Miembros() {
           </div>
         </div>
       )}
+      {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onClose={() => setToast(null)} />}
+
     </div>
   )
 }

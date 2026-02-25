@@ -1,4 +1,5 @@
 ﻿import { useState } from 'react'
+import Toast from '../components/Toast'
 import DatePicker from '../components/DatePicker'
 
 const STORAGE_KEY = 'documentos_iglesia'
@@ -16,6 +17,8 @@ const CATEGORIAS = [
 const emptyForm = () => ({ nombre:'', categoria:'Actas', fecha:'', descripcion:'', url:'', archivo_nombre:'' })
 
 export default function Documentos() {
+  const [toast, setToast] = useState(null)
+  const mostrarError = (msg) => setToast({ mensaje: msg, tipo: 'error' })
   const [documentos, setDocumentos] = useState(() => {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [] }
     catch { return [] }
@@ -206,6 +209,8 @@ export default function Documentos() {
           </div>
         </div>
       )}
+      {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onClose={() => setToast(null)} />}
+
     </div>
   )
 }
