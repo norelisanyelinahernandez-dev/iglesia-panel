@@ -3,6 +3,24 @@ import { usePermisos } from '../context/PermisosContext'
 import DatePicker from '../components/DatePicker'
 import { getEventos, createEvento, deleteEvento, getAsistencia, registrarAsistencia } from '../api/client'
 
+// Notificacion de exito
+function mostrarExito(mensaje) {
+  const existing = document.getElementById('_success_toast')
+  if (existing) existing.remove()
+  const toast = document.createElement('div')
+  toast.id = '_success_toast'
+  toast.style.cssText = `
+    position: fixed; top: 20px; right: 20px; z-index: 99999;
+    background: #27ae60; color: white; padding: 14px 20px;
+    border-radius: 8px; font-size: 14px; font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3); max-width: 320px;
+  `
+  toast.textContent = mensaje
+  document.body.appendChild(toast)
+  setTimeout(() => toast.remove(), 3000)
+}
+
+
 const TIPO_BADGE = { culto:'badge-gold', retiro:'badge-blue', conferencia:'badge-blue', boda:'badge-green', bautismo:'badge-gold', celula:'badge-amber', otro:'badge-green' }
 const TIPO_EMOJI = { culto:'\u26ea', retiro:'\ud83c\udfd5\ufe0f', conferencia:'\ud83c\udfa4', boda:'\ud83d\udc8d', bautismo:'\ud83d\udca7', celula:'\ud83d\udc65', otro:'\ud83d\udcc5' }
 const TIPO_LABEL = { culto:'Culto', retiro:'Retiro', conferencia:'Conferencia', boda:'Boda', bautismo:'Bautismo', celula:'C\u00e9lula', otro:'Otro' }

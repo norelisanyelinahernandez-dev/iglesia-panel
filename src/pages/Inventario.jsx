@@ -2,6 +2,24 @@ import { useEffect, useState } from 'react'
 import DatePicker from '../components/DatePicker'
 import { getInventario, createItem, updateItem, deleteItem, getPrestamos, createPrestamo, updatePrestamo, getCategoriasInventario } from '../api/client'
 
+// Notificacion de exito
+function mostrarExito(mensaje) {
+  const existing = document.getElementById('_success_toast')
+  if (existing) existing.remove()
+  const toast = document.createElement('div')
+  toast.id = '_success_toast'
+  toast.style.cssText = `
+    position: fixed; top: 20px; right: 20px; z-index: 99999;
+    background: #27ae60; color: white; padding: 14px 20px;
+    border-radius: 8px; font-size: 14px; font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3); max-width: 320px;
+  `
+  toast.textContent = mensaje
+  document.body.appendChild(toast)
+  setTimeout(() => toast.remove(), 3000)
+}
+
+
 const ESTADO_BADGE = { excelente:'badge-green', bueno:'badge-green', regular:'badge-amber', dañado:'badge-red', dado_de_baja:'badge-red' }
 const PRESTAMO_BADGE = { prestado:'badge-amber', devuelto:'badge-green', perdido:'badge-red' }
 const ESTADO_LABELS = { excelente:'Excelente', bueno:'Bueno', regular:'Regular', dañado:'Dañado', dado_de_baja:'Dado de baja' }
