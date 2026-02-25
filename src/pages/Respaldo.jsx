@@ -1,22 +1,38 @@
 ﻿import { useState, useEffect } from 'react'
-import { getMiembros, getIngresos, getGastos, getEventos, getInventario } from '../api/client'
+import { getMiembros, getIngresos, getGastos, getEventos, getInventario, getCategoriasIngreso, getCategoriasGasto } from '../api/client'
 import * as XLSX from 'xlsx'
 
 export default function Respaldo() {
   const [loading, setLoading] = useState(false)
   const [mensaje, setMensaje] = useState('')
 
+
+  const aplicarEstilosWs = (ws, columnas) => {
+    ws['!cols'] = columnas.map(ancho => ({ wch: ancho }))
+    // Auto-filter en la primera fila
+    const range = XLSX.utils.decode_range(ws['!ref'] || 'A1')
+    ws['!autofilter'] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: 0, c: range.e.c } }) }
+  }
+
   const exportarExcel = async () => {
     setLoading(true)
     setMensaje('')
     try {
-      const [m, i, g, e, inv] = await Promise.allSettled([
+      const [m, i, g, e, inv, catI, catG] = await Promise.allSettled([
         getMiembros({ limit:1000 }),
         getIngresos({ limit:1000 }),
         getGastos({ limit:1000 }),
         getEventos(),
         getInventario({ limit:1000 }),
+        getCategoriasIngreso(),
+        getCategoriasGasto(),
       ])
+
+      // Mapas de ID → nombre de categoría
+      const mapCatI = {}
+      if (catI.status === 'fulfilled') catI.value.data.forEach(c => { mapCatI[c.id] = c.nombre })
+      const mapCatG = {}
+      if (catG.status === 'fulfilled') catG.value.data.forEach(c => { mapCatG[c.id] = c.nombre })
 
       const wb = XLSX.utils.book_new()
 
@@ -24,14 +40,14 @@ export default function Respaldo() {
         const miembros = m.value.data.map(x => ({
           Nombres: x.nombres,
           Apellidos: x.apellidos,
-          Cédula: x.cedula || '',
-          Teléfono: x.telefono || '',
+          'Cédula': x.cedula || '',
+          'Teléfono': x.telefono || '',
           Email: x.email || '',
-          Género: x.genero || '',
+          'Género': x.genero === 'M' ? 'Masculino' : x.genero === 'F' ? 'Femenino' : x.genero || '',
           Estado_Civil: x.estado_civil || '',
-          Dirección: x.direccion || '',
+          'Dirección': x.direccion || '',
           Fecha_Nacimiento: x.fecha_nacimiento || '',
-          Fecha_Conversión: x.fecha_conversion || '',
+          'Fecha_Conversión': x.fecha_conversion || '',
           Fecha_Bautismo: x.fecha_bautismo || '',
           Iglesia_Bautismo: x.iglesia_bautismo || '',
           Tiempo_Iglesia: x.tiempo_en_iglesia || '',
@@ -42,29 +58,32 @@ export default function Respaldo() {
           Notas: x.notas || '',
         }))
         const ws = XLSX.utils.json_to_sheet(miembros)
+        aplicarEstilosWs(ws, [18,18,14,14,22,12,14,24,16,16,16,20,14,14,12,20,20,24])
         XLSX.utils.book_append_sheet(wb, ws, 'Miembros')
       }
 
       if (i.status === 'fulfilled') {
         const ingresos = i.value.data.map(x => ({
           Fecha: x.fecha,
-          Categoria_ID: x.categoria_id,
-          Monto: x.monto,
-          Descripción: x.descripcion || '',
+          'Categoría': mapCatI[x.categoria_id] || x.categoria_id,
+          'Monto (RD$)': x.monto,
+          'Descripción': x.descripcion || '',
         }))
         const ws = XLSX.utils.json_to_sheet(ingresos)
+        aplicarEstilosWs(ws, [14, 20, 14, 32])
         XLSX.utils.book_append_sheet(wb, ws, 'Ingresos')
       }
 
       if (g.status === 'fulfilled') {
         const gastos = g.value.data.map(x => ({
           Fecha: x.fecha,
-          Categoria_ID: x.categoria_id,
-          Monto: x.monto,
-          Descripción: x.descripcion || '',
+          'Categoría': mapCatG[x.categoria_id] || x.categoria_id,
+          'Monto (RD$)': x.monto,
+          'Descripción': x.descripcion || '',
           Beneficiario: x.beneficiario || '',
         }))
         const ws = XLSX.utils.json_to_sheet(gastos)
+        aplicarEstilosWs(ws, [14, 20, 14, 32, 22])
         XLSX.utils.book_append_sheet(wb, ws, 'Gastos')
       }
 
@@ -73,22 +92,24 @@ export default function Respaldo() {
           Nombre: x.nombre,
           Fecha: x.fecha,
           Lugar: x.lugar || '',
-          Descripción: x.descripcion || '',
+          'Descripción': x.descripcion || '',
           Estado: x.estado || '',
         }))
         const ws = XLSX.utils.json_to_sheet(eventos)
+        aplicarEstilosWs(ws, [28, 14, 20, 36, 12])
         XLSX.utils.book_append_sheet(wb, ws, 'Eventos')
       }
 
       if (inv.status === 'fulfilled') {
         const inventario = inv.value.data.map(x => ({
           Nombre: x.nombre,
-          Categoria: x.categoria || '',
+          'Categoría': x.categoria || '',
           Cantidad: x.cantidad,
           Estado: x.estado || '',
-          Descripción: x.descripcion || '',
+          'Descripción': x.descripcion || '',
         }))
         const ws = XLSX.utils.json_to_sheet(inventario)
+        aplicarEstilosWs(ws, [28, 18, 10, 14, 32])
         XLSX.utils.book_append_sheet(wb, ws, 'Inventario')
       }
 
@@ -136,6 +157,7 @@ export default function Respaldo() {
       }))
       const wb = XLSX.utils.book_new()
       const ws = XLSX.utils.json_to_sheet(miembros)
+      aplicarEstilosWs(ws, [18,18,14,14,22,12,14,24,16,16,16,20,14,14,12,20,20,20,14,18,10,18,16,8,12,24,24])
       XLSX.utils.book_append_sheet(wb, ws, 'Miembros')
       const fecha = new Date().toISOString().split('T')[0]
       XLSX.writeFile(wb, `miembros_${fecha}.xlsx`)
@@ -150,33 +172,42 @@ export default function Respaldo() {
     setLoading(true)
     setMensaje('')
     try {
-      const [i, g] = await Promise.allSettled([
+      const [i, g, catI, catG] = await Promise.allSettled([
         getIngresos({ limit:1000 }),
         getGastos({ limit:1000 }),
+        getCategoriasIngreso(),
+        getCategoriasGasto(),
       ])
+      const mapCatI = {}
+      if (catI.status === 'fulfilled') catI.value.data.forEach(c => { mapCatI[c.id] = c.nombre })
+      const mapCatG = {}
+      if (catG.status === 'fulfilled') catG.value.data.forEach(c => { mapCatG[c.id] = c.nombre })
+
       const wb = XLSX.utils.book_new()
       if (i.status === 'fulfilled') {
         const ws = XLSX.utils.json_to_sheet(i.value.data.map(x => ({
           Fecha: x.fecha,
-          Categoria_ID: x.categoria_id,
-          Monto: x.monto,
-          Descripción: x.descripcion || '',
+          'Categoría': mapCatI[x.categoria_id] || x.categoria_id,
+          'Monto (RD$)': x.monto,
+          'Descripción': x.descripcion || '',
         })))
+        aplicarEstilosWs(ws, [14, 20, 14, 32])
         XLSX.utils.book_append_sheet(wb, ws, 'Ingresos')
       }
       if (g.status === 'fulfilled') {
         const ws = XLSX.utils.json_to_sheet(g.value.data.map(x => ({
           Fecha: x.fecha,
-          Categoria_ID: x.categoria_id,
-          Monto: x.monto,
-          Descripción: x.descripcion || '',
+          'Categoría': mapCatG[x.categoria_id] || x.categoria_id,
+          'Monto (RD$)': x.monto,
+          'Descripción': x.descripcion || '',
           Beneficiario: x.beneficiario || '',
         })))
+        aplicarEstilosWs(ws, [14, 20, 14, 32, 22])
         XLSX.utils.book_append_sheet(wb, ws, 'Gastos')
       }
       const fecha = new Date().toISOString().split('T')[0]
       XLSX.writeFile(wb, `tesoreria_${fecha}.xlsx`)
-      setMensaje('Datos de tesoreria descargados correctamente')
+      setMensaje('Datos de tesorería descargados correctamente')
     } catch(err) {
       setMensaje('Error al generar el archivo')
     }
