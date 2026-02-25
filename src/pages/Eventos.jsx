@@ -113,7 +113,7 @@ export default function Eventos() {
 const handleDelete = async () => {
     setConfirmDel(id); return // modal
     if (!confirmDel) return
-    try { await deleteEvento(confirmDel); load()     setConfirmDel(null)
+    try { await deleteEvento(confirmDel); setConfirmDel(null); load()
   } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
   }
 
@@ -270,6 +270,7 @@ const handleDelete = async () => {
     </div>
   )
 }
+
 
 
 
