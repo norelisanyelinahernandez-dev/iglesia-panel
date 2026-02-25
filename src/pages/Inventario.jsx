@@ -62,15 +62,15 @@ export default function Inventario() {
         nombre: form.nombre,
         cantidad: parseInt(form.cantidad) || 1,
         estado: form.estado || 'bueno',
+        descripcion: form.descripcion || null,
+        numero_serie: form.numero_serie || null,
+        marca: form.marca || null,
+        modelo: form.modelo || null,
+        ubicacion: form.ubicacion || null,
+        notas: form.notas || null,
+        fecha_adquisicion: form.fecha_adquisicion || null,
+        valor_adquisicion: form.valor_adquisicion ? parseFloat(form.valor_adquisicion) : null,
       }
-      if (form.descripcion) payload.descripcion = form.descripcion
-      if (form.numero_serie) payload.numero_serie = form.numero_serie
-      if (form.marca) payload.marca = form.marca
-      if (form.modelo) payload.modelo = form.modelo
-      if (form.ubicacion) payload.ubicacion = form.ubicacion
-      if (form.notas) payload.notas = form.notas
-      if (form.fecha_adquisicion) payload.fecha_adquisicion = form.fecha_adquisicion
-      if (form.valor_adquisicion) payload.valor_adquisicion = parseFloat(form.valor_adquisicion)
       if (editItem) await updateItem(editItem.id, payload)
       else await createItem(payload)
       await load(); setModal(null)
