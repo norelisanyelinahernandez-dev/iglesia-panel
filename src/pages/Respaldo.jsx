@@ -65,9 +65,9 @@ export default function Respaldo() {
           Dones_Talentos: x.dones_talentos || '',
           Notas: x.notas || '',
         }))
-        const ws = XLSX.utils.json_to_sheet(miembros)
-        aplicarEstilosWs(ws, [18,18,14,14,22,12,14,24,16,16,16,20,14,14,12,20,20,24])
-        XLSX.utils.book_append_sheet(wb, ws, 'Miembros')
+        const headersMiembrosCompleto = ['Nombres','Apellidos','Cédula','Teléfono','Email','Género','Estado_Civil','Dirección','Fecha_Nacimiento','Fecha_Conversión','Fecha_Bautismo','Iglesia_Bautismo','Tiempo_Iglesia','Rol','Estado','Ministerio_Actual','Dones_Talentos','Notas']
+        XLSX.utils.book_append_sheet(wb, crearHoja(miembros, headersMiembrosCompleto,
+          [18,18,14,14,22,12,14,24,16,16,16,20,14,14,12,20,20,24]), 'Miembros')
       }
 
       const ingresosData = i.status === 'fulfilled' ? i.value.data.map(x => ({
