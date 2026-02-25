@@ -250,7 +250,7 @@ export default function Programa() {
 
   const [toast, setToast] = useState(null)
   const mostrarError = (msg) => setToast({ mensaje: msg, tipo: 'error' })
-  const { puedeEditar } = usePermisos()
+  const { puedeEditar, rol } = usePermisos()
   const puedeEdit = puedeEditar('programa')
   const [miembros, setMiembros] = useState([])
   const [modoSimple, setModoSimple] = useState(false)
@@ -258,12 +258,40 @@ export default function Programa() {
   const [programas, setProgramas] = useState({})
   const [guardado, setGuardado] = useState(false)
   const [vistaHistorial, setVistaHistorial] = useState(false)
+  const [autoArchivado, setAutoArchivado] = useState(false)
   const versiculo = VERSICULOS[new Date().getDay() % VERSICULOS.length]
   const esActual = semanaViendo === semanaActual()
   const semanaData = programas[semanaViendo] || DIAS.map(emptyDia)
 
   useEffect(() => {
     getMiembros({ limit:200 }).then(r => setMiembros(r.data)).catch(()=>{})
+    // Auto-archivado: domingos despues de las 5pm para admin/pastor/secretaria
+    const ROLES_AUTOARCHIVO = ['admin','pastor','pastora','secretaria','secretario']
+    if (ROLES_AUTOARCHIVO.includes(rol)) {
+      const ahora = new Date()
+      const esDomingo = ahora.getDay() === 0
+      const despues5pm = ahora.getHours() >= 17
+      const semanaHoy = semanaActual()
+      const yaArchivado = localStorage.getItem('programa_archivado_' + semanaHoy)
+      if (esDomingo && despues5pm && !yaArchivado) {
+        // Archivar programa actual y limpiar
+        getProgramaSemanas().then(r => {
+          const semanas = r.data || []
+          Promise.all(semanas.map(s => getPrograma(s))).then(results => {
+            const obj = {}
+            results.forEach(r2 => { if (r2.data) obj[r2.data.semana] = r2.data.datos })
+            setProgramas(obj)
+            // Limpiar la semana actual
+            savePrograma(semanaHoy, ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'].map(d => ({ dia:d, tipo:'', hora:'', lugar:'', encargado:'', partes:{}, pastor_visita:'', congregacion_visita:'' }))).then(() => {
+              localStorage.setItem('programa_archivado_' + semanaHoy, '1')
+              setAutoArchivado(true)
+              setTimeout(() => setAutoArchivado(false), 6000)
+            }).catch(() => {})
+          })
+        }).catch(() => {})
+      }
+    }
+
     // Cargar programas desde API
     getProgramaSemanas().then(r => {
       const semanas = r.data || []
@@ -287,6 +315,44 @@ export default function Programa() {
       setGuardado(true)
       setTimeout(() => setGuardado(false), 3000)
     } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
+  }
+
+
+  const descargarPDF = () => {
+    const lines = []
+    lines.push('PROGRAMA SEMANAL - MINISTERIO SAN JUAN 7:38')
+    lines.push('Semana: ' + semanaViendo)
+    lines.push('=' .repeat(50))
+    semanaData.forEach(d => {
+      lines.push('')
+      lines.push(d.dia.toUpperCase() + (d.tipo ? ' - ' + d.tipo : ' - Sin actividad'))
+      if (d.hora) lines.push('  Hora: ' + d.hora)
+      if (d.lugar) lines.push('  Lugar: ' + d.lugar)
+      if (d.pastor_visita) lines.push('  Pastor: ' + d.pastor_visita)
+      const partes = ['Oracion de apertura','Direccion','Devocional','Alabanzas','Mensaje','Oracion de cierre','Encargado del estudio','Encargado']
+      partes.forEach(parte => {
+        const pp = d.partes[parte]
+        if (pp) {
+          let nombre = 'Por asignar'
+          if (pp.tipo_asignado === 'externo') {
+            nombre = (pp.pastor_externo || 'Pastor externo') + ' de ' + (pp.congregacion_externa || 'otra congregacion')
+          } else {
+            const m = miembros.find(m => String(m.id) === String(pp.miembro_id))
+            if (m) nombre = m.nombres + ' ' + m.apellidos
+          }
+          lines.push('  ' + parte + ': ' + nombre)
+        }
+      })
+    })
+    lines.push('')
+    lines.push('Generado el ' + new Date().toLocaleDateString('es-DO'))
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'programa-' + semanaViendo + '.txt'
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   const limpiar = async () => setConfirmDel('limpiar')
@@ -348,11 +414,13 @@ export default function Programa() {
           )}
           {puedeEdit && !modoSimple && esActual && <button className="btn btn-ghost" onClick={limpiar}>Limpiar</button>}
           {puedeEdit && !modoSimple && esActual && <button className="btn btn-ghost" onClick={() => window.print()}>Imprimir</button>}
+          {puedeEdit && !modoSimple && <button className="btn btn-ghost" onClick={descargarPDF}>&#x21E9; Descargar</button>}
           {puedeEdit && !modoSimple && esActual && <button className="btn btn-gold" onClick={guardar}>Guardar</button>}
         </div>
       </div>
 
       {guardado && <div className="alert alert-success" style={{ marginBottom:16 }}>Programa guardado correctamente</div>}
+      {autoArchivado && <div className="alert alert-success" style={{ marginBottom:16 }}>&#x2713; El programa de esta semana fue archivado automáticamente.</div>}
 
       {modoSimple && (
         <div style={{ background:'var(--gold)', borderRadius:12, padding:'16px 20px', marginBottom:20, display:'flex', alignItems:'center', gap:12 }}>
