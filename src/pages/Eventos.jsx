@@ -22,7 +22,7 @@ function mostrarExito(mensaje) {
 
 
 const TIPO_BADGE = { culto:'badge-gold', retiro:'badge-blue', conferencia:'badge-blue', boda:'badge-green', bautismo:'badge-gold', celula:'badge-amber', otro:'badge-green' }
-const TIPO_EMOJI = { culto:'\u26ea', retiro:'\ud83c\udfd5\ufe0f', conferencia:'\ud83c\udfa4', boda:'\ud83d\udc8d', bautismo:'\ud83d\udca7', celula:'\ud83d\udc65', otro:'\ud83d\udcc5' }
+const TIPO_EMOJI = { culto:'⛪', retiro:'🏕️', conferencia:'🎤', boda:'💍', bautismo:'💧', celula:'👥', otro:'📅' }
 const TIPO_LABEL = { culto:'Culto', retiro:'Retiro', conferencia:'Conferencia', boda:'Boda', bautismo:'Bautismo', celula:'C\u00e9lula', otro:'Otro' }
 
 function Modal({ title, onClose, children }) {
@@ -142,14 +142,14 @@ export default function Eventos() {
           {eventos.map(ev => (
             <div key={ev.id} className="card" style={{ position:'relative', cursor:'default' }}>
               <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:12 }}>
-                <span style={{ fontSize:26 }}>{TIPO_EMOJI[ev.tipo] || '\ud83d\udcc5'}</span>
+                <span style={{ fontSize:26 }}>{TIPO_EMOJI[ev.tipo] || '📅'}</span>
                 <span className={`badge ${TIPO_BADGE[ev.tipo] || "badge-green"}`}>{TIPO_LABEL[ev.tipo] || ev.tipo}</span>
               </div>
               <h3 style={{ fontFamily:'var(--font-heading)', fontSize:16, fontWeight:600, marginBottom:6 }}>{ev.nombre}</h3>
               <div style={{ color:'var(--text-muted)', fontSize:12, marginBottom:4 }}>
-                \ud83d\udcc5 {new Date(ev.fecha_inicio).toLocaleDateString('es-DO', { weekday:'short', year:'numeric', month:'short', day:'numeric' })}
+                📅 {new Date(ev.fecha_inicio).toLocaleDateString('es-DO', { weekday:'short', year:'numeric', month:'short', day:'numeric' })}
               </div>
-              {ev.lugar && <div style={{ color:'var(--text-muted)', fontSize:12, marginBottom:12 }}>\ud83d\udccd {ev.lugar}</div>}
+              {ev.lugar && <div style={{ color:'var(--text-muted)', fontSize:12, marginBottom:12 }}>📍 {ev.lugar}</div>}
               <div style={{ display:'flex', gap:8, marginTop:14, borderTop:'1px solid var(--border)', paddingTop:12 }}>
                 <button className="btn btn-ghost" style={{ flex:1, justifyContent:'center', fontSize:12, padding:'6px' }} onClick={()=>loadAsistencia(ev)}>
                   Ver asistencia

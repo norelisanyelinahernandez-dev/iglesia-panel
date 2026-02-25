@@ -57,11 +57,11 @@ export default function Configuracion() {
       return
     }
     if (formPassword.password_nuevo !== formPassword.confirmar) {
-      setError('Las contrasenas no coinciden')
+      setError('Las contraseñas no coinciden')
       return
     }
     if (formPassword.password_nuevo.length < 6) {
-      setError('La contrasena debe tener al menos 6 caracteres')
+      setError('La contraseña debe tener al menos 6 caracteres')
       return
     }
     try {
@@ -71,9 +71,9 @@ export default function Configuracion() {
       })
       setModal(null)
       setFormPassword({ password_actual: '', password_nuevo: '', confirmar: '' })
-      mostrarExito('Contrasena actualizada exitosamente')
+      mostrarExito('Contraseña actualizada exitosamente')
     } catch (e) {
-      setError(e.response?.data?.detail || 'Error al cambiar contrasena')
+      setError(e.response?.data?.detail || 'Error al cambiar contraseña')
     }
   }
 
@@ -137,7 +137,7 @@ export default function Configuracion() {
                   <td>
                     <div style={{ display: 'flex', gap: 6 }}>
                       <button className="btn btn-sm" onClick={() => { setSelected(u); setError(''); setModal('password') }}>
-                        Contrasena
+                        Contraseña
                       </button>
                       <button
                         className={`btn btn-sm ${u.activo ? 'btn-danger' : 'btn-gold'}`}
@@ -178,7 +178,7 @@ export default function Configuracion() {
                 <input className="input" type="email" value={formNuevo.email} onChange={e => setFormNuevo(f => ({ ...f, email: e.target.value }))} placeholder="email@iglesia.com" />
               </div>
               <div className="form-group">
-                <label>Contrasena</label>
+                <label>Contraseña</label>
                 <input className="input" type="password" value={formNuevo.password} onChange={e => setFormNuevo(f => ({ ...f, password: e.target.value }))} placeholder="Minimo 6 caracteres" />
               </div>
               <div className="form-group">
@@ -196,23 +196,23 @@ export default function Configuracion() {
         </div>
       )}
 
-      {/* Modal Cambiar Contrasena */}
+      {/* Modal Cambiar Contraseña */}
       {modal === 'password' && selected && (
         <div className="modal-overlay" onClick={() => setModal(null)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Cambiar contrasena — {selected.nombre}</h3>
+              <h3>Cambiar contraseña — {selected.nombre}</h3>
               <button className="modal-close" onClick={() => setModal(null)}>✕</button>
             </div>
             <div className="modal-body">
               {error && <div className="alert alert-error">{error}</div>}
               <div className="form-group">
-                <label>Nueva contrasena</label>
+                <label>Nueva contraseña</label>
                 <input className="input" type="password" value={formPassword.password_nuevo} onChange={e => setFormPassword(f => ({ ...f, password_nuevo: e.target.value }))} placeholder="Minimo 6 caracteres" />
               </div>
               <div className="form-group">
-                <label>Confirmar contrasena</label>
-                <input className="input" type="password" value={formPassword.confirmar} onChange={e => setFormPassword(f => ({ ...f, confirmar: e.target.value }))} placeholder="Repite la contrasena" />
+                <label>Confirmar contraseña</label>
+                <input className="input" type="password" value={formPassword.confirmar} onChange={e => setFormPassword(f => ({ ...f, confirmar: e.target.value }))} placeholder="Repite la contraseña" />
               </div>
             </div>
             <div className="modal-footer">
