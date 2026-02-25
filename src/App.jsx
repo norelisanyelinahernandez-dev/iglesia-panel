@@ -69,7 +69,7 @@ function AppRoutes() {
           <PermisosProvider>
             <Layout>
               <Routes>
-                <Route path="/"           element={<Dashboard />} />
+                <Route path="/"           element={user?.tipo === 'miembro' ? <Navigate to="/miembro/" replace /> : <Dashboard />} />
                 <Route path="/miembros"   element={<RutaProtegida seccion="miembros"><Miembros /></RutaProtegida>} />
                 <Route path="/tesoreria"  element={<RutaProtegida seccion="tesoreria"><Tesoreria /></RutaProtegida>} />
                 <Route path="/inventario" element={<RutaProtegida seccion="inventario"><Inventario /></RutaProtegida>} />
