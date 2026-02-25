@@ -58,6 +58,13 @@ export default function Finanzas() {
     setTimeout(() => setGuardado(false), 3000)
   }
 
+  const limpiarPresupuesto = () => {
+    if (!window.confirm('¿Eliminar todos los presupuestos guardados? Esta acción no se puede deshacer.')) return
+    localStorage.removeItem(STORAGE_PRESUPUESTO)
+    setPresupuesto({})
+    mostrarExito('Presupuesto eliminado')
+  }
+
   const guardarDeuda = () => {
     if (!formDeuda.descripcion || !formDeuda.monto_total) return
     let nuevas
