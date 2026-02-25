@@ -240,7 +240,12 @@ export default function Programa() {
   const [confirmDel, setConfirmDel] = useState(null)
   const handleDelete = async () => {
     if (!confirmDel) return
-    try { await deletePrograma(confirmDel); setConfirmDel(null); load() } catch(_) { mostrarError('No se pudo eliminar.') }
+    if (confirmDel === 'limpiar') {
+      const nuevos = { ...programas, [semanaViendo]: DIAS.map(emptyDia) }
+      setProgramas(nuevos)
+      setConfirmDel(null)
+    }
+  } catch(_) { mostrarError('No se pudo eliminar.') }
   }
 
   const [toast, setToast] = useState(null)
@@ -420,6 +425,7 @@ export default function Programa() {
     </div>
   )
 }
+
 
 
 
