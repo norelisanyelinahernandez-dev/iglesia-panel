@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { usePermisos } from '../context/PermisosContext'
 import { getAnuncios, createAnuncio, updateAnuncio, deleteAnuncio } from '../api/client'
+import DatePicker from '../components/DatePicker'
 
 // Notificacion de exito
 function mostrarExito(mensaje) {
@@ -169,8 +170,8 @@ export default function Anuncios() {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Fecha de expiracion</label>
-                  <input name="fecha_expira" type="date" value={form.fecha_expira} onChange={h} className="form-input" />
+                  <label className="form-label">Fecha de expiración</label>
+                  <DatePicker name="fecha_expira" value={form.fecha_expira} onChange={h} />
                 </div>
               </div>
               <div style={{ display:'flex', gap:10, justifyContent:'flex-end', marginTop:4 }}>
