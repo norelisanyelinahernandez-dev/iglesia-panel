@@ -3,6 +3,7 @@ import DatePicker from '../components/DatePicker'
 import { getInventario, createItem, updateItem, deleteItem, getPrestamos, createPrestamo, updatePrestamo, getCategoriasInventario } from '../api/client'
 
 // Notificacion de exito
+  const [confirmDelId, setConfirmDelId] = React.useState ? require('react').useState(null)[0] : null
 function mostrarExito(mensaje) {
   const existing = document.getElementById('_success_toast')
   if (existing) existing.remove()
@@ -95,6 +96,7 @@ function Modal({ title, onClose, children }) {
 
 export default function Inventario() {
   const [items, setItems] = useState([])
+  const [confirmDelId, setConfirmDelId] = useState(null)
   const [prestamos, setPrestamos] = useState([])
   const [categorias, setCategorias] = useState([])
   const [loading, setLoading] = useState(true)
@@ -165,9 +167,9 @@ export default function Inventario() {
     } catch(_) {}
   }
 
-  const handleDelete = async (id) => {
-    if (!confirm('¿Eliminar este item?')) return
-    try { await deleteItem(id); load() } catch(_) {}
+  const handleDelete = async () => {
+    if (!confirmDelId) return
+    try { await deleteItem(confirmDelId); setConfirmDelId(null); load() } catch(_) {}
   }
 
 
@@ -255,7 +257,7 @@ export default function Inventario() {
                       <td>
                         <div style={{ display:'flex', gap:6 }}>
                           <button className="btn btn-ghost" style={{ padding:'5px 10px', fontSize:12 }} onClick={()=>openEdit(i)}>Editar</button>
-                          <button className="btn btn-danger" style={{ padding:'5px 10px', fontSize:12 }} onClick={()=>handleDelete(i.id)}>✕</button>
+                          <button className="btn btn-danger" style={{ padding:'5px 10px', fontSize:12 }} onClick={()=>setConfirmDelId(i.id)}>✕</button>
                         </div>
                       </td>
                     </tr>
@@ -377,6 +379,22 @@ export default function Inventario() {
           </form>
         </Modal>
       )}
+      {confirmDelId && (
+        <div className="modal-overlay">
+          <div className="modal" style={{ maxWidth:380 }}>
+            <div style={{ textAlign:'center', padding:'10px 0 4px' }}>
+              <div style={{ fontSize:36, marginBottom:12 }}>&#x26A0;&#xFE0F;</div>
+              <h3 style={{ fontFamily:'var(--font-heading)', fontSize:18, marginBottom:8 }}>&#x00BF;Eliminar item?</h3>
+              <p style={{ color:'var(--text-muted)', fontSize:13 }}>Esta acci&#x00F3;n no se puede deshacer.</p>
+            </div>
+            <div style={{ display:'flex', gap:10, marginTop:16 }}>
+              <button className="btn btn-ghost" style={{ flex:1 }} onClick={() => setConfirmDelId(null)}>Cancelar</button>
+              <button className="btn btn-danger" style={{ flex:1, justifyContent:'center' }} onClick={handleDelete}>S&#x00ED;, eliminar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }

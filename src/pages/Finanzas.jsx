@@ -60,6 +60,8 @@ const STORAGE_DEUDAS = 'deudas_iglesia'
 
 export default function Finanzas() {
   const [tab, setTab] = useState('presupuesto')
+  const [confirmLimpiar, setConfirmLimpiar] = useState(false)
+  const [confirmDeudaId, setConfirmDeudaId] = useState(null)
   const [gastos, setGastos] = useState([])
   const [catGas, setCatGas] = useState([])
   const [loading, setLoading] = useState(true)
@@ -111,7 +113,9 @@ export default function Finanzas() {
   }
 
   const limpiarPresupuesto = () => {
-    if (!window.confirm('¿Eliminar todos los presupuestos guardados? Esta acción no se puede deshacer.')) return
+    setConfirmLimpiar(true)
+    // confirmado en modal
+    if (false)
     localStorage.removeItem(STORAGE_PRESUPUESTO)
     setPresupuesto({})
     mostrarExito('Presupuesto eliminado')
@@ -133,10 +137,21 @@ export default function Finanzas() {
   }
 
   const eliminarDeuda = (id) => {
-    if (!confirm('¿Eliminar este compromiso?')) return
+    setConfirmDeudaId(id); return // modal se encarga
     const nuevas = deudas.filter(d => d.id !== id)
     setDeudas(nuevas)
     localStorage.setItem(STORAGE_DEUDAS, JSON.stringify(nuevas))
+  }
+  const confirmarEliminarDeuda = () => {
+    if (!confirmDeudaId) return
+    const nuevas = deudas.filter(d => d.id !== confirmDeudaId)
+    setDeudas(nuevas)
+    setConfirmDeudaId(null)
+  }
+  const confirmarLimpiarPresupuesto = () => {
+    localStorage.removeItem('presupuesto_iglesia')
+    setPresupuesto({})
+    setConfirmLimpiar(false)
   }
 
   const editarDeuda = (i) => {
@@ -400,6 +415,37 @@ export default function Finanzas() {
           </div>
         </div>
       )}
+      {confirmLimpiar && (
+        <div className="modal-overlay">
+          <div className="modal" style={{ maxWidth:400 }}>
+            <div style={{ textAlign:'center', padding:'10px 0 4px' }}>
+              <div style={{ fontSize:36, marginBottom:12 }}>&#x26A0;&#xFE0F;</div>
+              <h3 style={{ fontFamily:'var(--font-heading)', fontSize:18, marginBottom:8 }}>&#x00BF;Eliminar presupuesto?</h3>
+              <p style={{ color:'var(--text-muted)', fontSize:13 }}>Se borrar&#x00E1;n todos los presupuestos guardados. Esta acci&#x00F3;n no se puede deshacer.</p>
+            </div>
+            <div style={{ display:'flex', gap:10, marginTop:16 }}>
+              <button className="btn btn-ghost" style={{ flex:1 }} onClick={() => setConfirmLimpiar(false)}>Cancelar</button>
+              <button className="btn btn-danger" style={{ flex:1, justifyContent:'center' }} onClick={confirmarLimpiarPresupuesto}>S&#x00ED;, eliminar</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {confirmDeudaId && (
+        <div className="modal-overlay">
+          <div className="modal" style={{ maxWidth:380 }}>
+            <div style={{ textAlign:'center', padding:'10px 0 4px' }}>
+              <div style={{ fontSize:36, marginBottom:12 }}>&#x26A0;&#xFE0F;</div>
+              <h3 style={{ fontFamily:'var(--font-heading)', fontSize:18, marginBottom:8 }}>&#x00BF;Eliminar compromiso?</h3>
+              <p style={{ color:'var(--text-muted)', fontSize:13 }}>Esta acci&#x00F3;n no se puede deshacer.</p>
+            </div>
+            <div style={{ display:'flex', gap:10, marginTop:16 }}>
+              <button className="btn btn-ghost" style={{ flex:1 }} onClick={() => setConfirmDeudaId(null)}>Cancelar</button>
+              <button className="btn btn-danger" style={{ flex:1, justifyContent:'center' }} onClick={confirmarEliminarDeuda}>S&#x00ED;, eliminar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
