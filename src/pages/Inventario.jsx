@@ -196,7 +196,7 @@ export default function Inventario() {
               <div className="form-group">
                 <label className="form-label">Categoría *</label>
                 <select value={form.categoria_id} onChange={e=>setForm({...form,categoria_id:e.target.value})} className="form-input" required>
-                  <option value="">Ã¢â¬â Seleccionar Ã¢â¬â</option>
+                  <option value="">Ã¢â¬— Seleccionar —â</option>
                   {categorias.map(c=><option key={c.id} value={c.id}>{c.nombre}</option>)}
                 </select>
               </div>
@@ -247,7 +247,7 @@ export default function Inventario() {
             <div className="form-group">
               <label className="form-label">Item *</label>
               <select value={prestamoForm.item_id} onChange={e=>setPrestamoForm({...prestamoForm,item_id:e.target.value})} className="form-input" required>
-                <option value="">Ã¢â¬â Seleccionar Ã¢â¬â</option>
+                <option value="">Ã¢â¬— Seleccionar —â</option>
                 {items.filter(i=>i.cantidad>0).map(i=><option key={i.id} value={i.id}>{i.nombre}</option>)}
               </select>
             </div>
