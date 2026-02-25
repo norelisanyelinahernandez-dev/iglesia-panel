@@ -318,3 +318,31 @@ tbody td { padding: 11px 14px; font-size: 13.5px; }
 }
 .search-bar input::placeholder { color: var(--text-dim); }
 .search-icon { color: var(--text-dim); font-size: 15px; }
+
+/* ── Mejoras globales movil ── */
+@media (max-width: 768px) {
+  /* Evitar zoom al hacer focus en inputs en iOS */
+  input, select, textarea { font-size: 16px !important; }
+
+  /* Scroll suave */
+  * { -webkit-overflow-scrolling: touch; }
+
+  /* Toast en movil */
+  div[style*="position: fixed"][style*="bottom: 24"] {
+    bottom: 16px !important;
+    right: 12px !important;
+    left: 12px !important;
+    max-width: 100% !important;
+    font-size: 15px !important;
+  }
+
+  /* Alertas */
+  .alert { font-size: 14px !important; padding: 14px !important; }
+
+  /* Badges */
+  .badge { font-size: 11px; padding: 3px 10px; }
+
+  /* Search bar full width */
+  .search-bar { width: 100%; }
+  .search-bar input { width: 100% !important; }
+}
