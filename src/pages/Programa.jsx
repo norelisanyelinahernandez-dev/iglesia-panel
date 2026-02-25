@@ -244,6 +244,7 @@ export default function Programa() {
       const nuevos = { ...programas, [semanaViendo]: DIAS.map(emptyDia) }
       setProgramas(nuevos)
       setConfirmDel(null)
+      try { await savePrograma(semanaViendo, DIAS.map(emptyDia)) } catch(_) {}
     }
   }
 
@@ -424,6 +425,7 @@ export default function Programa() {
     </div>
   )
 }
+
 
 
 
