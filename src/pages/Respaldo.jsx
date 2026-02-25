@@ -33,29 +33,79 @@ const estiloCelda = (ws, fila, col, valor, esHeader = false, esPareja = false) =
   cell.alignment = { vertical: 'middle', wrapText: false }
 }
 
-const crearHoja = (wb, nombre, headers, anchos, filas) => {
+const crearHoja = (wb, nombre, headers, anchos, filas, logoBase64 = null) => {
+  const totalCols = headers.length
   const ws = wb.addWorksheet(nombre, {
-    views: [{ state: 'frozen', ySplit: 1 }],
+    views: [{ state: 'frozen', ySplit: 5 }],
   })
 
   // Anchos de columna
   ws.columns = anchos.map((w, i) => ({ key: String(i), width: w }))
 
-  // Fila de encabezado
-  ws.getRow(1).height = 22
-  headers.forEach((h, ci) => estiloCelda(ws, 1, ci + 1, h, true))
+  // ── Fila 1: Logo + Nombre iglesia ──────────────────────────────────────
+  ws.getRow(1).height = 36
+  // Celda del nombre de la iglesia (col 2 en adelante)
+  const celdaNombre = ws.getCell(1, 2)
+  celdaNombre.value = 'Iglesia Pentecostal Juan 7:38: El Semillero 1/10'
+  celdaNombre.font = { name: 'Calibri', bold: true, size: 16, color: { argb: '1A2E4A' } }
+  celdaNombre.alignment = { vertical: 'middle', horizontal: 'left' }
+  if (totalCols > 2) ws.mergeCells(1, 2, 1, totalCols)
 
-  // Filas de datos
+  // ── Fila 2: Pastora ───────────────────────────────────────────────────
+  ws.getRow(2).height = 20
+  const celdaPastora = ws.getCell(2, 2)
+  celdaPastora.value = 'Pastora: Dinorah Bautista'
+  celdaPastora.font = { name: 'Calibri', italic: true, size: 12, color: { argb: '4A6FA5' } }
+  celdaPastora.alignment = { vertical: 'middle', horizontal: 'left' }
+  if (totalCols > 2) ws.mergeCells(2, 2, 2, totalCols)
+
+  // ── Fila 3: Hoja y fecha de generación ───────────────────────────────
+  ws.getRow(3).height = 18
+  const celdaInfo = ws.getCell(3, 2)
+  const ahora = new Date()
+  const fechaStr = ahora.toLocaleDateString('es-DO', { year:'numeric', month:'long', day:'numeric' })
+  celdaInfo.value = `${nombre}  ·  Generado el ${fechaStr}`
+  celdaInfo.font = { name: 'Calibri', size: 10, color: { argb: '888888' } }
+  celdaInfo.alignment = { vertical: 'middle', horizontal: 'left' }
+  if (totalCols > 2) ws.mergeCells(3, 2, 3, totalCols)
+
+  // ── Fila 4: separador vacío ───────────────────────────────────────────
+  ws.getRow(4).height = 6
+  // Línea decorativa en la fila 4
+  for (let c = 1; c <= totalCols; c++) {
+    const cell = ws.getCell(4, c)
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '1A2E4A' } }
+  }
+
+  // ── Logo (col 1, filas 1-3 fusionadas) ───────────────────────────────
+  if (logoBase64) {
+    try {
+      const imageId = wb.addImage({ base64: logoBase64, extension: 'jpeg' })
+      ws.addImage(imageId, {
+        tl: { col: 0, row: 0 },
+        br: { col: 1, row: 3 },
+        editAs: 'oneCell',
+      })
+    } catch(_) {}
+  }
+  // Merge col 1 filas 1-3 para reservar espacio al logo
+  try { ws.mergeCells(1, 1, 3, 1) } catch(_) {}
+
+  // ── Fila 5: Encabezados de columnas ──────────────────────────────────
+  ws.getRow(5).height = 22
+  headers.forEach((h, ci) => estiloCelda(ws, 5, ci + 1, h, true))
+
+  // ── Filas de datos desde fila 6 ──────────────────────────────────────
   filas.forEach((fila, ri) => {
-    const rowNum = ri + 2
+    const rowNum = ri + 6
     ws.getRow(rowNum).height = 16
     fila.forEach((val, ci) => estiloCelda(ws, rowNum, ci + 1, val ?? '', false, ri % 2 === 0))
   })
 
-  // Auto-filtro
+  // Auto-filtro en fila 5
   ws.autoFilter = {
-    from: { row: 1, column: 1 },
-    to:   { row: 1, column: headers.length },
+    from: { row: 5, column: 1 },
+    to:   { row: 5, column: headers.length },
   }
 
   return ws
@@ -105,6 +155,16 @@ export default function Respaldo() {
       wb.creator = 'Sistema Iglesia'
       wb.created = new Date()
 
+      // Cargar logo como base64
+      let logoBase64 = null
+      try {
+        const resp = await fetch('/logo_iglesia.jpg')
+        if (resp.ok) {
+          const buf = await resp.arrayBuffer()
+          logoBase64 = btoa(String.fromCharCode(...new Uint8Array(buf)))
+        }
+      } catch(_) {}
+
       // Miembros
       const miembrosData = m.status === 'fulfilled' ? m.value.data : []
       crearHoja(wb, 'Miembros',
@@ -117,7 +177,7 @@ export default function Respaldo() {
           x.fecha_conversion||'', x.fecha_bautismo||'', x.iglesia_bautismo||'',
           x.tiempo_en_iglesia||'', x.rol||'', x.estado||'',
           x.ministerio_actual||'', x.dones_talentos||'', x.notas||'',
-        ])
+        ]), logoBase64
       )
 
       // Ingresos
@@ -125,7 +185,7 @@ export default function Respaldo() {
       crearHoja(wb, 'Ingresos',
         ['Fecha','Categoría','Monto (RD$)','Descripción'],
         [14,22,14,36],
-        ingresosData.map(x => [x.fecha, mapI[x.categoria_id]||'Sin categoría', x.monto, x.descripcion||''])
+        ingresosData.map(x => [x.fecha, mapI[x.categoria_id]||'Sin categoría', x.monto, x.descripcion||'']), logoBase64
       )
 
       // Gastos
@@ -133,7 +193,7 @@ export default function Respaldo() {
       crearHoja(wb, 'Gastos',
         ['Fecha','Categoría','Monto (RD$)','Descripción','Beneficiario'],
         [14,22,14,36,22],
-        gastosData.map(x => [x.fecha, mapG[x.categoria_id]||'Sin categoría', x.monto, x.descripcion||'', x.beneficiario||''])
+        gastosData.map(x => [x.fecha, mapG[x.categoria_id]||'Sin categoría', x.monto, x.descripcion||'', x.beneficiario||'']), logoBase64
       )
 
       // Eventos
@@ -141,7 +201,7 @@ export default function Respaldo() {
       crearHoja(wb, 'Eventos',
         ['Nombre','Fecha','Lugar','Descripción','Estado'],
         [30,14,22,38,12],
-        eventosData.map(x => [x.nombre, x.fecha, x.lugar||'', x.descripcion||'', x.estado||''])
+        eventosData.map(x => [x.nombre, x.fecha, x.lugar||'', x.descripcion||'', x.estado||'']), logoBase64
       )
 
       // Inventario
@@ -149,7 +209,7 @@ export default function Respaldo() {
       crearHoja(wb, 'Inventario',
         ['Nombre','Categoría','Cantidad','Estado','Descripción'],
         [30,20,10,14,34],
-        inventarioData.map(x => [x.nombre, x.categoria||'', x.cantidad, x.estado||'', x.descripcion||''])
+        inventarioData.map(x => [x.nombre, x.categoria||'', x.cantidad, x.estado||'', x.descripcion||'']), logoBase64
       )
 
       const fecha = new Date().toISOString().split('T')[0]
@@ -171,6 +231,15 @@ export default function Respaldo() {
       wb.creator = 'Sistema Iglesia'
       wb.created = new Date()
 
+      let logoBase64 = null
+      try {
+        const resp = await fetch('/logo_iglesia.jpg')
+        if (resp.ok) {
+          const buf = await resp.arrayBuffer()
+          logoBase64 = btoa(String.fromCharCode(...new Uint8Array(buf)))
+        }
+      } catch(_) {}
+
       crearHoja(wb, 'Miembros',
         ['Nombres','Apellidos','Cédula','Teléfono','Email','Género','Estado Civil','Dirección','Fecha Nacimiento','Fecha Conversión','Fecha Bautismo','Iglesia Bautismo','Tiempo Iglesia','Rol','Estado','Ministerio Actual','Ministerios Anteriores','Dones y Talentos','Disponibilidad','Nombre Cónyuge','Nº Hijos','Tel. Emergencia','Visitas Pastorales','Consejería','Motivo Oración','Notas'],
         [20,20,14,14,24,12,14,26,16,16,16,22,14,14,12,22,22,22,14,20,8,18,16,16,24,26],
@@ -185,7 +254,7 @@ export default function Respaldo() {
           x.numero_hijos||'', x.telefono_emergencia||'',
           x.visitas_pastorales||'', x.consejeria_pastoral||'',
           x.motivo_oracion||'', x.notas||'',
-        ])
+        ]), logoBase64
       )
 
       const fecha = new Date().toISOString().split('T')[0]
@@ -211,18 +280,27 @@ export default function Respaldo() {
       wb.creator = 'Sistema Iglesia'
       wb.created = new Date()
 
+      let logoBase64 = null
+      try {
+        const resp = await fetch('/logo_iglesia.jpg')
+        if (resp.ok) {
+          const buf = await resp.arrayBuffer()
+          logoBase64 = btoa(String.fromCharCode(...new Uint8Array(buf)))
+        }
+      } catch(_) {}
+
       const ingresosData = i.status === 'fulfilled' ? i.value.data : []
       crearHoja(wb, 'Ingresos',
         ['Fecha','Categoría','Monto (RD$)','Descripción'],
         [14,22,14,36],
-        ingresosData.map(x => [x.fecha, mapI[x.categoria_id]||'Sin categoría', x.monto, x.descripcion||''])
+        ingresosData.map(x => [x.fecha, mapI[x.categoria_id]||'Sin categoría', x.monto, x.descripcion||'']), logoBase64
       )
 
       const gastosData = g.status === 'fulfilled' ? g.value.data : []
       crearHoja(wb, 'Gastos',
         ['Fecha','Categoría','Monto (RD$)','Descripción','Beneficiario'],
         [14,22,14,36,22],
-        gastosData.map(x => [x.fecha, mapG[x.categoria_id]||'Sin categoría', x.monto, x.descripcion||'', x.beneficiario||''])
+        gastosData.map(x => [x.fecha, mapG[x.categoria_id]||'Sin categoría', x.monto, x.descripcion||'', x.beneficiario||'']), logoBase64
       )
 
       const fecha = new Date().toISOString().split('T')[0]
