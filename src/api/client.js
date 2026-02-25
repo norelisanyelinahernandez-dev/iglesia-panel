@@ -9,6 +9,25 @@ const api = axios.create({
   timeout: 15000,
 })
 
+// Mostrar notificacion de error global
+function mostrarError(mensaje) {
+  const existing = document.getElementById('_api_error_toast')
+  if (existing) existing.remove()
+
+  const toast = document.createElement('div')
+  toast.id = '_api_error_toast'
+  toast.style.cssText = `
+    position: fixed; top: 20px; right: 20px; z-index: 99999;
+    background: #c0392b; color: white; padding: 14px 20px;
+    border-radius: 8px; font-size: 14px; font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    max-width: 320px; animation: fadeIn 0.3s ease;
+  `
+  toast.textContent = mensaje
+  document.body.appendChild(toast)
+  setTimeout(() => toast.remove(), 4000)
+}
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
   if (token) config.headers.Authorization = `Bearer ${token}`
@@ -18,15 +37,36 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401 && window.location.pathname !== '/login') {
-      // Solo redirigir si es sesión de admin, no de miembro
-      const user = (() => { try { return JSON.parse(localStorage.getItem('user')) } catch { return null } })()
-      if (!user || user.tipo !== 'miembro') {
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        window.location.href = '/login'
+    const status = err.response?.status
+    const user = (() => { try { return JSON.parse(localStorage.getItem('user')) } catch { return null } })()
+
+    if (status === 401) {
+      if (window.location.pathname !== '/login') {
+        // Si es usuario admin (email/password), redirigir al login
+        if (!user || user.tipo !== 'miembro') {
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+          window.location.href = '/login'
+        } else {
+          // Si es miembro con rol especial, mostrar mensaje claro
+          mostrarError('Sesion expirada. Por favor cierra sesion e inicia de nuevo.')
+        }
       }
+    } else if (status === 403) {
+      mostrarError('No tienes permiso para realizar esta accion.')
+    } else if (status === 404) {
+      // Ignorar silenciosamente los 404 de health check
+      if (!err.config?.url?.includes('health')) {
+        mostrarError('Recurso no encontrado.')
+      }
+    } else if (status === 422) {
+      mostrarError('Datos invalidos. Verifica los campos e intenta de nuevo.')
+    } else if (status >= 500) {
+      mostrarError('Error en el servidor. Intenta de nuevo en unos momentos.')
+    } else if (!err.response) {
+      mostrarError('Sin conexion. Verifica tu internet e intenta de nuevo.')
     }
+
     return Promise.reject(err)
   }
 )
@@ -71,7 +111,8 @@ export const getCelulas = () => api.get('/celulas/')
 
 export const deleteIngreso = (id) => api.delete(`/tesoreria/ingresos/${id}`)
 export const deleteGasto = (id) => api.delete(`/tesoreria/gastos/${id}`)
-// Contenido público
+
+// Contenido publico
 export const getAnuncios = () => api.get('/contenido/anuncios')
 export const createAnuncio = (data) => api.post('/contenido/anuncios', data)
 export const updateAnuncio = (id, data) => api.put(`/contenido/anuncios/${id}`, data)
