@@ -20,6 +20,58 @@ function mostrarExito(mensaje) {
 }
 
 
+
+// ── Impresión con encabezado institucional ────────────────────────────────
+const imprimirConEncabezado = (titulo, htmlContenido) => {
+  const fecha = new Date().toLocaleDateString('es-DO', { weekday:'long', year:'numeric', month:'long', day:'numeric' })
+  const win = window.open('', '_blank', 'width=900,height=700')
+  win.document.write(`<!DOCTYPE html><html lang="es"><head>
+    <meta charset="UTF-8"/>
+    <title>${titulo}</title>
+    <style>
+      * { margin:0; padding:0; box-sizing:border-box; }
+      body { font-family: Calibri, Arial, sans-serif; color: #1a1a2e; padding: 24px 32px; }
+      .header { display:flex; align-items:center; gap:20px; border-bottom: 3px solid #1a2e4a; padding-bottom:14px; margin-bottom:18px; }
+      .header img { width:72px; height:72px; object-fit:contain; border-radius:8px; }
+      .header-info h1 { font-size:17px; font-weight:700; color:#1a2e4a; margin-bottom:3px; }
+      .header-info p { font-size:13px; color:#4a6fa5; font-style:italic; margin-bottom:2px; }
+      .header-info small { font-size:11px; color:#888; }
+      h2 { font-size:15px; font-weight:700; color:#1a2e4a; margin:18px 0 10px; }
+      table { width:100%; border-collapse:collapse; font-size:12px; margin-bottom:16px; }
+      th { background:#1a2e4a; color:#fff; padding:7px 10px; text-align:left; font-weight:600; }
+      td { padding:6px 10px; border-bottom:1px solid #e0e0e0; }
+      tr:nth-child(even) td { background:#eef3fa; }
+      .badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600; }
+      .badge-green { background:#d4edda; color:#155724; }
+      .badge-amber { background:#fff3cd; color:#856404; }
+      .badge-red   { background:#f8d7da; color:#721c24; }
+      .section { margin-bottom:20px; }
+      .stat-row { display:flex; gap:24px; margin-bottom:14px; flex-wrap:wrap; }
+      .stat-box { background:#eef3fa; border-radius:8px; padding:12px 20px; text-align:center; }
+      .stat-box .val { font-size:22px; font-weight:700; color:#1a2e4a; }
+      .stat-box .lbl { font-size:11px; color:#666; }
+      .bar-wrap { background:#e0e0e0; border-radius:4px; height:8px; margin-top:4px; }
+      .bar { height:8px; border-radius:4px; }
+      .footer { margin-top:24px; padding-top:10px; border-top:1px solid #ddd; font-size:11px; color:#aaa; text-align:right; }
+      @media print { body { padding:12px 20px; } }
+    </style>
+  </head><body>
+    <div class="header">
+      <img src="/logo_iglesia.jpg" onerror="this.style.display='none'" />
+      <div class="header-info">
+        <h1>Iglesia Pentecostal Juan 7:38: El Semillero 1/10</h1>
+        <p>Pastora: Dinorah Bautista</p>
+        <small>${titulo} &nbsp;·&nbsp; ${fecha}</small>
+      </div>
+    </div>
+    ${htmlContenido}
+    <div class="footer">Generado por el Sistema de Gestión — ${fecha}</div>
+  </body></html>`)
+  win.document.close()
+  win.focus()
+  setTimeout(() => { win.print(); win.close() }, 400)
+}
+
 const ESTADO_BADGE = { excelente:'badge-green', bueno:'badge-green', regular:'badge-amber', dañado:'badge-red', dado_de_baja:'badge-red' }
 const PRESTAMO_BADGE = { prestado:'badge-amber', devuelto:'badge-green', perdido:'badge-red' }
 const ESTADO_LABELS = { excelente:'Excelente', bueno:'Bueno', regular:'Regular', dañado:'Dañado', dado_de_baja:'Dado de baja' }
@@ -116,6 +168,35 @@ export default function Inventario() {
   const handleDelete = async (id) => {
     if (!confirm('¿Eliminar este item?')) return
     try { await deleteItem(id); load() } catch(_) {}
+  }
+
+
+  const imprimirInventario = () => {
+    const filas = filtered.map(i => {
+      const catNombre = categorias.find(c => c.id === i.categoria_id)?.nombre || '—'
+      const estadoLabel = { excelente:'Excelente', bueno:'Bueno', regular:'Regular' }[i.estado] || i.estado
+      const badgeColor = { excelente:'badge-green', bueno:'badge-green', regular:'badge-amber', dado_de_baja:'badge-red' }[i.estado] || ''
+      return `<tr>
+        <td>${i.nombre}</td>
+        <td>${catNombre}</td>
+        <td style="text-align:center">${i.cantidad}</td>
+        <td><span class="badge ${badgeColor}">${estadoLabel}</span></td>
+        <td>${i.ubicacion || '—'}</td>
+        <td>${[i.marca, i.modelo].filter(Boolean).join(' / ') || '—'}</td>
+      </tr>`
+    }).join('')
+    const html = `
+      <div class="stat-row">
+        <div class="stat-box"><div class="val">${items.length}</div><div class="lbl">Total items</div></div>
+        <div class="stat-box"><div class="val">${items.filter(i=>i.estado==='excelente'||i.estado==='bueno').length}</div><div class="lbl">En buen estado</div></div>
+        <div class="stat-box"><div class="val">${prestamos.filter(p=>p.estado==='prestado').length}</div><div class="lbl">Préstamos activos</div></div>
+      </div>
+      <h2>Inventario de Bienes</h2>
+      <table>
+        <thead><tr><th>Nombre</th><th>Categoría</th><th>Cantidad</th><th>Estado</th><th>Ubicación</th><th>Marca / Modelo</th></tr></thead>
+        <tbody>${filas}</tbody>
+      </table>`
+    imprimirConEncabezado('Inventario', html)
   }
 
   return (

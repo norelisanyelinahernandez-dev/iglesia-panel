@@ -2,6 +2,58 @@
 import { getGastos, getCategoriasGasto } from '../api/client'
 import DatePicker from '../components/DatePicker'
 
+
+// ── Impresión con encabezado institucional ────────────────────────────────
+const imprimirConEncabezado = (titulo, htmlContenido) => {
+  const fecha = new Date().toLocaleDateString('es-DO', { weekday:'long', year:'numeric', month:'long', day:'numeric' })
+  const win = window.open('', '_blank', 'width=900,height=700')
+  win.document.write(`<!DOCTYPE html><html lang="es"><head>
+    <meta charset="UTF-8"/>
+    <title>${titulo}</title>
+    <style>
+      * { margin:0; padding:0; box-sizing:border-box; }
+      body { font-family: Calibri, Arial, sans-serif; color: #1a1a2e; padding: 24px 32px; }
+      .header { display:flex; align-items:center; gap:20px; border-bottom: 3px solid #1a2e4a; padding-bottom:14px; margin-bottom:18px; }
+      .header img { width:72px; height:72px; object-fit:contain; border-radius:8px; }
+      .header-info h1 { font-size:17px; font-weight:700; color:#1a2e4a; margin-bottom:3px; }
+      .header-info p { font-size:13px; color:#4a6fa5; font-style:italic; margin-bottom:2px; }
+      .header-info small { font-size:11px; color:#888; }
+      h2 { font-size:15px; font-weight:700; color:#1a2e4a; margin:18px 0 10px; }
+      table { width:100%; border-collapse:collapse; font-size:12px; margin-bottom:16px; }
+      th { background:#1a2e4a; color:#fff; padding:7px 10px; text-align:left; font-weight:600; }
+      td { padding:6px 10px; border-bottom:1px solid #e0e0e0; }
+      tr:nth-child(even) td { background:#eef3fa; }
+      .badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600; }
+      .badge-green { background:#d4edda; color:#155724; }
+      .badge-amber { background:#fff3cd; color:#856404; }
+      .badge-red   { background:#f8d7da; color:#721c24; }
+      .section { margin-bottom:20px; }
+      .stat-row { display:flex; gap:24px; margin-bottom:14px; flex-wrap:wrap; }
+      .stat-box { background:#eef3fa; border-radius:8px; padding:12px 20px; text-align:center; }
+      .stat-box .val { font-size:22px; font-weight:700; color:#1a2e4a; }
+      .stat-box .lbl { font-size:11px; color:#666; }
+      .bar-wrap { background:#e0e0e0; border-radius:4px; height:8px; margin-top:4px; }
+      .bar { height:8px; border-radius:4px; }
+      .footer { margin-top:24px; padding-top:10px; border-top:1px solid #ddd; font-size:11px; color:#aaa; text-align:right; }
+      @media print { body { padding:12px 20px; } }
+    </style>
+  </head><body>
+    <div class="header">
+      <img src="/logo_iglesia.jpg" onerror="this.style.display='none'" />
+      <div class="header-info">
+        <h1>Iglesia Pentecostal Juan 7:38: El Semillero 1/10</h1>
+        <p>Pastora: Dinorah Bautista</p>
+        <small>${titulo} &nbsp;·&nbsp; ${fecha}</small>
+      </div>
+    </div>
+    ${htmlContenido}
+    <div class="footer">Generado por el Sistema de Gestión — ${fecha}</div>
+  </body></html>`)
+  win.document.close()
+  win.focus()
+  setTimeout(() => { win.print(); win.close() }, 400)
+}
+
 const fmt = (n) => new Intl.NumberFormat('es-DO', { style:'currency', currency:'DOP', maximumFractionDigits:0 }).format(n)
 const STORAGE_PRESUPUESTO = 'presupuesto_anual'
 const STORAGE_DEUDAS = 'deudas_iglesia'
@@ -101,6 +153,56 @@ export default function Finanzas() {
     completado: { label:'Completado', color:'var(--green)' },
   }
 
+
+  const imprimirPresupuesto = () => {
+    const filas = gastoPorCategoria.map(cat => {
+      const color = cat.excedido ? 'badge-red' : cat.porcentaje > 80 ? 'badge-amber' : 'badge-green'
+      const estado = cat.excedido ? 'Excedido' : cat.porcentaje > 80 ? 'En límite' : 'Normal'
+      return `<tr>
+        <td>${cat.nombre}</td>
+        <td style="text-align:right">${fmt(cat.pres)}</td>
+        <td style="text-align:right">${fmt(cat.total)}</td>
+        <td style="text-align:right">${fmt(Math.max(0, cat.pres - cat.total))}</td>
+        <td style="text-align:center">${cat.pres > 0 ? cat.porcentaje + '%' : '—'}</td>
+        <td><span class="badge ${color}">${estado}</span></td>
+      </tr>`
+    }).join('')
+    const html = `
+      <h2>Seguimiento de Presupuesto ${anio}</h2>
+      <table>
+        <thead><tr><th>Categoría</th><th>Presupuesto</th><th>Gastado</th><th>Disponible</th><th>%</th><th>Estado</th></tr></thead>
+        <tbody>${filas.length ? filas : '<tr><td colspan="6" style="text-align:center;color:#888">Sin datos aún</td></tr>'}</tbody>
+      </table>`
+    imprimirConEncabezado('Presupuesto Anual', html)
+  }
+
+  const imprimirDeudas = () => {
+    const filas = deudas.map(d => {
+      const pendiente = parseFloat(d.monto_total||0) - parseFloat(d.monto_pagado||0)
+      const color = d.estado === 'completado' ? 'badge-green' : d.estado === 'parcial' ? 'badge-amber' : 'badge-red'
+      const label = { pendiente:'Pendiente', parcial:'Pago parcial', completado:'Completado' }[d.estado] || d.estado
+      return `<tr>
+        <td>${d.descripcion}</td>
+        <td style="text-align:right">${fmt(d.monto_total)}</td>
+        <td style="text-align:right">${fmt(d.monto_pagado)}</td>
+        <td style="text-align:right">${fmt(pendiente)}</td>
+        <td>${d.fecha_vencimiento ? new Date(d.fecha_vencimiento).toLocaleDateString('es-DO') : '—'}</td>
+        <td><span class="badge ${color}">${label}</span></td>
+      </tr>`
+    }).join('')
+    const html = `
+      <div class="stat-row">
+        <div class="stat-box"><div class="val">${fmt(totalDeudas)}</div><div class="lbl">Total pendiente</div></div>
+        <div class="stat-box"><div class="val">${deudas.filter(d=>d.estado!=='completado').length}</div><div class="lbl">Compromisos activos</div></div>
+      </div>
+      <h2>Deudas y Compromisos Financieros</h2>
+      <table>
+        <thead><tr><th>Descripción</th><th>Total</th><th>Pagado</th><th>Pendiente</th><th>Vencimiento</th><th>Estado</th></tr></thead>
+        <tbody>${filas.length ? filas : '<tr><td colspan="6" style="text-align:center;color:#888">Sin compromisos registrados</td></tr>'}</tbody>
+      </table>`
+    imprimirConEncabezado('Deudas y Compromisos', html)
+  }
+
   return (
     <div className="page">
       <div className="page-header">
@@ -127,7 +229,10 @@ export default function Finanzas() {
           {guardado && <div className="alert alert-success" style={{ marginBottom:16 }}>Presupuesto guardado correctamente</div>}
 
           <div className="card" style={{ marginBottom:16 }}>
-            <h3 style={{ fontFamily:'var(--font-heading)', fontSize:15, fontWeight:600, marginBottom:14 }}>Definir presupuesto {anio} por categoría</h3>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
+              <h3 style={{ fontFamily:'var(--font-heading)', fontSize:15, fontWeight:600 }}>Definir presupuesto {anio} por categoría</h3>
+              <button className="btn btn-ghost" style={{ fontSize:13 }} onClick={imprimirPresupuesto}>🖨️ Imprimir</button>
+            </div>
             <div className="grid-2" style={{ gap:12 }}>
               {catGas.map(cat => (
                 <div key={cat.id} className="form-group">
@@ -189,9 +294,12 @@ export default function Finanzas() {
                 <div className="stat-label">Total pendiente</div>
               </div>
             )}
-            <button className="btn btn-gold" onClick={() => { setFormDeuda({ descripcion:'', monto_total:'', monto_pagado:'0', fecha_inicio:'', fecha_vencimiento:'', estado:'pendiente', notas:'' }); setEditDeuda(null); setModalDeuda(true) }}>
+            <div style={{ display:'flex', gap:10 }}>
+              <button className="btn btn-ghost" style={{ fontSize:13 }} onClick={imprimirDeudas}>🖨️ Imprimir</button>
+              <button className="btn btn-gold" onClick={() => { setFormDeuda({ descripcion:'', monto_total:'', monto_pagado:'0', fecha_inicio:'', fecha_vencimiento:'', estado:'pendiente', notas:'' }); setEditDeuda(null); setModalDeuda(true) }}>
               + Nuevo compromiso
             </button>
+            </div>
           </div>
 
           {deudas.length === 0 ? (

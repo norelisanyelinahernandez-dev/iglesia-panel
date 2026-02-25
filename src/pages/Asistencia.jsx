@@ -4,6 +4,58 @@ import { getMiembros } from '../api/client'
 
 const STORAGE_KEY = 'asistencia_iglesia'
 
+// ── Impresión con encabezado institucional ────────────────────────────────
+const imprimirConEncabezado = (titulo, htmlContenido) => {
+  const fecha = new Date().toLocaleDateString('es-DO', { weekday:'long', year:'numeric', month:'long', day:'numeric' })
+  const win = window.open('', '_blank', 'width=900,height=700')
+  win.document.write(`<!DOCTYPE html><html lang="es"><head>
+    <meta charset="UTF-8"/>
+    <title>${titulo}</title>
+    <style>
+      * { margin:0; padding:0; box-sizing:border-box; }
+      body { font-family: Calibri, Arial, sans-serif; color: #1a1a2e; padding: 24px 32px; }
+      .header { display:flex; align-items:center; gap:20px; border-bottom: 3px solid #1a2e4a; padding-bottom:14px; margin-bottom:18px; }
+      .header img { width:72px; height:72px; object-fit:contain; border-radius:8px; }
+      .header-info h1 { font-size:17px; font-weight:700; color:#1a2e4a; margin-bottom:3px; }
+      .header-info p { font-size:13px; color:#4a6fa5; font-style:italic; margin-bottom:2px; }
+      .header-info small { font-size:11px; color:#888; }
+      h2 { font-size:15px; font-weight:700; color:#1a2e4a; margin:18px 0 10px; }
+      table { width:100%; border-collapse:collapse; font-size:12px; margin-bottom:16px; }
+      th { background:#1a2e4a; color:#fff; padding:7px 10px; text-align:left; font-weight:600; }
+      td { padding:6px 10px; border-bottom:1px solid #e0e0e0; }
+      tr:nth-child(even) td { background:#eef3fa; }
+      .badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600; }
+      .badge-green { background:#d4edda; color:#155724; }
+      .badge-amber { background:#fff3cd; color:#856404; }
+      .badge-red   { background:#f8d7da; color:#721c24; }
+      .section { margin-bottom:20px; }
+      .stat-row { display:flex; gap:24px; margin-bottom:14px; flex-wrap:wrap; }
+      .stat-box { background:#eef3fa; border-radius:8px; padding:12px 20px; text-align:center; }
+      .stat-box .val { font-size:22px; font-weight:700; color:#1a2e4a; }
+      .stat-box .lbl { font-size:11px; color:#666; }
+      .bar-wrap { background:#e0e0e0; border-radius:4px; height:8px; margin-top:4px; }
+      .bar { height:8px; border-radius:4px; }
+      .footer { margin-top:24px; padding-top:10px; border-top:1px solid #ddd; font-size:11px; color:#aaa; text-align:right; }
+      @media print { body { padding:12px 20px; } }
+    </style>
+  </head><body>
+    <div class="header">
+      <img src="/logo_iglesia.jpg" onerror="this.style.display='none'" />
+      <div class="header-info">
+        <h1>Iglesia Pentecostal Juan 7:38: El Semillero 1/10</h1>
+        <p>Pastora: Dinorah Bautista</p>
+        <small>${titulo} &nbsp;·&nbsp; ${fecha}</small>
+      </div>
+    </div>
+    ${htmlContenido}
+    <div class="footer">Generado por el Sistema de Gestión — ${fecha}</div>
+  </body></html>`)
+  win.document.close()
+  win.focus()
+  setTimeout(() => { win.print(); win.close() }, 400)
+}
+
+
 const TIPOS = [
   'Culto de avivamiento',
   'Estudio bíblico',
@@ -87,6 +139,32 @@ export default function Asistencia() {
     const porcentaje = total > 0 ? Math.round((asistio / total) * 100) : 0
     return { ...m, asistio, total, porcentaje }
   }).sort((a, b) => a.porcentaje - b.porcentaje)
+
+
+  const imprimirResumen = () => {
+    const filas = resumenMiembros.map(m => {
+      const color = m.porcentaje > 70 ? 'badge-green' : m.porcentaje > 40 ? 'badge-amber' : 'badge-red'
+      const estado = m.porcentaje > 70 ? 'Regular' : m.porcentaje > 40 ? 'Irregular' : 'Ausente frecuente'
+      return `<tr>
+        <td>${m.nombres} ${m.apellidos}</td>
+        <td style="text-align:center">${m.asistio}</td>
+        <td style="text-align:center">${m.total}</td>
+        <td style="text-align:center"><strong>${m.porcentaje}%</strong></td>
+        <td><span class="badge ${color}">${estado}</span></td>
+      </tr>`
+    }).join('')
+    const html = `
+      <div class="stat-row">
+        <div class="stat-box"><div class="val">${registros.length}</div><div class="lbl">Cultos registrados</div></div>
+        <div class="stat-box"><div class="val">${miembros.length}</div><div class="lbl">Miembros activos</div></div>
+      </div>
+      <h2>Resumen de Asistencia por Miembro</h2>
+      <table>
+        <thead><tr><th>Miembro</th><th>Asistencias</th><th>Total cultos</th><th>%</th><th>Estado</th></tr></thead>
+        <tbody>${filas}</tbody>
+      </table>`
+    imprimirConEncabezado('Resumen de Asistencia', html)
+  }
 
   return (
     <div className="page">
@@ -209,7 +287,10 @@ export default function Asistencia() {
 
       {tab === 'resumen' && (
         <div className="card">
-          <p style={{ color:'var(--text-muted)', fontSize:13, marginBottom:16 }}>Basado en {registros.length} registros. Los miembros con menor asistencia aparecen primero.</p>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
+            <p style={{ color:'var(--text-muted)', fontSize:13 }}>Basado en {registros.length} registros. Los miembros con menor asistencia aparecen primero.</p>
+            <button className="btn btn-ghost" style={{ fontSize:13 }} onClick={imprimirResumen}>🖨️ Imprimir</button>
+          </div>
           {resumenMiembros.length === 0 ? (
             <p style={{ color:'var(--text-muted)', textAlign:'center', padding:30 }}>No hay datos aun.</p>
           ) : (
