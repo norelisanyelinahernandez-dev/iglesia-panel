@@ -18,7 +18,7 @@ const NAV_ADMIN = [
   { to: '/anuncios',    label: 'Anuncios',         icono: '📢', seccion: 'anuncios' },
   { to: '/documentos',  label: 'Documentos',       icono: '📄', seccion: 'documentos' },
   { to: '/respaldo',    label: 'Respaldo',         icono: '💾', seccion: 'respaldo' },
-  { to: '/configuracion', label: 'Configuracion',     icono: '⚙️', seccion: 'configuracion' },
+  { to: '/configuracion', label: 'Configuración',     icono: '⚙️', seccion: 'configuracion' },
 ]
 
 const NAV_MIEMBRO = [
@@ -43,7 +43,7 @@ const NAV = [
   { to: '/anuncios',    label: 'Anuncios',         icono: '📢', seccion: 'anuncios' },
   { to: '/documentos',  label: 'Documentos',       icono: '📄', seccion: 'documentos' },
   { to: '/respaldo',    label: 'Respaldo',         icono: '💾', seccion: 'respaldo' },
-  { to: '/configuracion', label: 'Configuracion',     icono: '⚙️', seccion: 'configuracion' },
+  { to: '/configuracion', label: 'Configuración',     icono: '⚙️', seccion: 'configuracion' },
 ]
 
 export default function Layout({ children }) {
