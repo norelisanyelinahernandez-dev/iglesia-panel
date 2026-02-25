@@ -13,7 +13,7 @@ function Modal({ title, onClose, children }) {
       <div className="modal">
         <div className="modal-header">
           <h3 className="modal-title">{title}</h3>
-          <button className="modal-close" onClick={onClose}>Ã—</button>
+          <button className="modal-close" onClick={onClose}>×</button>
         </div>
         {children}
       </div>
@@ -81,7 +81,7 @@ export default function Inventario() {
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('Â¿Eliminar este item?')) return
+    if (!confirm('¿Eliminar este item?')) return
     try { await deleteItem(id); load() } catch(_) {}
   }
 
@@ -103,7 +103,7 @@ export default function Inventario() {
         {['excelente','bueno','regular','dañado'].map(e => (
           <div key={e} className="stat-card">
             <div className="stat-value">{items.filter(i=>i.estado===e).length}</div>
-            <div className="stat-label"><span className={`badge ${ESTADO_BADGE[e]}`}>{e}</span></div>
+            <div className="stat-label"><span className={`badge ${ESTADO_BADGE[e]}`}>{{'excelente':'Excelente','bueno':'Bueno','regular':'Regular','dañado':'Dañado'}[e] || e}</span></div>
           </div>
         ))}
       </div>
@@ -121,14 +121,14 @@ export default function Inventario() {
         <>
           <div style={{ marginBottom:16 }}>
             <div className="search-bar">
-              <span className="search-icon">âŒ•</span>
+              <span className="search-icon">⌕</span>
               <input placeholder="Buscar item..." value={buscar} onChange={e=>setBuscar(e.target.value)} />
             </div>
           </div>
           <div className="card">
             <div className="table-wrap">
               <table>
-                <thead><tr><th>Nombre</th><th>CategorÃ­a</th><th>Cantidad</th><th>Estado</th><th>UbicaciÃ³n</th><th>Marca/Modelo</th><th></th></tr></thead>
+                <thead><tr><th>Nombre</th><th>Categoría</th><th>Cantidad</th><th>Estado</th><th>Ubicación</th><th>Marca/Modelo</th><th></th></tr></thead>
                 <tbody>
                   {loading ? <tr><td colSpan={7} style={{ textAlign:'center', padding:40 }}><span className="spinner"/></td></tr>
                   : filtered.map(i => (
@@ -136,13 +136,13 @@ export default function Inventario() {
                       <td style={{ fontWeight:500 }}>{i.nombre}</td>
                       <td style={{ color:'var(--text-muted)' }}>{categorias.find(c=>c.id===i.categoria_id)?.nombre || 'â€”'}</td>
                       <td style={{ fontWeight:600, color:'var(--blue)' }}>{i.cantidad}</td>
-                      <td><span className={`badge ${ESTADO_BADGE[i.estado]}`}>{i.estado}</span></td>
+                      <td><span className={`badge ${ESTADO_BADGE[i.estado]}`}>{{'excelente':'Excelente','bueno':'Bueno','regular':'Regular','dañado':'Dañado','dado_de_baja':'Dado de baja'}[i.estado] || i.estado}</span></td>
                       <td style={{ color:'var(--text-muted)' }}>{i.ubicacion || 'â€”'}</td>
                       <td style={{ color:'var(--text-muted)', fontSize:12 }}>{[i.marca, i.modelo].filter(Boolean).join(' / ') || 'â€”'}</td>
                       <td>
                         <div style={{ display:'flex', gap:6 }}>
                           <button className="btn btn-ghost" style={{ padding:'5px 10px', fontSize:12 }} onClick={()=>openEdit(i)}>Editar</button>
-                          <button className="btn btn-danger" style={{ padding:'5px 10px', fontSize:12 }} onClick={()=>handleDelete(i.id)}>âœ•</button>
+                          <button className="btn btn-danger" style={{ padding:'5px 10px', fontSize:12 }} onClick={()=>handleDelete(i.id)}>✕</button>
                         </div>
                       </td>
                     </tr>
@@ -169,7 +169,7 @@ export default function Inventario() {
                       <td>{p.nombre_externo || p.miembro_id || 'â€”'}</td>
                       <td style={{ color:'var(--text-muted)' }}>{new Date(p.fecha_salida).toLocaleDateString('es-DO')}</td>
                       <td style={{ color:'var(--text-muted)' }}>{p.fecha_retorno_esperada ? new Date(p.fecha_retorno_esperada).toLocaleDateString('es-DO') : 'â€”'}</td>
-                      <td><span className={`badge ${PRESTAMO_BADGE[p.estado]}`}>{p.estado}</span></td>
+                      <td><span className={`badge ${PRESTAMO_BADGE[p.estado]}`}>{{'prestado':'Prestado','devuelto':'Devuelto','perdido':'Perdido'}[p.estado] || p.estado}</span></td>
                       <td>
                         {p.estado === 'prestado' && (
                           <button className="btn btn-ghost" style={{ padding:'5px 12px', fontSize:12 }} onClick={()=>devolverPrestamo(p.id)}>âœ“ Devolver</button>
@@ -194,7 +194,7 @@ export default function Inventario() {
                 <input value={form.nombre} onChange={e=>setForm({...form,nombre:e.target.value})} className="form-input" required />
               </div>
               <div className="form-group">
-                <label className="form-label">CategorÃ­a *</label>
+                <label className="form-label">Categoría *</label>
                 <select value={form.categoria_id} onChange={e=>setForm({...form,categoria_id:e.target.value})} className="form-input" required>
                   <option value="">â€” Seleccionar â€”</option>
                   {categorias.map(c=><option key={c.id} value={c.id}>{c.nombre}</option>)}
@@ -203,7 +203,7 @@ export default function Inventario() {
               <div className="form-group">
                 <label className="form-label">Estado</label>
                 <select value={form.estado} onChange={e=>setForm({...form,estado:e.target.value})} className="form-input">
-                  {['excelente','bueno','regular','dañado','dado_de_baja'].map(e=><option key={e} value={e}>{e}</option>)}
+                  {[['excelente','Excelente'],['bueno','Bueno'],['regular','Regular'],['dañado','Dañado'],['dado_de_baja','Dado de baja']].map(([v,l])=><option key={v} value={v}>{l}</option>)}
                 </select>
               </div>
               <div className="form-group">
@@ -211,7 +211,7 @@ export default function Inventario() {
                 <input type="number" value={form.cantidad} onChange={e=>setForm({...form,cantidad:e.target.value})} className="form-input" min="0" />
               </div>
               <div className="form-group">
-                <label className="form-label">Valor adquisiciÃ³n</label>
+                <label className="form-label">Valor adquisición</label>
                 <input type="number" value={form.valor_adquisicion} onChange={e=>setForm({...form,valor_adquisicion:e.target.value})} className="form-input" min="0" step="0.01" />
               </div>
               <div className="form-group">
@@ -223,11 +223,11 @@ export default function Inventario() {
                 <input value={form.modelo} onChange={e=>setForm({...form,modelo:e.target.value})} className="form-input" />
               </div>
               <div className="form-group">
-                <label className="form-label">NÂ° de serie</label>
+                <label className="form-label">N° de serie</label>
                 <input value={form.numero_serie} onChange={e=>setForm({...form,numero_serie:e.target.value})} className="form-input" />
               </div>
               <div className="form-group">
-                <label className="form-label">UbicaciÃ³n</label>
+                <label className="form-label">Ubicación</label>
                 <input value={form.ubicacion} onChange={e=>setForm({...form,ubicacion:e.target.value})} className="form-input" />
               </div>
             </div>
