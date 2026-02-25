@@ -71,9 +71,10 @@ const hoy = () => new Date().toISOString().split('T')[0]
 
 export default function Asistencia() {
   const [confirmDel, setConfirmDel] = useState(null)
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!confirmDel) return
-    try { await deleteAsistencia(confirmDel); setConfirmDel(null); load() } catch(_) { mostrarError('No se pudo eliminar.') }
+    setRegistros(prev => prev.filter(r => r.id !== confirmDel))
+    setConfirmDel(null)
   }
 
   const [toast, setToast] = useState(null)
@@ -379,6 +380,7 @@ export default function Asistencia() {
     </div>
   )
 }
+
 
 
 

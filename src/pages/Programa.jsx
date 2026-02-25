@@ -284,7 +284,6 @@ export default function Programa() {
     } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
 
   const limpiar = async () => setConfirmDel('limpiar')
-  }
 
   const escucharTodo = () => {
     let texto = 'Programa de la semana. '
