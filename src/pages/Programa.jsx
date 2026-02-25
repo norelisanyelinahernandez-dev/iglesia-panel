@@ -282,7 +282,6 @@ export default function Programa() {
       setGuardado(true)
       setTimeout(() => setGuardado(false), 3000)
     } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
-  }
 
   const limpiar = async () => setConfirmDel('limpiar')
   }
