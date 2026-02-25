@@ -274,7 +274,6 @@ export default function Programa() {
     const nueva = [...semanaData]
     nueva[index] = data
     const nuevos = { ...programas, [semanaViendo]: nueva }
-    setProgramas(nuevos)
   }
 
   const guardar = async () => {
@@ -286,8 +285,6 @@ export default function Programa() {
   }
 
   const limpiar = async () => setConfirmDel('limpiar')
-    setProgramas(nuevos)
-    try { await savePrograma(semanaViendo, DIAS.map(emptyDia)) } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
   }
 
   const escucharTodo = () => {
