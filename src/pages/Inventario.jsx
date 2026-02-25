@@ -57,11 +57,24 @@ export default function Inventario() {
   const submitItem = async (e) => {
     e.preventDefault(); setSaving(true); setError('')
     try {
-      const payload = { ...form, categoria_id: parseInt(form.categoria_id), cantidad: parseInt(form.cantidad), valor_adquisicion: form.valor_adquisicion ? parseFloat(form.valor_adquisicion) : null }
+      const payload = {
+        categoria_id: parseInt(form.categoria_id),
+        nombre: form.nombre,
+        cantidad: parseInt(form.cantidad) || 1,
+        estado: form.estado || 'bueno',
+      }
+      if (form.descripcion) payload.descripcion = form.descripcion
+      if (form.numero_serie) payload.numero_serie = form.numero_serie
+      if (form.marca) payload.marca = form.marca
+      if (form.modelo) payload.modelo = form.modelo
+      if (form.ubicacion) payload.ubicacion = form.ubicacion
+      if (form.notas) payload.notas = form.notas
+      if (form.fecha_adquisicion) payload.fecha_adquisicion = form.fecha_adquisicion
+      if (form.valor_adquisicion) payload.valor_adquisicion = parseFloat(form.valor_adquisicion)
       if (editItem) await updateItem(editItem.id, payload)
       else await createItem(payload)
       await load(); setModal(null)
-    } catch(err) { setError(err.response?.data?.detail || 'Error') }
+    } catch(err) { setError(err.response?.data?.detail || JSON.stringify(err.response?.data) || 'Error') }
     setSaving(false)
   }
 
