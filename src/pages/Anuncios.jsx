@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import Toast from '../components/Toast'
 import { usePermisos } from '../context/PermisosContext'
 import { getAnuncios, createAnuncio, updateAnuncio, deleteAnuncio } from '../api/client'
@@ -32,6 +32,7 @@ const emptyForm = () => ({ titulo:'', contenido:'', prioridad:'media', fecha_exp
 
 export default function Anuncios() {
   const [toast, setToast] = useState(null)
+  const [confirmDel, setConfirmDel] = useState(null)
   const mostrarError = (msg) => setToast({ mensaje: msg, tipo: 'error' })
   const { puedeEditar } = usePermisos()
   const puedeEdit = puedeEditar('anuncios')
@@ -69,8 +70,11 @@ export default function Anuncios() {
   }
 
   const eliminar = async (id) => {
-    if (!confirm('¿Eliminar este anuncio?')) return
-    try { await deleteAnuncio(id); cargar() } catch(_) { mostrarError('Ocurrio un error inesperado. Intenta de nuevo.') }
+    setConfirmDel(id)
+  }
+  const handleDelete = async () => {
+    if (!confirmDel) return
+    try { await deleteAnuncio(confirmDel); setConfirmDel(null); cargar() } catch(_) { mostrarError('No se pudo eliminar.') }
   }
 
   const editar = (a) => {
@@ -97,7 +101,7 @@ export default function Anuncios() {
 
       {!loading && activos.length === 0 && (
         <div className="card" style={{ textAlign:'center', padding:40, color:'var(--text-muted)' }}>
-          <div style={{ fontSize:40, marginBottom:12 }}>📢</div>
+          <div style={{ fontSize:40, marginBottom:12 }}>ðŸ“¢</div>
           <p>No hay anuncios activos. Crea uno nuevo.</p>
         </div>
       )}
@@ -115,7 +119,7 @@ export default function Anuncios() {
                 </span>
                 {a.fecha_expira && (
                   <span style={{ color:'var(--text-muted)', fontSize:12 }}>
-                    · Expira: {new Date(a.fecha_expira).toLocaleDateString('es-DO')}
+                    Â· Expira: {new Date(a.fecha_expira).toLocaleDateString('es-DO')}
                   </span>
                 )}
               </div>
@@ -124,7 +128,7 @@ export default function Anuncios() {
             </div>
             <div style={{ display:'flex', gap:6, flexShrink:0 }}>
               <button className="btn btn-ghost" style={{ padding:'5px 10px', fontSize:12 }} onClick={() => editar(a)}>Editar</button>
-              <button className="btn btn-danger" style={{ padding:'5px 10px', fontSize:12 }} onClick={() => eliminar(a.id)}>✕</button>
+              <button className="btn btn-danger" style={{ padding:'5px 10px', fontSize:12 }} onClick={() => setConfirmDel(a.id)}>âœ•</button>
             </div>
           </div>
         </div>
@@ -138,9 +142,9 @@ export default function Anuncios() {
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                 <div>
                   <span style={{ fontWeight:600, fontSize:14 }}>{a.titulo}</span>
-                  <span style={{ color:'var(--text-muted)', fontSize:12, marginLeft:10 }}>Expiró: {new Date(a.fecha_expira).toLocaleDateString('es-DO')}</span>
+                  <span style={{ color:'var(--text-muted)', fontSize:12, marginLeft:10 }}>ExpirÃ³: {new Date(a.fecha_expira).toLocaleDateString('es-DO')}</span>
                 </div>
-                <button className="btn btn-danger" style={{ padding:'4px 10px', fontSize:12 }} onClick={() => eliminar(a.id)}>✕</button>
+                <button className="btn btn-danger" style={{ padding:'4px 10px', fontSize:12 }} onClick={() => setConfirmDel(a.id)}>âœ•</button>
               </div>
             </div>
           ))}
@@ -152,7 +156,7 @@ export default function Anuncios() {
           <div className="modal" style={{ maxWidth:520 }}>
             <div className="modal-header">
               <h3 className="modal-title">{editando !== null ? 'Editar anuncio' : 'Nuevo anuncio'}</h3>
-              <button className="modal-close" onClick={() => setModal(false)}>×</button>
+              <button className="modal-close" onClick={() => setModal(false)}>Ã—</button>
             </div>
             <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
               <div className="form-group">
@@ -161,7 +165,7 @@ export default function Anuncios() {
               </div>
               <div className="form-group">
                 <label className="form-label">Contenido *</label>
-                <textarea name="contenido" value={form.contenido} onChange={h} className="form-input" rows={4} style={{ resize:'vertical' }} placeholder="Escribe aquí el detalle del anuncio..." />
+                <textarea name="contenido" value={form.contenido} onChange={h} className="form-input" rows={4} style={{ resize:'vertical' }} placeholder="Escribe aquÃ­ el detalle del anuncio..." />
               </div>
               <div className="grid-2" style={{ gap:12 }}>
                 <div className="form-group">
@@ -173,7 +177,7 @@ export default function Anuncios() {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Fecha de expiración</label>
+                  <label className="form-label">Fecha de expiraciÃ³n</label>
                   <DatePicker name="fecha_expira" value={form.fecha_expira} onChange={h} />
                 </div>
               </div>
@@ -188,7 +192,23 @@ export default function Anuncios() {
         </div>
       )}
       {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onClose={() => setToast(null)} />}
+      {confirmDel && (
+        <div className="modal-overlay">
+          <div className="modal" style={{ maxWidth:380 }}>
+            <div style={{ textAlign:'center', padding:'10px 0 4px' }}>
+              <div style={{ fontSize:36, marginBottom:12 }}>&#x26A0;&#xFE0F;</div>
+              <h3 style={{ fontFamily:'var(--font-heading)', fontSize:18, marginBottom:8 }}>&#x00BF;Eliminar anuncio?</h3>
+              <p style={{ color:'var(--text-muted)', fontSize:13 }}>Esta accion no se puede deshacer.</p>
+            </div>
+            <div style={{ display:'flex', gap:10, marginTop:16 }}>
+              <button className="btn btn-ghost" style={{ flex:1 }} onClick={() => setConfirmDel(null)}>Cancelar</button>
+              <button className="btn btn-danger" style={{ flex:1, justifyContent:'center' }} onClick={handleDelete}>Si, eliminar</button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   )
 }
+
