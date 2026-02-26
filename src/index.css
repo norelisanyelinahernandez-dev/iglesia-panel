@@ -66,7 +66,19 @@ html, body, #root {
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 @keyframes shimmer {
@@ -232,7 +244,7 @@ tbody td { padding: 11px 14px; font-size: 13.5px; }
 .modal-close:hover { color: var(--text); }
 
 /* Page layout */
-.page { animation: fadeIn 0.3s ease; }
+.page { animation: fadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) both; }
 .page-header {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 24px;
@@ -318,3 +330,27 @@ tbody td { padding: 11px 14px; font-size: 13.5px; }
 }
 .search-bar input::placeholder { color: var(--text-dim); }
 .search-icon { color: var(--text-dim); font-size: 15px; }
+
+/* Animaciones de elementos */
+.card { animation: fadeInScale 0.3s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.stat-card { animation: fadeInScale 0.3s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.modal { animation: fadeInScale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.modal-overlay { animation: fadeIn 0.2s ease both; }
+.alert { animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.badge { transition: transform 0.15s ease; }
+.badge:hover { transform: scale(1.05); }
+
+/* Transicion suave en nav items */
+.nav-item { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important; }
+
+/* Delay escalonado para cards en grids */
+.grid-2 .card:nth-child(1), .grid-3 .card:nth-child(1), .grid-4 .card:nth-child(1) { animation-delay: 0.05s; }
+.grid-2 .card:nth-child(2), .grid-3 .card:nth-child(2), .grid-4 .card:nth-child(2) { animation-delay: 0.1s; }
+.grid-3 .card:nth-child(3), .grid-4 .card:nth-child(3) { animation-delay: 0.15s; }
+.grid-4 .card:nth-child(4) { animation-delay: 0.2s; }
+
+/* Transicion suave en botones */
+.btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important; }
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn-danger:hover { transform: translateY(-1px); }
