@@ -50,10 +50,10 @@ export default function Login() {
         {/* Selector de modo */}
         <div style={{ display:'flex', background:'var(--surface-2)', borderRadius:10, padding:4, marginBottom:20, gap:4 }}>
           <button type="button" onClick={() => setModo('admin')} style={{ flex:1, padding:'8px 0', borderRadius:8, border:'none', cursor:'pointer', fontWeight:600, fontSize:13, background: modo==='admin' ? 'var(--gold)' : 'transparent', color: modo==='admin' ? '#000' : 'var(--text-muted)', transition:'all .2s' }}>
-            ðŸ‘‘ Administración
+            👑 Administración
           </button>
           <button type="button" onClick={() => setModo('miembro')} style={{ flex:1, padding:'8px 0', borderRadius:8, border:'none', cursor:'pointer', fontWeight:600, fontSize:13, background: modo==='miembro' ? 'var(--gold)' : 'transparent', color: modo==='miembro' ? '#000' : 'var(--text-muted)', transition:'all .2s' }}>
-            ðŸ™ Soy miembro
+            🙏 Soy miembro
           </button>
         </div>
 
@@ -117,7 +117,7 @@ export default function Login() {
           <p style={{ fontStyle:'italic', fontSize:13, color:'var(--text-muted)', lineHeight:1.7 }}>
             "El que cree en mí, como dice la Escritura, de su interior correrán ríos de agua viva."
           </p>
-          <span style={{ color:'var(--gold)', fontSize:12, fontWeight:600 }}>â€” Juan 7:38</span>
+            <span style={{ color:'var(--gold)', fontSize:12, fontWeight:600 }}>— Juan 7:38</span>
         </div>
       </div>
     </div>
