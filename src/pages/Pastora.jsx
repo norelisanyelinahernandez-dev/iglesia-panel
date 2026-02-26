@@ -54,7 +54,7 @@ export default function Pastora() {
           <p className="page-subtitle">Información pastoral y ministerial</p>
         </div>
         {!editando && puedeEdit && (
-          <button className="btn btn-gold" onClick={() => { setForm(perfil); setEditando(true) }}>âœï¸ Editar perfil</button>
+          <button className="btn btn-gold" onClick={() => { setForm(perfil); setEditando(true) }}>✏️ Editar perfil</button>
         )}
       </div>
 
