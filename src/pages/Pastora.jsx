@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import Toast from '../components/Toast'
+import { usePermisos } from '../context/PermisosContext'
 import { getPastora, savePastora } from '../api/client'
 
 const EMPTY = { nombre:'', cargo:'', telefono:'', email:'', direccion:'', biografia:'', versiculo:'', anios_ministerio:'', especialidad:'', foto_url:'' }
@@ -7,6 +8,8 @@ const EMPTY = { nombre:'', cargo:'', telefono:'', email:'', direccion:'', biogra
 export default function Pastora() {
   const [toast, setToast] = useState(null)
   const mostrarError = (msg) => setToast({ mensaje: msg, tipo: 'error' })
+  const { puedeEditar } = usePermisos()
+  const puedeEdit = puedeEditar('pastora')
   const [perfil, setPerfil] = useState(EMPTY)
   const [editando, setEditando] = useState(false)
   const [form, setForm] = useState(EMPTY)
@@ -48,14 +51,14 @@ export default function Pastora() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Perfil de la Pastora</h1>
-          <p className="page-subtitle">Información pastoral y ministerial</p>
+          <p className="page-subtitle">InformaciÃ³n pastoral y ministerial</p>
         </div>
-        {!editando && (
-          <button className="btn btn-gold" onClick={() => { setForm(perfil); setEditando(true) }}>✏️ Editar perfil</button>
+        {!editando && puedeEdit && (
+          <button className="btn btn-gold" onClick={() => { setForm(perfil); setEditando(true) }}>âœï¸ Editar perfil</button>
         )}
       </div>
 
-      {guardado && <div className="alert alert-success" style={{ marginBottom:16 }}>✅ Perfil guardado correctamente</div>}
+      {guardado && <div className="alert alert-success" style={{ marginBottom:16 }}>âœ… Perfil guardado correctamente</div>}
 
       {!editando ? (
         <div style={{ display:'flex', gap:24, flexWrap:'wrap' }}>
@@ -63,35 +66,35 @@ export default function Pastora() {
             {perfil.foto_url ? (
               <img src={perfil.foto_url} alt="Foto pastora" style={{ width:140, height:140, borderRadius:'50%', objectFit:'cover', border:'3px solid var(--gold)', marginBottom:16 }} />
             ) : (
-              <div style={{ width:140, height:140, borderRadius:'50%', background:'var(--bg-card)', border:'3px solid var(--gold)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:48, margin:'0 auto 16px' }}>👩‍💼</div>
+              <div style={{ width:140, height:140, borderRadius:'50%', background:'var(--bg-card)', border:'3px solid var(--gold)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:48, margin:'0 auto 16px' }}>ðŸ‘©â€ðŸ’¼</div>
             )}
             <h2 style={{ fontFamily:'var(--font-heading)', fontSize:20, fontWeight:700, marginBottom:4 }}>{perfil.nombre || 'Sin nombre'}</h2>
             <div style={{ color:'var(--gold)', fontWeight:600, marginBottom:8 }}>{perfil.cargo || 'Pastora'}</div>
-            {perfil.anios_ministerio && <div style={{ color:'var(--text-muted)', fontSize:13 }}>{perfil.anios_ministerio} años en el ministerio</div>}
+            {perfil.anios_ministerio && <div style={{ color:'var(--text-muted)', fontSize:13 }}>{perfil.anios_ministerio} aÃ±os en el ministerio</div>}
           </div>
 
           <div style={{ flex:1, minWidth:280, display:'flex', flexDirection:'column', gap:16 }}>
             <div className="card">
               <div style={{ borderLeft:'3px solid var(--gold)', paddingLeft:10, marginBottom:14 }}>
-                <span style={{ fontFamily:'var(--font-heading)', fontWeight:700, fontSize:13, color:'var(--gold)', textTransform:'uppercase', letterSpacing:1 }}>Información de contacto</span>
+                <span style={{ fontFamily:'var(--font-heading)', fontWeight:700, fontSize:13, color:'var(--gold)', textTransform:'uppercase', letterSpacing:1 }}>InformaciÃ³n de contacto</span>
               </div>
-              {campo('Teléfono', perfil.telefono)}
+              {campo('TelÃ©fono', perfil.telefono)}
               {campo('Correo', perfil.email)}
-              {campo('Dirección', perfil.direccion)}
-              {!perfil.telefono && !perfil.email && !perfil.direccion && <p style={{ color:'var(--text-muted)', fontSize:13 }}>Sin información de contacto</p>}
+              {campo('DirecciÃ³n', perfil.direccion)}
+              {!perfil.telefono && !perfil.email && !perfil.direccion && <p style={{ color:'var(--text-muted)', fontSize:13 }}>Sin informaciÃ³n de contacto</p>}
             </div>
             <div className="card">
               <div style={{ borderLeft:'3px solid var(--gold)', paddingLeft:10, marginBottom:14 }}>
                 <span style={{ fontFamily:'var(--font-heading)', fontWeight:700, fontSize:13, color:'var(--gold)', textTransform:'uppercase', letterSpacing:1 }}>Ministerio</span>
               </div>
               {campo('Especialidad', perfil.especialidad)}
-              {campo('Biografía', perfil.biografia)}
-              {!perfil.especialidad && !perfil.biografia && <p style={{ color:'var(--text-muted)', fontSize:13 }}>Sin información ministerial</p>}
+              {campo('BiografÃ­a', perfil.biografia)}
+              {!perfil.especialidad && !perfil.biografia && <p style={{ color:'var(--text-muted)', fontSize:13 }}>Sin informaciÃ³n ministerial</p>}
             </div>
             {perfil.versiculo && (
               <div className="card" style={{ borderLeft:'3px solid var(--gold)' }}>
                 <p style={{ fontStyle:'italic', fontSize:15, color:'var(--text)', marginBottom:6 }}>"{perfil.versiculo}"</p>
-                <span style={{ color:'var(--gold)', fontSize:12, fontWeight:600 }}>— Versículo favorito</span>
+                <span style={{ color:'var(--gold)', fontSize:12, fontWeight:600 }}>â€” VersÃ­culo favorito</span>
               </div>
             )}
           </div>
@@ -100,7 +103,7 @@ export default function Pastora() {
         <div className="card" style={{ maxWidth:660 }}>
           <form onSubmit={guardar} style={{ display:'flex', flexDirection:'column', gap:14 }}>
             <div style={{ borderLeft:'3px solid var(--gold)', paddingLeft:10, marginBottom:4 }}>
-              <span style={{ fontFamily:'var(--font-heading)', fontWeight:700, fontSize:13, color:'var(--gold)', textTransform:'uppercase', letterSpacing:1 }}>Información Personal</span>
+              <span style={{ fontFamily:'var(--font-heading)', fontWeight:700, fontSize:13, color:'var(--gold)', textTransform:'uppercase', letterSpacing:1 }}>InformaciÃ³n Personal</span>
             </div>
             <div className="grid-2" style={{ gap:12 }}>
               <div className="form-group">
@@ -108,11 +111,11 @@ export default function Pastora() {
                 <input name="nombre" value={form.nombre} onChange={h} className="form-input" required />
               </div>
               <div className="form-group">
-                <label className="form-label">Cargo / Título</label>
+                <label className="form-label">Cargo / TÃ­tulo</label>
                 <input name="cargo" value={form.cargo} onChange={h} className="form-input" placeholder="Ej: Pastora Principal" />
               </div>
               <div className="form-group">
-                <label className="form-label">Teléfono</label>
+                <label className="form-label">TelÃ©fono</label>
                 <input name="telefono" value={form.telefono} onChange={h} className="form-input" />
               </div>
               <div className="form-group">
@@ -120,7 +123,7 @@ export default function Pastora() {
                 <input name="email" type="email" value={form.email} onChange={h} className="form-input" />
               </div>
               <div className="form-group">
-                <label className="form-label">Años en el ministerio</label>
+                <label className="form-label">AÃ±os en el ministerio</label>
                 <input name="anios_ministerio" value={form.anios_ministerio} onChange={h} className="form-input" placeholder="Ej: 15" />
               </div>
               <div className="form-group">
@@ -129,7 +132,7 @@ export default function Pastora() {
               </div>
             </div>
             <div className="form-group">
-              <label className="form-label">Dirección</label>
+              <label className="form-label">DirecciÃ³n</label>
               <input name="direccion" value={form.direccion} onChange={h} className="form-input" />
             </div>
             <div style={{ borderLeft:'3px solid var(--gold)', paddingLeft:10, margin:'8px 0 4px' }}>
@@ -140,16 +143,16 @@ export default function Pastora() {
               <input name="especialidad" value={form.especialidad} onChange={h} className="form-input" />
             </div>
             <div className="form-group">
-              <label className="form-label">Biografía</label>
+              <label className="form-label">BiografÃ­a</label>
               <textarea name="biografia" value={form.biografia} onChange={h} className="form-input" rows={4} style={{ resize:'vertical' }} />
             </div>
             <div className="form-group">
-              <label className="form-label">Versículo favorito</label>
+              <label className="form-label">VersÃ­culo favorito</label>
               <input name="versiculo" value={form.versiculo} onChange={h} className="form-input" placeholder="Ej: Juan 7:38" />
             </div>
             <div style={{ display:'flex', gap:10, justifyContent:'flex-end', marginTop:6 }}>
               <button type="button" className="btn btn-ghost" onClick={() => setEditando(false)}>Cancelar</button>
-              <button type="submit" className="btn btn-gold">💾 Guardar perfil</button>
+              <button type="submit" className="btn btn-gold">ðŸ’¾ Guardar perfil</button>
             </div>
           </form>
         </div>
@@ -159,3 +162,4 @@ export default function Pastora() {
     </div>
   )
 }
+
