@@ -66,7 +66,7 @@ export default function Pastora() {
             {perfil.foto_url ? (
               <img src={perfil.foto_url} alt="Foto pastora" style={{ width:140, height:140, borderRadius:'50%', objectFit:'cover', border:'3px solid var(--gold)', marginBottom:16 }} />
             ) : (
-              <div style={{ width:140, height:140, borderRadius:'50%', background:'var(--bg-card)', border:'3px solid var(--gold)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:48, margin:'0 auto 16px' }}>ðŸ‘©â€ðŸ’¼</div>
+        <div style={{ width:140, height:140, borderRadius:'50%', background:'var(--bg-card)', border:'3px solid var(--gold)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:48, margin:'0 auto 16px' }}>👩‍💼</div>
             )}
             <h2 style={{ fontFamily:'var(--font-heading)', fontSize:20, fontWeight:700, marginBottom:4 }}>{perfil.nombre || 'Sin nombre'}</h2>
             <div style={{ color:'var(--gold)', fontWeight:600, marginBottom:8 }}>{perfil.cargo || 'Pastora'}</div>
