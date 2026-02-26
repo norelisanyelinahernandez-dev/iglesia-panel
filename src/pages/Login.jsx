@@ -68,7 +68,7 @@ export default function Login() {
               </div>
               <div className="form-group">
                 <label className="form-label">Contraseña</label>
-                <input name="password" type="password" className="form-input" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" value={form.password} onChange={handle} required />
+                <input name="password" type="password" className="form-input" placeholder="••••••••" value={form.password} onChange={handle} required />
               </div>
             </>
           ) : (

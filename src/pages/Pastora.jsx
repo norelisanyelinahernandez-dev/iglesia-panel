@@ -80,7 +80,7 @@ export default function Pastora() {
               </div>
               {campo('Teléfono', perfil.telefono)}
               {campo('Correo', perfil.email)}
-              {campo('DirecciÃ³n', perfil.direccion)}
+              {campo('Dirección', perfil.direccion)}
               {!perfil.telefono && !perfil.email && !perfil.direccion && <p style={{ color:'var(--text-muted)', fontSize:13 }}>Sin información de contacto</p>}
             </div>
             <div className="card">
@@ -88,13 +88,13 @@ export default function Pastora() {
                 <span style={{ fontFamily:'var(--font-heading)', fontWeight:700, fontSize:13, color:'var(--gold)', textTransform:'uppercase', letterSpacing:1 }}>Ministerio</span>
               </div>
               {campo('Especialidad', perfil.especialidad)}
-              {campo('BiografÃ­a', perfil.biografia)}
+              {campo('Biografía', perfil.biografia)}
               {!perfil.especialidad && !perfil.biografia && <p style={{ color:'var(--text-muted)', fontSize:13 }}>Sin información ministerial</p>}
             </div>
             {perfil.versiculo && (
               <div className="card" style={{ borderLeft:'3px solid var(--gold)' }}>
                 <p style={{ fontStyle:'italic', fontSize:15, color:'var(--text)', marginBottom:6 }}>"{perfil.versiculo}"</p>
-                <span style={{ color:'var(--gold)', fontSize:12, fontWeight:600 }}>â€” VersÃ­culo favorito</span>
+                <span style={{ color:'var(--gold)', fontSize:12, fontWeight:600 }}>â€” Versículo favorito</span>
               </div>
             )}
           </div>
@@ -111,7 +111,7 @@ export default function Pastora() {
                 <input name="nombre" value={form.nombre} onChange={h} className="form-input" required />
               </div>
               <div className="form-group">
-                <label className="form-label">Cargo / TÃ­tulo</label>
+                <label className="form-label">Cargo / Título</label>
                 <input name="cargo" value={form.cargo} onChange={h} className="form-input" placeholder="Ej: Pastora Principal" />
               </div>
               <div className="form-group">
@@ -123,7 +123,7 @@ export default function Pastora() {
                 <input name="email" type="email" value={form.email} onChange={h} className="form-input" />
               </div>
               <div className="form-group">
-                <label className="form-label">AÃ±os en el ministerio</label>
+                <label className="form-label">Años en el ministerio</label>
                 <input name="anios_ministerio" value={form.anios_ministerio} onChange={h} className="form-input" placeholder="Ej: 15" />
               </div>
               <div className="form-group">
@@ -132,7 +132,7 @@ export default function Pastora() {
               </div>
             </div>
             <div className="form-group">
-              <label className="form-label">DirecciÃ³n</label>
+              <label className="form-label">Dirección</label>
               <input name="direccion" value={form.direccion} onChange={h} className="form-input" />
             </div>
             <div style={{ borderLeft:'3px solid var(--gold)', paddingLeft:10, margin:'8px 0 4px' }}>
@@ -143,11 +143,11 @@ export default function Pastora() {
               <input name="especialidad" value={form.especialidad} onChange={h} className="form-input" />
             </div>
             <div className="form-group">
-              <label className="form-label">BiografÃ­a</label>
+              <label className="form-label">Biografía</label>
               <textarea name="biografia" value={form.biografia} onChange={h} className="form-input" rows={4} style={{ resize:'vertical' }} />
             </div>
             <div className="form-group">
-              <label className="form-label">VersÃ­culo favorito</label>
+              <label className="form-label">Versículo favorito</label>
               <input name="versiculo" value={form.versiculo} onChange={h} className="form-input" placeholder="Ej: Juan 7:38" />
             </div>
             <div style={{ display:'flex', gap:10, justifyContent:'flex-end', marginTop:6 }}>
