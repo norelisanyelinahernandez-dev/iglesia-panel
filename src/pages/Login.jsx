@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import './Login.css'
@@ -24,10 +24,10 @@ export default function Login() {
         navigate('/')
       } else {
         await loginMiembro(esMenor ? { nombres: form.nombres, apellidos: form.apellidos, fecha_nacimiento: form.fecha_nacimiento } : { cedula: form.cedula })
-        navigate('/mi-perfil')
+        navigate('/miembro/')
       }
     } catch (err) {
-      setError(err.response?.data?.detail || 'No se encontraron datos con esa información')
+      setError(err.response?.data?.detail || 'No se encontraron datos con esa informaciÃ³n')
     } finally {
       setLoading(false)
     }
@@ -35,9 +35,9 @@ export default function Login() {
 
   return (
     <div className="login-bg">
-      <div className="deco-cross cross-1">✛</div>
-      <div className="deco-cross cross-2">✛</div>
-      <div className="deco-cross cross-3">✛</div>
+      <div className="deco-cross cross-1">âœ›</div>
+      <div className="deco-cross cross-2">âœ›</div>
+      <div className="deco-cross cross-3">âœ›</div>
       <div className="login-card fade-in">
         <div className="login-header">
           <div className="login-logo">
@@ -50,10 +50,10 @@ export default function Login() {
         {/* Selector de modo */}
         <div style={{ display:'flex', background:'var(--surface-2)', borderRadius:10, padding:4, marginBottom:20, gap:4 }}>
           <button type="button" onClick={() => setModo('admin')} style={{ flex:1, padding:'8px 0', borderRadius:8, border:'none', cursor:'pointer', fontWeight:600, fontSize:13, background: modo==='admin' ? 'var(--gold)' : 'transparent', color: modo==='admin' ? '#000' : 'var(--text-muted)', transition:'all .2s' }}>
-            👑 Administración
+            ðŸ‘‘ AdministraciÃ³n
           </button>
           <button type="button" onClick={() => setModo('miembro')} style={{ flex:1, padding:'8px 0', borderRadius:8, border:'none', cursor:'pointer', fontWeight:600, fontSize:13, background: modo==='miembro' ? 'var(--gold)' : 'transparent', color: modo==='miembro' ? '#000' : 'var(--text-muted)', transition:'all .2s' }}>
-            🙏 Soy miembro
+            ðŸ™ Soy miembro
           </button>
         </div>
 
@@ -63,12 +63,12 @@ export default function Login() {
           {modo === 'admin' ? (
             <>
               <div className="form-group">
-                <label className="form-label">Correo electrónico</label>
+                <label className="form-label">Correo electrÃ³nico</label>
                 <input name="email" type="email" className="form-input" placeholder="admin@iglesia.com" value={form.email} onChange={handle} required />
               </div>
               <div className="form-group">
-                <label className="form-label">Contraseña</label>
-                <input name="password" type="password" className="form-input" placeholder="••••••••" value={form.password} onChange={handle} required />
+                <label className="form-label">ContraseÃ±a</label>
+                <input name="password" type="password" className="form-input" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" value={form.password} onChange={handle} required />
               </div>
             </>
           ) : (
@@ -85,7 +85,7 @@ export default function Login() {
 
               {!esMenor ? (
                 <div className="form-group">
-                  <label className="form-label">Número de cédula</label>
+                  <label className="form-label">NÃºmero de cÃ©dula</label>
                   <input name="cedula" type="text" className="form-input" placeholder="000-0000000-0" value={form.cedula} onChange={handle} required />
                 </div>
               ) : (
@@ -108,18 +108,19 @@ export default function Login() {
           )}
 
           <button type="submit" className="btn btn-gold login-btn" disabled={loading}>
-            {loading ? <><span className="spinner" style={{width:16,height:16}} /> Buscando...</> : modo === 'admin' ? 'Iniciar sesión' : 'Entrar'}
+            {loading ? <><span className="spinner" style={{width:16,height:16}} /> Buscando...</> : modo === 'admin' ? 'Iniciar sesiÃ³n' : 'Entrar'}
           </button>
         </form>
 
-        <div className="login-divider"><span>Sistema de Gestión Integral</span></div>
+        <div className="login-divider"><span>Sistema de GestiÃ³n Integral</span></div>
         <div style={{ textAlign:'center', marginTop:16, padding:'0 8px' }}>
           <p style={{ fontStyle:'italic', fontSize:13, color:'var(--text-muted)', lineHeight:1.7 }}>
-            "El que cree en mí, como dice la Escritura, de su interior correrán ríos de agua viva."
+            "El que cree en mÃ­, como dice la Escritura, de su interior correrÃ¡n rÃ­os de agua viva."
           </p>
-          <span style={{ color:'var(--gold)', fontSize:12, fontWeight:600 }}>— Juan 7:38</span>
+          <span style={{ color:'var(--gold)', fontSize:12, fontWeight:600 }}>â€” Juan 7:38</span>
         </div>
       </div>
     </div>
   )
 }
+
