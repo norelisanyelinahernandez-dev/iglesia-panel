@@ -293,8 +293,7 @@ export default function Programa() {
       }
     }
 
-    // Auto-archivado: domingos despues de las 5pm para admin/pastor/secretaria
-    const ROLES_AUTOARCHIVO = ['admin','pastor','pastora','secretaria','secretario']
+    
     if (ROLES_AUTOARCHIVO.includes(rol)) {
       const ahora = new Date()
       const esDomingo = ahora.getDay() === 0
@@ -385,41 +384,6 @@ export default function Programa() {
 
 
   const descargarPDF = () => {
-    const lines = []
-    lines.push('PROGRAMA SEMANAL - MINISTERIO SAN JUAN 7:38')
-    lines.push('Semana: ' + semanaViendo)
-    lines.push('=' .repeat(50))
-    semanaData.forEach(d => {
-      lines.push('')
-      lines.push(d.dia.toUpperCase() + (d.tipo ? ' - ' + d.tipo : ' - Sin actividad'))
-      if (d.hora) lines.push('  Hora: ' + d.hora)
-      if (d.lugar) lines.push('  Lugar: ' + d.lugar)
-      if (d.pastor_visita) lines.push('  Pastor: ' + d.pastor_visita)
-      const partes = ['Oracion de apertura','Direccion','Devocional','Alabanzas','Mensaje','Oracion de cierre','Encargado del estudio','Encargado']
-      partes.forEach(parte => {
-        const pp = d.partes[parte]
-        if (pp) {
-          let nombre = 'Por asignar'
-          if (pp.tipo_asignado === 'externo') {
-            nombre = (pp.pastor_externo || 'Pastor externo') + ' de ' + (pp.congregacion_externa || 'otra congregacion')
-          } else {
-            const m = miembros.find(m => String(m.id) === String(pp.miembro_id))
-            if (m) nombre = m.nombres + ' ' + m.apellidos
-          }
-          lines.push('  ' + parte + ': ' + nombre)
-        }
-      })
-    })
-    lines.push('')
-    lines.push('Generado el ' + new Date().toLocaleDateString('es-DO'))
-    const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'programa-' + semanaViendo + '.txt'
-    a.click()
-    URL.revokeObjectURL(url)
-  }
 
   const limpiar = async () => setConfirmDel('limpiar')
 
