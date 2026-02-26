@@ -27,7 +27,7 @@ export default function Login() {
         navigate('/miembro/')
       }
     } catch (err) {
-      setError(err.response?.data?.detail || 'No se encontraron datos con esa informaciÃ³n')
+      setError(err.response?.data?.detail || 'No se encontraron datos con esa información')
     } finally {
       setLoading(false)
     }
@@ -50,7 +50,7 @@ export default function Login() {
         {/* Selector de modo */}
         <div style={{ display:'flex', background:'var(--surface-2)', borderRadius:10, padding:4, marginBottom:20, gap:4 }}>
           <button type="button" onClick={() => setModo('admin')} style={{ flex:1, padding:'8px 0', borderRadius:8, border:'none', cursor:'pointer', fontWeight:600, fontSize:13, background: modo==='admin' ? 'var(--gold)' : 'transparent', color: modo==='admin' ? '#000' : 'var(--text-muted)', transition:'all .2s' }}>
-            ðŸ‘‘ AdministraciÃ³n
+            ðŸ‘‘ Administración
           </button>
           <button type="button" onClick={() => setModo('miembro')} style={{ flex:1, padding:'8px 0', borderRadius:8, border:'none', cursor:'pointer', fontWeight:600, fontSize:13, background: modo==='miembro' ? 'var(--gold)' : 'transparent', color: modo==='miembro' ? '#000' : 'var(--text-muted)', transition:'all .2s' }}>
             ðŸ™ Soy miembro
@@ -63,11 +63,11 @@ export default function Login() {
           {modo === 'admin' ? (
             <>
               <div className="form-group">
-                <label className="form-label">Correo electrÃ³nico</label>
+                <label className="form-label">Correo electrónico</label>
                 <input name="email" type="email" className="form-input" placeholder="admin@iglesia.com" value={form.email} onChange={handle} required />
               </div>
               <div className="form-group">
-                <label className="form-label">ContraseÃ±a</label>
+                <label className="form-label">Contraseña</label>
                 <input name="password" type="password" className="form-input" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" value={form.password} onChange={handle} required />
               </div>
             </>
@@ -85,7 +85,7 @@ export default function Login() {
 
               {!esMenor ? (
                 <div className="form-group">
-                  <label className="form-label">NÃºmero de cÃ©dula</label>
+                  <label className="form-label">Número de cédula</label>
                   <input name="cedula" type="text" className="form-input" placeholder="000-0000000-0" value={form.cedula} onChange={handle} required />
                 </div>
               ) : (
@@ -108,14 +108,14 @@ export default function Login() {
           )}
 
           <button type="submit" className="btn btn-gold login-btn" disabled={loading}>
-            {loading ? <><span className="spinner" style={{width:16,height:16}} /> Buscando...</> : modo === 'admin' ? 'Iniciar sesiÃ³n' : 'Entrar'}
+            {loading ? <><span className="spinner" style={{width:16,height:16}} /> Buscando...</> : modo === 'admin' ? 'Iniciar sesión' : 'Entrar'}
           </button>
         </form>
 
-        <div className="login-divider"><span>Sistema de GestiÃ³n Integral</span></div>
+        <div className="login-divider"><span>Sistema de Gestión Integral</span></div>
         <div style={{ textAlign:'center', marginTop:16, padding:'0 8px' }}>
           <p style={{ fontStyle:'italic', fontSize:13, color:'var(--text-muted)', lineHeight:1.7 }}>
-            "El que cree en mÃ­, como dice la Escritura, de su interior correrÃ¡n rÃ­os de agua viva."
+            "El que cree en mí, como dice la Escritura, de su interior correrán ríos de agua viva."
           </p>
           <span style={{ color:'var(--gold)', fontSize:12, fontWeight:600 }}>â€” Juan 7:38</span>
         </div>

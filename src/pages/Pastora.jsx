@@ -51,7 +51,7 @@ export default function Pastora() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Perfil de la Pastora</h1>
-          <p className="page-subtitle">InformaciÃ³n pastoral y ministerial</p>
+          <p className="page-subtitle">Información pastoral y ministerial</p>
         </div>
         {!editando && puedeEdit && (
           <button className="btn btn-gold" onClick={() => { setForm(perfil); setEditando(true) }}>âœï¸ Editar perfil</button>
@@ -70,18 +70,18 @@ export default function Pastora() {
             )}
             <h2 style={{ fontFamily:'var(--font-heading)', fontSize:20, fontWeight:700, marginBottom:4 }}>{perfil.nombre || 'Sin nombre'}</h2>
             <div style={{ color:'var(--gold)', fontWeight:600, marginBottom:8 }}>{perfil.cargo || 'Pastora'}</div>
-            {perfil.anios_ministerio && <div style={{ color:'var(--text-muted)', fontSize:13 }}>{perfil.anios_ministerio} aÃ±os en el ministerio</div>}
+            {perfil.anios_ministerio && <div style={{ color:'var(--text-muted)', fontSize:13 }}>{perfil.anios_ministerio} años en el ministerio</div>}
           </div>
 
           <div style={{ flex:1, minWidth:280, display:'flex', flexDirection:'column', gap:16 }}>
             <div className="card">
               <div style={{ borderLeft:'3px solid var(--gold)', paddingLeft:10, marginBottom:14 }}>
-                <span style={{ fontFamily:'var(--font-heading)', fontWeight:700, fontSize:13, color:'var(--gold)', textTransform:'uppercase', letterSpacing:1 }}>InformaciÃ³n de contacto</span>
+                <span style={{ fontFamily:'var(--font-heading)', fontWeight:700, fontSize:13, color:'var(--gold)', textTransform:'uppercase', letterSpacing:1 }}>Información de contacto</span>
               </div>
-              {campo('TelÃ©fono', perfil.telefono)}
+              {campo('Teléfono', perfil.telefono)}
               {campo('Correo', perfil.email)}
               {campo('DirecciÃ³n', perfil.direccion)}
-              {!perfil.telefono && !perfil.email && !perfil.direccion && <p style={{ color:'var(--text-muted)', fontSize:13 }}>Sin informaciÃ³n de contacto</p>}
+              {!perfil.telefono && !perfil.email && !perfil.direccion && <p style={{ color:'var(--text-muted)', fontSize:13 }}>Sin información de contacto</p>}
             </div>
             <div className="card">
               <div style={{ borderLeft:'3px solid var(--gold)', paddingLeft:10, marginBottom:14 }}>
@@ -89,7 +89,7 @@ export default function Pastora() {
               </div>
               {campo('Especialidad', perfil.especialidad)}
               {campo('BiografÃ­a', perfil.biografia)}
-              {!perfil.especialidad && !perfil.biografia && <p style={{ color:'var(--text-muted)', fontSize:13 }}>Sin informaciÃ³n ministerial</p>}
+              {!perfil.especialidad && !perfil.biografia && <p style={{ color:'var(--text-muted)', fontSize:13 }}>Sin información ministerial</p>}
             </div>
             {perfil.versiculo && (
               <div className="card" style={{ borderLeft:'3px solid var(--gold)' }}>
@@ -103,7 +103,7 @@ export default function Pastora() {
         <div className="card" style={{ maxWidth:660 }}>
           <form onSubmit={guardar} style={{ display:'flex', flexDirection:'column', gap:14 }}>
             <div style={{ borderLeft:'3px solid var(--gold)', paddingLeft:10, marginBottom:4 }}>
-              <span style={{ fontFamily:'var(--font-heading)', fontWeight:700, fontSize:13, color:'var(--gold)', textTransform:'uppercase', letterSpacing:1 }}>InformaciÃ³n Personal</span>
+              <span style={{ fontFamily:'var(--font-heading)', fontWeight:700, fontSize:13, color:'var(--gold)', textTransform:'uppercase', letterSpacing:1 }}>Información Personal</span>
             </div>
             <div className="grid-2" style={{ gap:12 }}>
               <div className="form-group">
@@ -115,7 +115,7 @@ export default function Pastora() {
                 <input name="cargo" value={form.cargo} onChange={h} className="form-input" placeholder="Ej: Pastora Principal" />
               </div>
               <div className="form-group">
-                <label className="form-label">TelÃ©fono</label>
+                <label className="form-label">Teléfono</label>
                 <input name="telefono" value={form.telefono} onChange={h} className="form-input" />
               </div>
               <div className="form-group">
